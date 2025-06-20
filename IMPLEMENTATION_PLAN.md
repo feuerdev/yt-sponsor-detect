@@ -110,30 +110,30 @@ The extension will consist of three main components:
 
 ## 4. Milestones
 
-1.  **M1: Foundation (1 day)**
-    -   Set up `manifest.json` and file structure.
-    -   Implement caption interception in `background.js` and log parsed captions to the console.
+1.  **M1: Foundation (1 day) - Completed**
+    -   [x] Set up `manifest.json` and file structure.
+    -   [x] Implement caption interception in `background.js` and log parsed captions to the console.
 
-2.  **M2: Content Script & Communication (2 days)**
-    -   Inject `content.js` into YouTube pages.
-    -   Establish message passing between `background.js` and `content.js`.
-    -   Implement the caption buffering logic in `content.js`.
-    -   Implement chapter extraction and logging.
+2.  **M2: Content Script & Communication (2 days) - Completed**
+    -   [x] Inject `content.js` into YouTube pages.
+    -   [x] Establish message passing between `background.js` and `content.js`.
+    -   [x] Implement the caption buffering logic in `content.js`.
+    -   [x] Implement chapter extraction and logging.
 
-3.  **M3: Model Integration & Basic Detection (3 days)**
-    -   Integrate `Transformers.js` into the background script.
-    -   Load a pre-trained classification model.
-    -   Set up the pipeline to classify buffered caption text sent from the content script.
-    -   Log the classification result.
+3.  **M3: Model Integration & Basic Detection (3 days) - Completed**
+    -   [x] Integrate `Transformers.js` into the background script.
+    -   [x] Load a pre-trained classification model.
+    -   [x] Set up the pipeline to classify buffered caption text sent from the content script.
+    -   **Note**: For rapid prototyping, `Transformers.js` is currently loaded from a CDN. For production, this should be bundled with the extension.
 
-4.  **M4: End-to-End Skipping (2 days)**
-    -   Implement the video skipping logic in `content.js` based on the model's output.
-    -   Refine the detection threshold and buffer size for better accuracy.
+4.  **M4: End-to-End Skipping (2 days) - Completed**
+    -   [x] Implement the video skipping logic in `content.js` based on the model's output.
+    -   [x] Refine the detection threshold and buffer size for better accuracy.
 
-5.  **M5: UI & Refinements (2 days)**
-    -   Create a simple UI overlay to notify the user of a skip.
-    -   Add an options page to enable/disable the feature.
-    -   Test thoroughly and handle edge cases (live streams, videos without captions).
+5.  **M5: UI & Refinements (2 days) - Completed**
+    -   [x] Create a simple UI overlay to notify the user of a skip.
+    -   [x] Add an options page to enable/disable the feature.
+    -   [x] Test thoroughly and handle edge cases (live streams, videos without captions).
 
 ## 5. Potential Challenges
 
