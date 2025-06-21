@@ -2,6 +2,19 @@ import { classifyText } from './classifier.js';
 
 console.log("Background script loaded.");
 
+const OFFSCREEN_DOCUMENT_PATH = '/offscreen.html';
+
+async function getOffscreenDocument() {
+    if (await chrome.offscreen.hasDocument()) {
+        return;
+    }
+    await chrome.offscreen.createDocument({
+        url: OFFSCREEN_DOCUMENT_PATH,
+        reasons: [chrome.offscreen.Reason.DOM_PARSER],
+        justification: 'Parsing XML captions',
+    });
+}
+
 chrome.webRequest.onCompleted.addListener(
   (details) => {
     chrome.storage.sync.get({ isEnabled: true }, (data) => {
@@ -20,15 +33,12 @@ chrome.webRequest.onCompleted.addListener(
               }
               return response.text();
           })
-          .then(xmlText => {
-            const parser = new DOMParser();
-            const xmlDoc = parser.parseFromString(xmlText, "text/xml");
-            const textNodes = xmlDoc.getElementsByTagName("text");
-            const captions = Array.from(textNodes).map(node => ({
-              start: node.getAttribute("start"),
-              duration: node.getAttribute("dur"),
-              text: node.textContent.replace(/<\/?.*?>/g, "").replace(/\n/g, " ").trim()
-            }));
+          .then(async (xmlText) => {
+            await getOffscreenDocument();
+            const captions = await chrome.runtime.sendMessage({
+                type: 'parse-xml',
+                payload: xmlText,
+            });
             
             // Send captions to the active tab's content script
             chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
