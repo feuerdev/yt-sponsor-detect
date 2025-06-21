@@ -17,6 +17,9 @@ async function getOffscreenDocument() {
 
 chrome.webRequest.onCompleted.addListener(
   (details) => {
+    if (details.initiator === `chrome-extension://${chrome.runtime.id}`) {
+        return; // Ignore requests from the extension itself
+    }
     chrome.storage.sync.get({ isEnabled: true }, (data) => {
       if (!data.isEnabled) {
         return; // Do nothing if the feature is disabled
