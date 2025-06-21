@@ -6,13 +6,13 @@
   "permissions": ["scripting", "webRequest", "storage"],
   "host_permissions": ["*://*.youtube.com/*"],
   "background": {
-    "service_worker": "src/background.js",
+    "service_worker": "background.js",
     "type": "module"
   },
   "content_scripts": [
     {
       "matches": ["*://*.youtube.com/watch*"],
-      "js": ["src/content.js"]
+      "js": ["content.js"]
     }
   ],
   "action": {
