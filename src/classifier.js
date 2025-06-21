@@ -1,5 +1,3 @@
-import { pipeline } from '@xenova/transformers';
-
 /**
  * @class Classifier
  *
@@ -14,6 +12,16 @@ export class Classifier {
 
     static async getInstance(progress_callback = null) {
         if (this.instance === null) {
+            // Dynamically import the pipeline function based on the environment.
+            const { pipeline } = await (async () => {
+                if (typeof self !== 'undefined' && typeof self.chrome !== 'undefined') {
+                    // Running in the extension, so import from CDN.
+                    return import('https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1');
+                }
+                // Running in Node.js for local testing.
+                return import('@xenova/transformers');
+            })();
+
             this.instance = await pipeline(this.task, this.model, {
                 progress_callback,
                 quantized: false, // Full-precision model for better accuracy
