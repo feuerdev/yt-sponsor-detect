@@ -85,13 +85,3 @@ chrome.tabs.onRemoved.addListener((tabId) => {
         console.log(`Cleaned up buffer for closed tab: ${tabId}`);
     }
 });
-
-// This listener is no longer needed for caption analysis,
-// but we'll keep it for the chapter functionality.
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.type === "CHAPTERS_FOUND") {
-      console.log("Received chapters from content script:", request.payload);
-      // We can store or process these chapters later
-    }
-    return true;
-});

@@ -1,20 +1,5 @@
 console.log("Content script loaded.");
 
-// Function to extract chapters
-const extractChapters = () => {
-    try {
-        const data = window.ytInitialPlayerResponse;
-        const chapters = data?.playerOverlays?.playerOverlayRenderer?.decoratedPlayerBarRenderer?.decoratedPlayerBar?.playerBar?.chapteredPlayerBarRenderer?.chapters;
-        if (chapters) {
-            console.log("Found chapters:", chapters.map(c => ({ title: c.chapterRenderer.title.simpleText, startTime: c.chapterRenderer.timeRangeStartMillis })));
-            // Send chapters to background script
-            chrome.runtime.sendMessage({ type: "CHAPTERS_FOUND", payload: chapters });
-        }
-    } catch (e) {
-        console.error("Could not extract chapters", e);
-    }
-};
-
 // Listener for commands from the background script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === "SKIP_SEGMENT") {
@@ -55,10 +40,3 @@ const showSkipNotification = () => {
         notification.remove();
     }, 3000);
 };
-
-// Run chapter extraction once the page is loaded
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', extractChapters);
-} else {
-    extractChapters();
-}
