@@ -1,8 +1,5 @@
 console.log("Content script loaded.");
 
-let captionBuffer = [];
-const BUFFER_SIZE = 5; // Store the last 5 captions
-
 // Function to extract chapters
 const extractChapters = () => {
     try {
@@ -18,53 +15,21 @@ const extractChapters = () => {
     }
 };
 
-// Listener for captions from the background script
+// Listener for commands from the background script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.type === "CAPTIONS_RECEIVED") {
-    console.log("Received captions:", request.payload);
-    // Add new captions to the buffer
-    captionBuffer.push(...request.payload);
+  if (request.type === "SKIP_SEGMENT") {
+    const { skipToTime } = request.payload;
+    console.log(`Received skip command. Skipping to ${skipToTime}s`);
 
-    // Keep the buffer at a fixed size
-    if (captionBuffer.length > BUFFER_SIZE) {
-      captionBuffer = captionBuffer.slice(captionBuffer.length - BUFFER_SIZE);
-    }
-
-    const textToAnalyze = captionBuffer.map(c => c.text).join(' ');
-    console.log("Combined text from captions:", textToAnalyze);
-    // chrome.runtime.sendMessage({
-    //   type: "ANALYZE_TEXT",
-    //   payload: {
-    //     text: textToAnalyze,
-    //   }
-    // });
-  } else if (request.type === "ANALYSIS_RESULT") {
-    console.log("Received analysis result:", request.payload);
-    // The following logic is disabled because classification is currently off.
-    /*
-    const { block, scores } = request.payload;
-    const promotionalScore = scores['promotional content'] || 0;
-
-    // Check if the top label is 'sponsored' with a high confidence.
-    if (block) {
-        console.log(`Sponsor segment detected! Confidence: ${promotionalScore}. Skipping...`);
-
-        const video = document.querySelector('video');
-        if (video && captionBuffer.length > 0) {
-            const lastCaption = captionBuffer[captionBuffer.length - 1];
-            const skipToTime = parseFloat(lastCaption.start) + parseFloat(lastCaption.duration);
-
-            // Don't skip if we are already past that time
-            if (video.currentTime < skipToTime) {
-                video.currentTime = skipToTime;
-                console.log(`Skipped to ${skipToTime}s`);
-                showSkipNotification();
-                // Clear buffer to prevent immediate re-triggering
-                captionBuffer = [];
-            }
+    const video = document.querySelector('video');
+    if (video) {
+        // Don't skip if we are already past that time
+        if (video.currentTime < skipToTime) {
+            video.currentTime = skipToTime;
+            console.log(`Skipped to ${skipToTime}s`);
+            showSkipNotification();
         }
     }
-    */
   }
 });
 
