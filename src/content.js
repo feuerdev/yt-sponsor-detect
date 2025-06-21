@@ -41,29 +41,28 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   } else if (request.type === "ANALYSIS_RESULT") {
     console.log("Received analysis result:", request.payload);
     
-    const { classification, score } = request.payload;
+    const { block, scores } = request.payload;
+    const promotionalScore = scores['promotional content'] || 0;
 
-    chrome.storage.sync.get({ confidenceThreshold: 0.8 }, (data) => {
-        // Check if the top label is 'sponsored' with a high confidence.
-        if (classification === 'sponsored' && score > data.confidenceThreshold) {
-            console.log(`Sponsor segment detected! Confidence: ${score}. Threshold: ${data.confidenceThreshold}. Skipping...`);
+    // Check if the top label is 'sponsored' with a high confidence.
+    if (block) {
+        console.log(`Sponsor segment detected! Confidence: ${promotionalScore}. Skipping...`);
 
-            const video = document.querySelector('video');
-            if (video && captionBuffer.length > 0) {
-                const lastCaption = captionBuffer[captionBuffer.length - 1];
-                const skipToTime = parseFloat(lastCaption.start) + parseFloat(lastCaption.duration);
+        const video = document.querySelector('video');
+        if (video && captionBuffer.length > 0) {
+            const lastCaption = captionBuffer[captionBuffer.length - 1];
+            const skipToTime = parseFloat(lastCaption.start) + parseFloat(lastCaption.duration);
 
-                // Don't skip if we are already past that time
-                if (video.currentTime < skipToTime) {
-                    video.currentTime = skipToTime;
-                    console.log(`Skipped to ${skipToTime}s`);
-                    showSkipNotification();
-                    // Clear buffer to prevent immediate re-triggering
-                    captionBuffer = [];
-                }
+            // Don't skip if we are already past that time
+            if (video.currentTime < skipToTime) {
+                video.currentTime = skipToTime;
+                console.log(`Skipped to ${skipToTime}s`);
+                showSkipNotification();
+                // Clear buffer to prevent immediate re-triggering
+                captionBuffer = [];
             }
         }
-    });
+    }
   }
 });
 

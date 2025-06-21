@@ -49,22 +49,26 @@ chrome.webRequest.onCompleted.addListener(
   { urls: ["*://*.youtube.com/*"] }
 );
 
-chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     if (request.type === "CHAPTERS_FOUND") {
       console.log("Received chapters from content script:", request.payload);
       // We can store or process these chapters later
     } else if (request.type === "ANALYZE_TEXT") {
-        const result = await classifyText(request.payload.text);
-        console.log("Classification result:", result);
-
-        // Send result back to the content script
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            if (tabs[0]) {
-              chrome.tabs.sendMessage(tabs[0].id, {
-                type: "ANALYSIS_RESULT",
-                payload: result
-              });
-            }
+        chrome.storage.sync.get({ confidenceThreshold: 0.8 }, async (data) => {
+            const result = await classifyText(request.payload.text, data.confidenceThreshold);
+            console.log("Classification result:", result);
+    
+            // Send result back to the content script
+            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                if (tabs[0]) {
+                  chrome.tabs.sendMessage(tabs[0].id, {
+                    type: "ANALYSIS_RESULT",
+                    payload: result
+                  });
+                }
+            });
         });
+        return true; // Keep message channel open for async response
     }
+    return true;
 });

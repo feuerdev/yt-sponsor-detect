@@ -28,16 +28,20 @@ export class Classifier {
  * This is the single public entry point for the classification logic.
  * 
  * @param {string} text The text to classify.
- * @returns {Promise<{classification: string, score: number}>} An object containing the classification and confidence score.
+ * @param {number} threshold The confidence threshold to decide whether to block.
+ * @returns {Promise<{block: boolean, scores: Record<string, number>}>} An object containing the block decision and the scores for each label.
  */
-export async function classifyText(text) {
+export async function classifyText(text, threshold) {
     const classifier = await Classifier.getInstance();
     const result = await classifier(text, Classifier.labels);
 
-    const topResult = result.labels[0];
-    const topScore = result.scores[0];
+    const scores = result.labels.reduce((obj, label, index) => {
+        obj[label] = result.scores[index];
+        return obj;
+    }, {});
 
-    const classification = (topResult === 'promotional content') ? 'sponsored' : 'regular';
+    const promotionalScore = scores['promotional content'] || 0;
+    const block = promotionalScore > threshold;
     
-    return { classification, score: topScore };
+    return { block, scores };
 } 
