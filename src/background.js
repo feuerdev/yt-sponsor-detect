@@ -56,6 +56,7 @@ chrome.webRequest.onCompleted.addListener(
                 tabSegments[tabId] = { captions: [], wordCount: 0 }; // Reset for next segment
 
                 const textToAnalyze = segment.captions.map(c => c.text).join(' ');
+                console.debug(`Analyzing segment for tab ${tabId}: "${textToAnalyze}"`);
                 const result = await classifyText(textToAnalyze, confidenceThreshold);
 
                 if (result.block) {
