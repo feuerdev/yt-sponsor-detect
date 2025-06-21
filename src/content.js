@@ -31,16 +31,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 
     const textToAnalyze = captionBuffer.map(c => c.text).join(' ');
-    console.log("Sending text for analysis:", textToAnalyze);
-    chrome.runtime.sendMessage({
-      type: "ANALYZE_TEXT",
-      payload: {
-        text: textToAnalyze,
-      }
-    });
+    console.log("Combined text from captions:", textToAnalyze);
+    // chrome.runtime.sendMessage({
+    //   type: "ANALYZE_TEXT",
+    //   payload: {
+    //     text: textToAnalyze,
+    //   }
+    // });
   } else if (request.type === "ANALYSIS_RESULT") {
     console.log("Received analysis result:", request.payload);
-    
+    // The following logic is disabled because classification is currently off.
+    /*
     const { block, scores } = request.payload;
     const promotionalScore = scores['promotional content'] || 0;
 
@@ -63,6 +64,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             }
         }
     }
+    */
   }
 });
 
