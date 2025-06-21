@@ -14,7 +14,7 @@
   "author": "",
   "license": "UNLICENSED",
   "dependencies": {
-    "@xenova/transformers": "^2.17.1"
+    "@huggingface/transformers": "^3.5.2"
   },
   "devDependencies": {
     "vite": "^6.3.5",
