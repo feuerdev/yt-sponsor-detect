@@ -43,25 +43,27 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     
     const { classification, score } = request.payload;
 
-    // Check if the top label is 'sponsored' with a high confidence.
-    if (classification === 'sponsored' && score > 0.8) {
-      console.log(`Sponsor segment detected! Confidence: ${score}. Skipping...`);
+    chrome.storage.sync.get({ confidenceThreshold: 0.8 }, (data) => {
+        // Check if the top label is 'sponsored' with a high confidence.
+        if (classification === 'sponsored' && score > data.confidenceThreshold) {
+            console.log(`Sponsor segment detected! Confidence: ${score}. Threshold: ${data.confidenceThreshold}. Skipping...`);
 
-      const video = document.querySelector('video');
-      if (video && captionBuffer.length > 0) {
-        const lastCaption = captionBuffer[captionBuffer.length - 1];
-        const skipToTime = parseFloat(lastCaption.start) + parseFloat(lastCaption.duration);
-        
-        // Don't skip if we are already past that time
-        if (video.currentTime < skipToTime) {
-            video.currentTime = skipToTime;
-            console.log(`Skipped to ${skipToTime}s`);
-            showSkipNotification();
-            // Clear buffer to prevent immediate re-triggering
-            captionBuffer = [];
+            const video = document.querySelector('video');
+            if (video && captionBuffer.length > 0) {
+                const lastCaption = captionBuffer[captionBuffer.length - 1];
+                const skipToTime = parseFloat(lastCaption.start) + parseFloat(lastCaption.duration);
+
+                // Don't skip if we are already past that time
+                if (video.currentTime < skipToTime) {
+                    video.currentTime = skipToTime;
+                    console.log(`Skipped to ${skipToTime}s`);
+                    showSkipNotification();
+                    // Clear buffer to prevent immediate re-triggering
+                    captionBuffer = [];
+                }
+            }
         }
-      }
-    }
+    });
   }
 });
 
