@@ -21,6 +21,7 @@ chrome.webRequest.onCompleted.addListener(
     }
 
     if (details.url.includes("youtube.com/api/timedtext")) {
+      // The webRequest API doesn't provide the response body, so we re-fetch the URL to get the captions.
       try {
         const response = await fetch(details.url);
         if (!response.ok) {
