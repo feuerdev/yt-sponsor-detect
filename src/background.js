@@ -62,8 +62,9 @@ chrome.webRequest.onCompleted.addListener(
                     const startTime = parseFloat(segment.captions[0].start);
                     const lastCaption = segment.captions[segment.captions.length - 1];
                     const endTime = parseFloat(lastCaption.start) + parseFloat(lastCaption.duration);
+                    const confidence = result.scores['promotional content'];
 
-                    console.log(`Sponsored segment found for tab ${tabId}: ${startTime}s - ${endTime}s`);
+                    console.log(`Sponsored segment found for tab ${tabId}: "${textToAnalyze}" [${startTime}s - ${endTime}s] - Confidence: ${confidence.toFixed(2)}`);
                     chrome.tabs.sendMessage(tabId, {
                         type: "SPONSORED_SEGMENT_FOUND",
                         payload: { startTime, endTime }
