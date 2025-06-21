@@ -2,8 +2,8 @@ import { classifyText } from './classifier.js';
 
 console.log("Background script loaded.");
 
-const captionBuffers = {};
-const BUFFER_SIZE = 5; // Store the last 5 captions for each tab
+const tabSegments = {};
+const WORDS_PER_SEGMENT_THRESHOLD = 20;
 
 chrome.webRequest.onCompleted.addListener(
   async (details) => {
@@ -42,31 +42,33 @@ chrome.webRequest.onCompleted.addListener(
             
             if (captions.length === 0) return;
 
-            // Buffer management
             const tabId = details.tabId;
-            if (!captionBuffers[tabId]) {
-                captionBuffers[tabId] = [];
+            if (!tabSegments[tabId]) {
+                tabSegments[tabId] = { captions: [], wordCount: 0 };
             }
-            captionBuffers[tabId].push(...captions);
-            if (captionBuffers[tabId].length > BUFFER_SIZE) {
-                captionBuffers[tabId] = captionBuffers[tabId].slice(captionBuffers[tabId].length - BUFFER_SIZE);
-            }
-            const buffer = captionBuffers[tabId];
-            const textToAnalyze = buffer.map(c => c.text).join(' ');
 
-            // Classification
-            const result = await classifyText(textToAnalyze, confidenceThreshold);
-            if (result.block) {
-                console.log(`Sponsor segment detected in tab ${tabId}! Confidence: ${result.scores['promotional content']}. Skipping...`);
-                const lastCaption = buffer[buffer.length - 1];
-                const skipToTime = parseFloat(lastCaption.start) + parseFloat(lastCaption.duration);
+            tabSegments[tabId].captions.push(...captions);
+            const newWords = captions.reduce((sum, cap) => sum + cap.text.split(' ').length, 0);
+            tabSegments[tabId].wordCount += newWords;
 
-                chrome.tabs.sendMessage(tabId, {
-                    type: "SKIP_SEGMENT",
-                    payload: { skipToTime }
-                });
-                // Clear buffer to prevent immediate re-triggering
-                captionBuffers[tabId] = [];
+            if (tabSegments[tabId].wordCount >= WORDS_PER_SEGMENT_THRESHOLD) {
+                const segment = tabSegments[tabId];
+                tabSegments[tabId] = { captions: [], wordCount: 0 }; // Reset for next segment
+
+                const textToAnalyze = segment.captions.map(c => c.text).join(' ');
+                const result = await classifyText(textToAnalyze, confidenceThreshold);
+
+                if (result.block) {
+                    const startTime = parseFloat(segment.captions[0].start);
+                    const lastCaption = segment.captions[segment.captions.length - 1];
+                    const endTime = parseFloat(lastCaption.start) + parseFloat(lastCaption.duration);
+
+                    console.log(`Sponsored segment found for tab ${tabId}: ${startTime}s - ${endTime}s`);
+                    chrome.tabs.sendMessage(tabId, {
+                        type: "SPONSORED_SEGMENT_FOUND",
+                        payload: { startTime, endTime }
+                    });
+                }
             }
         }
       } catch (error) {
@@ -79,8 +81,8 @@ chrome.webRequest.onCompleted.addListener(
 
 // Clean up buffer when a tab is closed
 chrome.tabs.onRemoved.addListener((tabId) => {
-    if (captionBuffers[tabId]) {
-        delete captionBuffers[tabId];
-        console.log(`Cleaned up buffer for closed tab: ${tabId}`);
+    if (tabSegments[tabId]) {
+        delete tabSegments[tabId];
+        console.log(`Cleaned up segment data for closed tab: ${tabId}`);
     }
 });

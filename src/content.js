@@ -1,20 +1,13 @@
 console.log("Content script loaded.");
 
+const sponsoredSegments = [];
+
 // Listener for commands from the background script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-  if (request.type === "SKIP_SEGMENT") {
-    const { skipToTime } = request.payload;
-    console.log(`Received skip command. Skipping to ${skipToTime}s`);
-
-    const video = document.querySelector('video');
-    if (video) {
-        // Don't skip if we are already past that time
-        if (video.currentTime < skipToTime) {
-            video.currentTime = skipToTime;
-            console.log(`Skipped to ${skipToTime}s`);
-            showSkipNotification();
-        }
-    }
+  if (request.type === "SPONSORED_SEGMENT_FOUND") {
+    console.log("Received sponsored segment:", request.payload);
+    sponsoredSegments.push(request.payload);
+    console.log("All detected segments:", sponsoredSegments);
   }
 });
 
