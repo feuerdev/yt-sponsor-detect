@@ -36,19 +36,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
       type: "ANALYZE_TEXT",
       payload: {
         text: textToAnalyze,
-        labels: ['sponsored', 'regular']
       }
     });
   } else if (request.type === "ANALYSIS_RESULT") {
     console.log("Received analysis result:", request.payload);
     
-    // The top-scoring label is the first one in the labels array in the result.
-    const topLabel = request.payload.labels[0];
-    const topScore = request.payload.scores[0];
+    const { classification, score } = request.payload;
 
     // Check if the top label is 'sponsored' with a high confidence.
-    if (topLabel === 'sponsored' && topScore > 0.8) {
-      console.log(`Sponsor segment detected! Confidence: ${topScore}. Skipping...`);
+    if (classification === 'sponsored' && score > 0.8) {
+      console.log(`Sponsor segment detected! Confidence: ${score}. Skipping...`);
 
       const video = document.querySelector('video');
       if (video && captionBuffer.length > 0) {

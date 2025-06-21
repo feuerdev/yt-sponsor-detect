@@ -1,22 +1,6 @@
-import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1';
+import { classifyText } from './classifier.js';
 
 console.log("Background script loaded.");
-
-class PipelineSingleton {
-    static task = 'zero-shot-classification';
-    static model = 'Xenova/mobilebert-uncased-mnli';
-    static instance = null;
-
-    static async getInstance(progress_callback = null) {
-        if (this.instance === null) {
-            this.instance = await pipeline(this.task, this.model, {
-                progress_callback,
-                quantized: true
-            });
-        }
-        return this.instance;
-    }
-}
 
 chrome.webRequest.onCompleted.addListener(
   (details) => {
@@ -70,8 +54,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       console.log("Received chapters from content script:", request.payload);
       // We can store or process these chapters later
     } else if (request.type === "ANALYZE_TEXT") {
-        const classifier = await PipelineSingleton.getInstance();
-        const result = await classifier(request.payload.text, request.payload.labels);
+        const result = await classifyText(request.payload.text);
         console.log("Classification result:", result);
 
         // Send result back to the content script
