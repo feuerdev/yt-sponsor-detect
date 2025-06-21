@@ -1,0 +1,17 @@
+{
+  "name": "adblock",
+  "version": "0.1.0",
+  "description": "Automatically skips sponsored segments in YouTube videos.",
+  "main": "src/background.js",
+  "type": "module",
+  "scripts": {
+    "classify": "node classify.js",
+    "test": "node test_classifier.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "@xenova/transformers": "^2.17.1"
+  }
+}

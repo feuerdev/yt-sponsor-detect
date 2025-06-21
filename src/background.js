@@ -3,13 +3,16 @@ import { pipeline } from 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17
 console.log("Background script loaded.");
 
 class PipelineSingleton {
-    static task = 'text-classification';
-    static model = 'Xenova/distilbert-base-uncased-finetuned-sst-2-english';
+    static task = 'zero-shot-classification';
+    static model = 'Xenova/mobilebert-uncased-mnli';
     static instance = null;
 
     static async getInstance(progress_callback = null) {
         if (this.instance === null) {
-            this.instance = pipeline(this.task, this.model, { progress_callback });
+            this.instance = await pipeline(this.task, this.model, {
+                progress_callback,
+                quantized: true
+            });
         }
         return this.instance;
     }
@@ -68,7 +71,7 @@ chrome.runtime.onMessage.addListener(async (request, sender, sendResponse) => {
       // We can store or process these chapters later
     } else if (request.type === "ANALYZE_TEXT") {
         const classifier = await PipelineSingleton.getInstance();
-        const result = await classifier(request.payload);
+        const result = await classifier(request.payload.text, request.payload.labels);
         console.log("Classification result:", result);
 
         // Send result back to the content script

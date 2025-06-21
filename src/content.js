@@ -32,15 +32,23 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
 
     const textToAnalyze = captionBuffer.map(c => c.text).join(' ');
     console.log("Sending text for analysis:", textToAnalyze);
-    chrome.runtime.sendMessage({ type: "ANALYZE_TEXT", payload: textToAnalyze });
+    chrome.runtime.sendMessage({
+      type: "ANALYZE_TEXT",
+      payload: {
+        text: textToAnalyze,
+        labels: ['sponsored', 'regular']
+      }
+    });
   } else if (request.type === "ANALYSIS_RESULT") {
     console.log("Received analysis result:", request.payload);
-    const result = request.payload[0];
+    
+    // The top-scoring label is the first one in the labels array in the result.
+    const topLabel = request.payload.labels[0];
+    const topScore = request.payload.scores[0];
 
-    // Check if the result indicates a sponsor segment
-    // For the current model, 'POSITIVE' can be interpreted as a sponsor
-    if (result.label === 'POSITIVE' && result.score > 0.9) {
-      console.log("Sponsor segment detected! Skipping...");
+    // Check if the top label is 'sponsored' with a high confidence.
+    if (topLabel === 'sponsored' && topScore > 0.8) {
+      console.log(`Sponsor segment detected! Confidence: ${topScore}. Skipping...`);
 
       const video = document.querySelector('video');
       if (video && captionBuffer.length > 0) {
