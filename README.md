@@ -39,9 +39,9 @@ npm install
 
 To run a batch test against the sample data in `test_data.js`, use:
 ```bash
-npm run test:classifier
+npm run test
 ```
 
-To classify a single sentence from your terminal, use the `classify` script:
+To classify a single sentence from your terminal, use the `debug` script:
 ```bash
-npm run classify "this video is sponsored by" "sponsored,regular" 
+npm run debug "this video is sponsored by" "promotional content,neutral content"

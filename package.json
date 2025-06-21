@@ -5,7 +5,7 @@
   "main": "src/background.js",
   "type": "module",
   "scripts": {
-    "classify": "node classify.js",
+    "debug": "node debug.js",
     "test": "node test_classifier.js"
   },
   "keywords": [],

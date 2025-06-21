@@ -4,10 +4,9 @@ import { pipeline } from '@xenova/transformers';
  * @class Classifier
  *
  * @description
- * A singleton class for zero-shot text classification. This is an internal implementation
- * detail and should not be used directly by other parts of the application.
+ * A singleton class for zero-shot text classification.
  */
-class Classifier {
+export class Classifier {
     static task = 'zero-shot-classification';
     static model = 'Xenova/mobilebert-uncased-mnli';
     static labels = ['promotional content', 'neutral content']; // Source of truth for labels
