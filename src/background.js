@@ -2,19 +2,6 @@ import { classifyText } from './classifier.js';
 
 console.log("Background script loaded.");
 
-const OFFSCREEN_DOCUMENT_PATH = '/offscreen.html';
-
-async function getOffscreenDocument() {
-    if (await chrome.offscreen.hasDocument()) {
-        return;
-    }
-    await chrome.offscreen.createDocument({
-        url: OFFSCREEN_DOCUMENT_PATH,
-        reasons: [chrome.offscreen.Reason.DOM_PARSER],
-        justification: 'Parsing XML captions',
-    });
-}
-
 chrome.webRequest.onCompleted.addListener(
   (details) => {
     if (details.initiator === `chrome-extension://${chrome.runtime.id}`) {
@@ -36,22 +23,32 @@ chrome.webRequest.onCompleted.addListener(
               }
               return response.text();
           })
-          .then(async (xmlText) => {
-            await getOffscreenDocument();
-            const captions = await chrome.runtime.sendMessage({
-                type: 'parse-xml',
-                payload: xmlText,
-            });
-            
-            // Send captions to the active tab's content script
-            chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-              if (tabs[0]) {
-                chrome.tabs.sendMessage(tabs[0].id, {
-                  type: "CAPTIONS_RECEIVED",
-                  payload: captions
-                });
-              }
-            });
+          .then(async (responseText) => {
+            try {
+                const data = JSON.parse(responseText);
+                if (data && data.events) {
+                    const captions = data.events
+                        .filter(event => event.segs)
+                        .map(event => ({
+                            start: (event.tStartMs / 1000).toFixed(3),
+                            duration: (event.dDurationMs / 1000).toFixed(3),
+                            text: event.segs.map(s => s.utf8).join('').replace(/\n/g, ' ').trim()
+                        }))
+                        .filter(caption => caption.text);
+                    
+                    // Send captions to the active tab's content script
+                    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+                        if (tabs[0]) {
+                            chrome.tabs.sendMessage(tabs[0].id, {
+                                type: "CAPTIONS_RECEIVED",
+                                payload: captions
+                            });
+                        }
+                    });
+                }
+            } catch (e) {
+                console.error("Error parsing captions:", e, "Payload:", responseText);
+            }
           })
           .catch(error => {
             console.error("Error fetching or parsing captions:", error);

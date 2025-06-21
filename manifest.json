@@ -3,7 +3,7 @@
   "name": "YouTube Sponsor Skipper",
   "version": "0.1.0",
   "description": "Automatically skips sponsored segments in YouTube videos.",
-  "permissions": ["scripting", "webRequest", "storage", "offscreen"],
+  "permissions": ["scripting", "webRequest", "storage"],
   "host_permissions": ["*://*.youtube.com/*"],
   "background": {
     "service_worker": "src/background.js",
