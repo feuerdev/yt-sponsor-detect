@@ -20,6 +20,12 @@ const tabSegments = {};
 const MIN_TEXT_LENGTH = 1000; // User-defined minimum text length for a chunk
 const MAX_TEXT_LENGTH = 1500; // Failsafe character limit to prevent model errors
 
+function formatTime(totalSeconds) {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = Math.floor(totalSeconds % 60);
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
 async function analyzeCaptionChunk(tabId, captions, confidenceThreshold) {
     if (captions.length === 0) return;
 
@@ -42,7 +48,7 @@ async function analyzeCaptionChunk(tabId, captions, confidenceThreshold) {
 
         const tab = await chrome.tabs.get(tabId);
         if (tab.url && tab.url.includes("youtube.com/watch")) {
-            console.log(`Sponsored segment found for tab ${tabId}: "${textToAnalyze.substring(0,100)}..." [${startTime}s - ${endTime}s] - Confidence: ${promotionalScore.toFixed(2)}`);
+            console.log(`Sponsored segment found for tab ${tabId}: "${textToAnalyze}" [${formatTime(startTime)} - ${formatTime(endTime)}] - Confidence: ${promotionalScore.toFixed(2)}`);
             chrome.tabs.sendMessage(tabId, {
                 type: "SPONSORED_SEGMENT_FOUND",
                 payload: { startTime, endTime }
