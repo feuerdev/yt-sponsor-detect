@@ -17,8 +17,39 @@ const PROD_LABELS = [
 const PROD_PROMOTIONAL_LABEL = PROD_LABELS[0];
 
 const tabSegments = {};
-const WORDS_PER_SEGMENT_THRESHOLD = 50;
+const MIN_TEXT_LENGTH = 1000; // User-defined minimum text length for a chunk
 const MAX_TEXT_LENGTH = 1500; // Failsafe character limit to prevent model errors
+
+async function analyzeCaptionChunk(tabId, captions, confidenceThreshold) {
+    if (captions.length === 0) return;
+
+    let textToAnalyze = captions.map(c => c.text).join(' ');
+    // The chunking logic should prevent this, but as a safeguard:
+    if (textToAnalyze.length > MAX_TEXT_LENGTH) {
+        textToAnalyze = textToAnalyze.substring(0, MAX_TEXT_LENGTH);
+    }
+
+    const scores = await classifyText(textToAnalyze, PROD_LABELS);
+    const promotionalScore = scores[PROD_PROMOTIONAL_LABEL] || 0;
+
+    console.log(`Analyzing segment for tab ${tabId}: "${textToAnalyze.substring(0,100)}..."`);
+    console.log(`Classification scores:`, JSON.stringify(scores));
+
+    if (promotionalScore > confidenceThreshold) {
+        const startTime = parseFloat(captions[0].start);
+        const lastCaption = captions[captions.length - 1];
+        const endTime = parseFloat(lastCaption.start) + parseFloat(lastCaption.duration);
+
+        const tab = await chrome.tabs.get(tabId);
+        if (tab.url && tab.url.includes("youtube.com/watch")) {
+            console.log(`Sponsored segment found for tab ${tabId}: "${textToAnalyze.substring(0,100)}..." [${startTime}s - ${endTime}s] - Confidence: ${promotionalScore.toFixed(2)}`);
+            chrome.tabs.sendMessage(tabId, {
+                type: "SPONSORED_SEGMENT_FOUND",
+                payload: { startTime, endTime }
+            });
+        }
+    }
+}
 
 chrome.webRequest.onCompleted.addListener(
   async (details) => {
@@ -59,38 +90,48 @@ chrome.webRequest.onCompleted.addListener(
 
             const tabId = details.tabId;
             if (!tabSegments[tabId]) {
-                tabSegments[tabId] = { captions: [], wordCount: 0 };
+                tabSegments[tabId] = { captions: [] };
             }
 
             tabSegments[tabId].captions.push(...captions);
-            const newWords = captions.reduce((sum, cap) => sum + cap.text.split(' ').length, 0);
-            tabSegments[tabId].wordCount += newWords;
+            
+            const accumulatedTextLength = tabSegments[tabId].captions.reduce((sum, cap) => sum + cap.text.length + 1, 0);
 
-            if (tabSegments[tabId].wordCount >= WORDS_PER_SEGMENT_THRESHOLD) {
-                const segment = tabSegments[tabId];
-                tabSegments[tabId] = { captions: [], wordCount: 0 }; // Reset for next segment
+            if (accumulatedTextLength >= MIN_TEXT_LENGTH) {
+                let allCaptions = tabSegments[tabId].captions;
+                tabSegments[tabId] = { captions: [] }; // Reset for next segment
 
-                let textToAnalyze = segment.captions.map(c => c.text).join(' ');
-                if (textToAnalyze.length > MAX_TEXT_LENGTH) {
-                    textToAnalyze = textToAnalyze.substring(0, MAX_TEXT_LENGTH);
-                }
-                const scores = await classifyText(textToAnalyze, PROD_LABELS);
+                while (allCaptions.length > 0) {
+                    let chunkCaptions = [];
+                    let chunkLength = 0;
+                    let lastGoodIndex = -1;
 
-                const promotionalScore = scores[PROD_PROMOTIONAL_LABEL] || 0;
+                    // Greedily build a chunk up to MAX_TEXT_LENGTH
+                    for (let i = 0; i < allCaptions.length; i++) {
+                        const caption = allCaptions[i];
+                        const newLength = chunkLength + (caption.text + ' ').length;
+                        
+                        if (newLength > MAX_TEXT_LENGTH && i > 0) {
+                            break; 
+                        }
+                        
+                        chunkLength = newLength;
 
-                if (promotionalScore > confidenceThreshold) {
-                    const startTime = parseFloat(segment.captions[0].start);
-                    const lastCaption = segment.captions[segment.captions.length - 1];
-                    const endTime = parseFloat(lastCaption.start) + parseFloat(lastCaption.duration);
+                        if (chunkLength >= MIN_TEXT_LENGTH) {
+                            lastGoodIndex = i;
+                        }
+                    }
 
-                    const tab = await chrome.tabs.get(tabId);
-                    if (tab.url && tab.url.includes("youtube.com/watch")) {
-                        console.log(`Sponsored segment found for tab ${tabId}: "${textToAnalyze}" [${startTime}s - ${endTime}s] - Confidence: ${promotionalScore.toFixed(2)}`);
-                        console.log(`Classification scores:`, JSON.stringify(scores));
-                        chrome.tabs.sendMessage(tabId, {
-                            type: "SPONSORED_SEGMENT_FOUND",
-                            payload: { startTime, endTime }
-                        });
+                    if (lastGoodIndex !== -1) {
+                        // We have a chunk that's >= MIN_TEXT_LENGTH and <= MAX_TEXT_LENGTH
+                        chunkCaptions = allCaptions.slice(0, lastGoodIndex + 1);
+                        await analyzeCaptionChunk(tabId, chunkCaptions, confidenceThreshold);
+                        allCaptions = allCaptions.slice(lastGoodIndex + 1);
+                    } else {
+                        // Could not form a chunk of MIN_TEXT_LENGTH.
+                        // Put remaining captions back to be processed with the next batch.
+                        tabSegments[tabId].captions = allCaptions;
+                        break; // Exit the while loop
                     }
                 }
             }
