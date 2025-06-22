@@ -18,7 +18,7 @@ const PROD_PROMOTIONAL_LABEL = PROD_LABELS[0];
 
 const tabSegments = {};
 const MIN_TEXT_LENGTH = 1000; // User-defined minimum text length for a chunk
-const MAX_TEXT_LENGTH = 1500; // Failsafe character limit to prevent model errors
+const MAX_TEXT_LENGTH = 1400; // Failsafe character limit to prevent model errors
 
 function formatTime(totalSeconds) {
     const minutes = Math.floor(totalSeconds / 60);
