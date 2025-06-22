@@ -2,10 +2,17 @@ console.log("Content script loaded.");
 
 const sponsoredSegments = [];
 
+function formatTime(totalSeconds) {
+    const minutes = Math.floor(totalSeconds / 60);
+    const seconds = Math.floor(totalSeconds % 60);
+    return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+}
+
 // Listener for commands from the background script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === "SPONSORED_SEGMENT_FOUND") {
-    console.log("Received sponsored segment:", request.payload);
+    const { startTime, endTime } = request.payload;
+    console.log(`Received sponsored segment: [${formatTime(startTime)} - ${formatTime(endTime)}]`);
     sponsoredSegments.push(request.payload);
   }
 });
