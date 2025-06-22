@@ -18,6 +18,7 @@ const PROD_PROMOTIONAL_LABEL = PROD_LABELS[0];
 
 const tabSegments = {};
 const WORDS_PER_SEGMENT_THRESHOLD = 50;
+const MAX_TEXT_LENGTH = 1500; // Failsafe character limit to prevent model errors
 
 chrome.webRequest.onCompleted.addListener(
   async (details) => {
@@ -69,7 +70,10 @@ chrome.webRequest.onCompleted.addListener(
                 const segment = tabSegments[tabId];
                 tabSegments[tabId] = { captions: [], wordCount: 0 }; // Reset for next segment
 
-                const textToAnalyze = segment.captions.map(c => c.text).join(' ');
+                let textToAnalyze = segment.captions.map(c => c.text).join(' ');
+                if (textToAnalyze.length > MAX_TEXT_LENGTH) {
+                    textToAnalyze = textToAnalyze.substring(0, MAX_TEXT_LENGTH);
+                }
                 const scores = await classifyText(textToAnalyze, PROD_LABELS);
 
                 const promotionalScore = scores[PROD_PROMOTIONAL_LABEL] || 0;
