@@ -93,11 +93,16 @@ chrome.webRequest.onCompleted.addListener(
                     const lastCaption = segment.captions[segment.captions.length - 1];
                     const endTime = parseFloat(lastCaption.start) + parseFloat(lastCaption.duration);
 
-                    console.log(`Sponsored segment found for tab ${tabId}: "${textToAnalyze}" [${startTime}s - ${endTime}s] - Highest Confidence: ${highestConfidence.toFixed(2)}`);
-                    chrome.tabs.sendMessage(tabId, {
-                        type: "SPONSORED_SEGMENT_FOUND",
-                        payload: { startTime, endTime }
-                    });
+                    // Before sending a message, verify the tab is a YouTube watch page
+                    // where the content script is expected to be running.
+                    const tab = await chrome.tabs.get(tabId);
+                    if (tab.url && tab.url.includes("youtube.com/watch")) {
+                        console.log(`Sponsored segment found for tab ${tabId}: "${textToAnalyze}" [${startTime}s - ${endTime}s] - Highest Confidence: ${highestConfidence.toFixed(2)}`);
+                        chrome.tabs.sendMessage(tabId, {
+                            type: "SPONSORED_SEGMENT_FOUND",
+                            payload: { startTime, endTime }
+                        });
+                    }
                 }
             }
         }
