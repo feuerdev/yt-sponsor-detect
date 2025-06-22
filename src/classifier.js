@@ -34,7 +34,7 @@ export class Classifier {
  */
 export async function classifyText(text, labels) {
     const classifier = await Classifier.getInstance();
-    const result = await classifier(text, labels);
+    const result = await classifier(text, labels, { truncation: true });
 
     const scores = result.labels.reduce((obj, label, index) => {
         obj[label] = result.scores[index];
