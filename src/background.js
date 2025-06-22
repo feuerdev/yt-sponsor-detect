@@ -63,7 +63,7 @@ chrome.webRequest.onCompleted.addListener(
                 const segment = tabSegments[tabId];
                 tabSegments[tabId] = { captions: [], wordCount: 0 }; // Reset for next segment
 
-                const MAX_CHUNK_LENGTH = 500; // Heuristic character limit per chunk
+                const MAX_CHUNK_LENGTH = 100; // Heuristic character limit per chunk
                 const captionChunks = [];
                 let currentChunk = [];
                 let currentChunkLength = 0;
@@ -95,6 +95,7 @@ chrome.webRequest.onCompleted.addListener(
                         const tab = await chrome.tabs.get(tabId);
                         if (tab.url && tab.url.includes("youtube.com/watch")) {
                             console.log(`Sponsored segment found for tab ${tabId}: "${textToAnalyze}" [${startTime}s - ${endTime}s] - Confidence: ${confidence.toFixed(2)}`);
+                            console.log(`Classification scores:`, JSON.stringify(result.scores));
                             chrome.tabs.sendMessage(tabId, {
                                 type: "SPONSORED_SEGMENT_FOUND",
                                 payload: { startTime, endTime }
