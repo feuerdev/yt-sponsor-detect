@@ -1,5 +1,5 @@
 import { env } from '@xenova/transformers';
-import { classifyText, PROMOTIONAL_LABEL } from './classifier.js';
+import { classifyText } from './classifier.js';
 
 // Due to a bug in onnxruntime-web, we must disable multithreading for now.
 // See https://github.com/microsoft/onnxruntime/issues/14445 for more information.
@@ -9,6 +9,12 @@ env.allowRemoteModels = true;
 env.allowLocalModels = false;
 
 console.log("Background script loaded.");
+
+const PROD_LABELS = [
+    "This is a paid promotion, endorsement, or sponsorship.",
+    "This is neutral, normal, or regular content."
+];
+const PROD_PROMOTIONAL_LABEL = PROD_LABELS[0];
 
 const tabSegments = {};
 const WORDS_PER_SEGMENT_THRESHOLD = 20;
@@ -84,18 +90,19 @@ chrome.webRequest.onCompleted.addListener(
 
                 for (const captionChunk of captionChunks) {
                     const textToAnalyze = captionChunk.map(c => c.text).join(' ');
-                    const result = await classifyText(textToAnalyze, confidenceThreshold);
+                    const scores = await classifyText(textToAnalyze, PROD_LABELS);
 
-                    if (result.block) {
+                    const promotionalScore = scores[PROD_PROMOTIONAL_LABEL] || 0;
+
+                    if (promotionalScore > confidenceThreshold) {
                         const startTime = parseFloat(captionChunk[0].start);
                         const lastCaption = captionChunk[captionChunk.length - 1];
                         const endTime = parseFloat(lastCaption.start) + parseFloat(lastCaption.duration);
-                        const confidence = result.scores[PROMOTIONAL_LABEL];
 
                         const tab = await chrome.tabs.get(tabId);
                         if (tab.url && tab.url.includes("youtube.com/watch")) {
-                            console.log(`Sponsored segment found for tab ${tabId}: "${textToAnalyze}" [${startTime}s - ${endTime}s] - Confidence: ${confidence.toFixed(2)}`);
-                            console.log(`Classification scores:`, JSON.stringify(result.scores));
+                            console.log(`Sponsored segment found for tab ${tabId}: "${textToAnalyze}" [${startTime}s - ${endTime}s] - Confidence: ${promotionalScore.toFixed(2)}`);
+                            console.log(`Classification scores:`, JSON.stringify(scores));
                             chrome.tabs.sendMessage(tabId, {
                                 type: "SPONSORED_SEGMENT_FOUND",
                                 payload: { startTime, endTime }

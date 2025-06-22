@@ -12,10 +12,6 @@ export const NEUTRAL_LABEL = 'neutral';
 export class Classifier {
     static task = 'zero-shot-classification';
     static model = 'Xenova/mobilebert-uncased-mnli';
-    static labels = [
-        "This is a paid promotion, endorsement, or sponsorship.",
-        "This is neutral, normal, or regular content."
-    ];
     static instance = null;
 
     static async getInstance(progress_callback = null) {
@@ -30,25 +26,20 @@ export class Classifier {
 }
 
 /**
- * Classifies a given text as either 'sponsored' or 'regular'.
- * This is the single public entry point for the classification logic.
+ * Classifies a given text against a set of candidate labels.
  * 
  * @param {string} text The text to classify.
- * @param {number} threshold The confidence threshold to decide whether to block.
- * @returns {Promise<{block: boolean, scores: Record<string, number>}>} An object containing the block decision and the scores for each label.
+ * @param {string[]} labels The candidate labels to test against.
+ * @returns {Promise<Record<string, number>>} An object containing the scores for each label.
  */
-export async function classifyText(text, threshold) {
+export async function classifyText(text, labels) {
     const classifier = await Classifier.getInstance();
-    const result = await classifier(text, Classifier.labels);
+    const result = await classifier(text, labels);
 
     const scores = result.labels.reduce((obj, label, index) => {
-        let key = label.includes('promotion') ? PROMOTIONAL_LABEL : NEUTRAL_LABEL;
-        obj[key] = result.scores[index];
+        obj[label] = result.scores[index];
         return obj;
     }, {});
-
-    const promotionalScore = scores[PROMOTIONAL_LABEL] || 0;
-    const block = promotionalScore > threshold;
     
-    return { block, scores };
+    return scores;
 } 
