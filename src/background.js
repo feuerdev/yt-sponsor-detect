@@ -150,6 +150,17 @@ chrome.webRequest.onCompleted.addListener(
   { urls: ["*://*.youtube.com/*"] }
 );
 
+// Listen for messages from content scripts
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.type === "NEW_VIDEO_LOADED" && sender.tab) {
+        const tabId = sender.tab.id;
+        if (tabSegments[tabId]) {
+            delete tabSegments[tabId];
+            console.log(`Cleaned up segment data for new video on tab: ${tabId}`);
+        }
+    }
+});
+
 // Clean up buffer when a tab is closed
 chrome.tabs.onRemoved.addListener((tabId) => {
     if (tabSegments[tabId]) {
