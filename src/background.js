@@ -27,7 +27,7 @@ chrome.webRequest.onCompleted.addListener(
     
     const { isEnabled, confidenceThreshold } = await chrome.storage.sync.get({ 
         isEnabled: true, 
-        confidenceThreshold: 0.80 
+        confidenceThreshold: 0.85 
     });
 
     if (!isEnabled || details.tabId < 0) {
