@@ -64,16 +64,36 @@ chrome.webRequest.onCompleted.addListener(
                 tabSegments[tabId] = { captions: [], wordCount: 0 }; // Reset for next segment
 
                 const textToAnalyze = segment.captions.map(c => c.text).join(' ');
-                console.debug(`Analyzing segment for tab ${tabId}: "${textToAnalyze}"`);
-                const result = await classifyText(textToAnalyze, confidenceThreshold);
+                
+                // The transformer model has a token limit (e.g., 512 tokens).
+                // To avoid errors with long inputs, we process the text in chunks.
+                const MAX_CHUNK_LENGTH = 1500; // Heuristic character limit per chunk
+                const chunks = [];
+                for (let i = 0; i < textToAnalyze.length; i += MAX_CHUNK_LENGTH) {
+                    chunks.push(textToAnalyze.substring(i, i + MAX_CHUNK_LENGTH));
+                }
 
-                if (result.block) {
+                let isSponsored = false;
+                let highestConfidence = 0;
+
+                for (const chunk of chunks) {
+                    console.debug(`Analyzing chunk for tab ${tabId}: "${chunk}"`);
+                    const result = await classifyText(chunk, confidenceThreshold);
+                    if (result.block) {
+                        isSponsored = true;
+                        const promotionalScore = result.scores['promotional content'];
+                        if (promotionalScore > highestConfidence) {
+                            highestConfidence = promotionalScore;
+                        }
+                    }
+                }
+
+                if (isSponsored) {
                     const startTime = parseFloat(segment.captions[0].start);
                     const lastCaption = segment.captions[segment.captions.length - 1];
                     const endTime = parseFloat(lastCaption.start) + parseFloat(lastCaption.duration);
-                    const confidence = result.scores['promotional content'];
 
-                    console.log(`Sponsored segment found for tab ${tabId}: "${textToAnalyze}" [${startTime}s - ${endTime}s] - Confidence: ${confidence.toFixed(2)}`);
+                    console.log(`Sponsored segment found for tab ${tabId}: "${textToAnalyze}" [${startTime}s - ${endTime}s] - Highest Confidence: ${highestConfidence.toFixed(2)}`);
                     chrome.tabs.sendMessage(tabId, {
                         type: "SPONSORED_SEGMENT_FOUND",
                         payload: { startTime, endTime }
