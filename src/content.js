@@ -40,9 +40,51 @@ const showSkipNotification = () => {
     }, 3000);
 };
 
+function updateProgressBarHighlights() {
+    const progressBar = document.querySelector('.ytp-progress-bar');
+    const video = document.querySelector('video');
+
+    if (!progressBar || !video || !video.duration) {
+        return;
+    }
+
+    const duration = video.duration;
+
+    for (const segment of sponsoredSegments) {
+        const highlightId = `sponsored-highlight-${segment.startTime}-${segment.endTime}`;
+        if (document.getElementById(highlightId)) {
+            continue;
+        }
+
+        const highlight = document.createElement('div');
+        highlight.id = highlightId;
+        highlight.className = 'sponsored-segment-highlight';
+        highlight.style.position = 'absolute';
+        highlight.style.backgroundColor = 'rgba(255, 234, 0, 0.8)';
+        highlight.style.top = '0';
+        highlight.style.bottom = '0';
+        highlight.style.zIndex = '9998';
+
+        const left = (segment.startTime / duration) * 100;
+        const width = ((segment.endTime - segment.startTime) / duration) * 100;
+
+        highlight.style.left = `${left}%`;
+        highlight.style.width = `${width}%`;
+
+        progressBar.appendChild(highlight);
+    }
+}
+
+function clearProgressBarHighlights() {
+    const highlights = document.querySelectorAll('.sponsored-segment-highlight');
+    highlights.forEach(h => h.remove());
+}
+
 function checkForSponsorBlock() {
     const video = document.querySelector('video');
     if (!video || video.readyState < 1) return; // No video or not ready to play
+
+    updateProgressBarHighlights();
 
     for (const segment of sponsoredSegments) {
         // A tiny buffer to prevent getting stuck in a skip loop if a segment starts exactly where another ends.
@@ -71,6 +113,7 @@ function initializeVideoListener() {
 
             // Clear segments from the previous video
             sponsoredSegments.length = 0;
+            clearProgressBarHighlights();
             chrome.runtime.sendMessage({ type: "NEW_VIDEO_LOADED" });
 
             if (videoElement) {
