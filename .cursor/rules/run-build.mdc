@@ -1,6 +1,6 @@
 ---
-description: Any implementation task
+description: 
 globs: 
-alwaysApply: false
+alwaysApply: true
 ---
 Run 'npm run build' after an implementation.
