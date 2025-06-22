@@ -16,6 +16,14 @@ export const testData = [
         text: "This build wouldn't have been possible without the great components from PC-Parts. Check them out in the link below.",
         expected: "sponsor"
     },
+    {
+        text: "A big thank you to NordVPN for sponsoring this video. Protect your online privacy with the best VPN service.",
+        expected: "sponsor"
+    },
+    {
+        text: "You can get this awesome t-shirt from my merch store, link in the description.",
+        expected: "sponsor" // Self-promotion is still a form of promotion
+    },
 
     // === Regular Content ===
     {
@@ -38,8 +46,34 @@ export const testData = [
         text: "Okay, let's get this connected and see if it boots up properly.",
         expected: "neutral"
     },
+    {
+        text: "So, the first step is to solder the wires to the board, making sure you have a good connection.",
+        expected: "neutral"
+    },
+    {
+        text: "And that's how you make the perfect sourdough bread. It's all about patience and a good starter.",
+        expected: "neutral"
+    },
+    {
+        text: "Her reign was marked by significant political turmoil and social change.",
+        expected: "neutral"
+    },
 
-    // === False Positives (from user feedback) ===
+    // === Calls to Action (Should be Neutral) ===
+    {
+        text: "If you enjoyed this video, please give it a thumbs up and subscribe to the channel.",
+        expected: "neutral"
+    },
+    {
+        text: "Don't forget to hit that notification bell so you don't miss any of our future content.",
+        expected: "neutral"
+    },
+    {
+        text: "Let me know in the comments below what you think about this new setup.",
+        expected: "neutral"
+    },
+
+    // === Ambiguous / Edge Cases (from user feedback & imagination) ===
     {
         text: "this happened— welcome by the way to the party, the Philippines,",
         expected: "neutral"
@@ -51,5 +85,17 @@ export const testData = [
     {
         text: "your warehouses, at which point you  are a golden target for opportunism.",
         expected: "neutral"
+    },
+    {
+        text: "This is a product I bought myself, but I really like it and wanted to share it with you.",
+        expected: "neutral"
+    },
+    {
+        text: "They did send me this for free, but all opinions are my own and this video is not sponsored.",
+        expected: "neutral"
+    },
+    {
+        text: "Check out my other video where I review the predecessor to this model.",
+        expected: "neutral" // Self-promotion to other content, not a product
     }
 ]; 
