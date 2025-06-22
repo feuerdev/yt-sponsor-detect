@@ -7,7 +7,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === "SPONSORED_SEGMENT_FOUND") {
     console.log("Received sponsored segment:", request.payload);
     sponsoredSegments.push(request.payload);
-    console.log("All detected segments:", sponsoredSegments);
   }
 });
 
