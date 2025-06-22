@@ -4,7 +4,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const confidenceValue = document.getElementById('confidence-value');
 
     // Load saved settings and update the UI
-    chrome.storage.sync.get({ isEnabled: true, confidenceThreshold: 0.8 }, (data) => {
+    chrome.storage.sync.get({ isEnabled: true, confidenceThreshold: 0.80 }, (data) => {
         enabledCheckbox.checked = data.isEnabled;
         confidenceSlider.value = data.confidenceThreshold;
         confidenceValue.textContent = data.confidenceThreshold;
