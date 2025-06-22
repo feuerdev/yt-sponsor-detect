@@ -19,6 +19,29 @@ const experiments = [
         name: "Multi-Label Keywords",
         labels: ["sponsor", "advertisement", "promotion", "neutral", "regular content"],
         getPromotionalScore: (scores) => Math.max(scores.sponsor || 0, scores.advertisement || 0, scores.promotion || 0)
+    },
+    {
+        name: "Hypothesis Template",
+        labels: [
+            "This text is about a paid promotion.",
+            "This text is about a regular video segment."
+        ],
+        getPromotionalScore: (scores) => scores["This text is about a paid promotion."]
+    },
+    {
+        name: "Specific Promo Keywords",
+        labels: ["sponsored by", "thanks to our sponsor", "get 20% off", "link in description", "neutral content"],
+        getPromotionalScore: (scores) => Math.max(
+            scores["sponsored by"] || 0,
+            scores["thanks to our sponsor"] || 0,
+            scores["get 20% off"] || 0,
+            scores["link in description"] || 0
+        )
+    },
+    {
+        name: "Explicit Call to Action",
+        labels: ["promotional content", "call to action", "neutral content"],
+        getPromotionalScore: (scores) => scores["promotional content"]
     }
 ];
 
@@ -34,7 +57,7 @@ const main = async () => {
         let bestThresholdForExp = 0;
         let maxAccuracyForExp = 0;
 
-        const thresholds = [0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95];
+        const thresholds = [0.5, 0.6, 0.7, 0.8, 0.85, 0.9, 0.95, 0.99, 0.999];
         
         for (const threshold of thresholds) {
             let passed = 0;
