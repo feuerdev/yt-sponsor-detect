@@ -1,5 +1,8 @@
 import { pipeline } from '@xenova/transformers';
 
+export const PROMOTIONAL_LABEL = 'sponsor';
+export const NEUTRAL_LABEL = 'neutral';
+
 /**
  * @class Classifier
  *
@@ -9,7 +12,7 @@ import { pipeline } from '@xenova/transformers';
 export class Classifier {
     static task = 'zero-shot-classification';
     static model = 'Xenova/mobilebert-uncased-mnli';
-    static labels = ['promotional content', 'neutral content']; // Source of truth for labels
+    static labels = [PROMOTIONAL_LABEL, NEUTRAL_LABEL]; // Source of truth for labels
     static instance = null;
 
     static async getInstance(progress_callback = null) {
@@ -40,7 +43,7 @@ export async function classifyText(text, threshold) {
         return obj;
     }, {});
 
-    const promotionalScore = scores['promotional content'] || 0;
+    const promotionalScore = scores[PROMOTIONAL_LABEL] || 0;
     const block = promotionalScore > threshold;
     
     return { block, scores };

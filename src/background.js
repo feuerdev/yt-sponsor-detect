@@ -1,5 +1,5 @@
 import { env } from '@xenova/transformers';
-import { classifyText } from './classifier.js';
+import { classifyText, PROMOTIONAL_LABEL } from './classifier.js';
 
 // Due to a bug in onnxruntime-web, we must disable multithreading for now.
 // See https://github.com/microsoft/onnxruntime/issues/14445 for more information.
@@ -90,7 +90,7 @@ chrome.webRequest.onCompleted.addListener(
                         const startTime = parseFloat(captionChunk[0].start);
                         const lastCaption = captionChunk[captionChunk.length - 1];
                         const endTime = parseFloat(lastCaption.start) + parseFloat(lastCaption.duration);
-                        const confidence = result.scores['promotional content'];
+                        const confidence = result.scores[PROMOTIONAL_LABEL];
 
                         const tab = await chrome.tabs.get(tabId);
                         if (tab.url && tab.url.includes("youtube.com/watch")) {
