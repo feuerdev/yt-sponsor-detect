@@ -12,7 +12,10 @@ export const NEUTRAL_LABEL = 'neutral';
 export class Classifier {
     static task = 'zero-shot-classification';
     static model = 'Xenova/mobilebert-uncased-mnli';
-    static labels = [PROMOTIONAL_LABEL, NEUTRAL_LABEL]; // Source of truth for labels
+    static labels = [
+        "This is a paid promotion, endorsement, or sponsorship.",
+        "This is neutral, normal, or regular content."
+    ];
     static instance = null;
 
     static async getInstance(progress_callback = null) {
@@ -39,7 +42,8 @@ export async function classifyText(text, threshold) {
     const result = await classifier(text, Classifier.labels);
 
     const scores = result.labels.reduce((obj, label, index) => {
-        obj[label] = result.scores[index];
+        let key = label.includes('promotion') ? PROMOTIONAL_LABEL : NEUTRAL_LABEL;
+        obj[key] = result.scores[index];
         return obj;
     }, {});
 
