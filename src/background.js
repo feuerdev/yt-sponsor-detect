@@ -63,45 +63,44 @@ chrome.webRequest.onCompleted.addListener(
                 const segment = tabSegments[tabId];
                 tabSegments[tabId] = { captions: [], wordCount: 0 }; // Reset for next segment
 
-                const textToAnalyze = segment.captions.map(c => c.text).join(' ');
-                
-                // The transformer model has a token limit (e.g., 512 tokens).
-                // To avoid errors with long inputs, we process the text in chunks.
-                const MAX_CHUNK_LENGTH = 1500; // Heuristic character limit per chunk
-                const chunks = [];
-                for (let i = 0; i < textToAnalyze.length; i += MAX_CHUNK_LENGTH) {
-                    chunks.push(textToAnalyze.substring(i, i + MAX_CHUNK_LENGTH));
-                }
+                const MAX_CHUNK_LENGTH = 500; // Heuristic character limit per chunk
+                const captionChunks = [];
+                let currentChunk = [];
+                let currentChunkLength = 0;
 
-                let isSponsored = false;
-                let highestConfidence = 0;
-
-                for (const chunk of chunks) {
-                    console.debug(`Analyzing chunk for tab ${tabId}: "${chunk}"`);
-                    const result = await classifyText(chunk, confidenceThreshold);
-                    if (result.block) {
-                        isSponsored = true;
-                        const promotionalScore = result.scores['promotional content'];
-                        if (promotionalScore > highestConfidence) {
-                            highestConfidence = promotionalScore;
-                        }
+                for (const caption of segment.captions) {
+                    const captionLength = caption.text.length;
+                    if (currentChunk.length > 0 && currentChunkLength + captionLength > MAX_CHUNK_LENGTH) {
+                        captionChunks.push(currentChunk);
+                        currentChunk = [];
+                        currentChunkLength = 0;
                     }
+                    currentChunk.push(caption);
+                    currentChunkLength += captionLength;
+                }
+                if (currentChunk.length > 0) {
+                    captionChunks.push(currentChunk);
                 }
 
-                if (isSponsored) {
-                    const startTime = parseFloat(segment.captions[0].start);
-                    const lastCaption = segment.captions[segment.captions.length - 1];
-                    const endTime = parseFloat(lastCaption.start) + parseFloat(lastCaption.duration);
+                for (const captionChunk of captionChunks) {
+                    const textToAnalyze = captionChunk.map(c => c.text).join(' ');
+                    console.debug(`Analyzing chunk for tab ${tabId}: "${textToAnalyze}"`);
+                    const result = await classifyText(textToAnalyze, confidenceThreshold);
 
-                    // Before sending a message, verify the tab is a YouTube watch page
-                    // where the content script is expected to be running.
-                    const tab = await chrome.tabs.get(tabId);
-                    if (tab.url && tab.url.includes("youtube.com/watch")) {
-                        console.log(`Sponsored segment found for tab ${tabId}: "${textToAnalyze}" [${startTime}s - ${endTime}s] - Highest Confidence: ${highestConfidence.toFixed(2)}`);
-                        chrome.tabs.sendMessage(tabId, {
-                            type: "SPONSORED_SEGMENT_FOUND",
-                            payload: { startTime, endTime }
-                        });
+                    if (result.block) {
+                        const startTime = parseFloat(captionChunk[0].start);
+                        const lastCaption = captionChunk[captionChunk.length - 1];
+                        const endTime = parseFloat(lastCaption.start) + parseFloat(lastCaption.duration);
+                        const confidence = result.scores['promotional content'];
+
+                        const tab = await chrome.tabs.get(tabId);
+                        if (tab.url && tab.url.includes("youtube.com/watch")) {
+                            console.log(`Sponsored segment found for tab ${tabId}: "${textToAnalyze}" [${startTime}s - ${endTime}s] - Confidence: ${confidence.toFixed(2)}`);
+                            chrome.tabs.sendMessage(tabId, {
+                                type: "SPONSORED_SEGMENT_FOUND",
+                                payload: { startTime, endTime }
+                            });
+                        }
                     }
                 }
             }
