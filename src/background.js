@@ -21,7 +21,7 @@ chrome.webRequest.onCompleted.addListener(
     
     const { isEnabled, confidenceThreshold } = await chrome.storage.sync.get({ 
         isEnabled: true, 
-        confidenceThreshold: 0.8 
+        confidenceThreshold: 0.95 
     });
 
     if (!isEnabled || details.tabId < 0) {
@@ -84,7 +84,6 @@ chrome.webRequest.onCompleted.addListener(
 
                 for (const captionChunk of captionChunks) {
                     const textToAnalyze = captionChunk.map(c => c.text).join(' ');
-                    console.debug(`Analyzing chunk for tab ${tabId}: "${textToAnalyze}"`);
                     const result = await classifyText(textToAnalyze, confidenceThreshold);
 
                     if (result.block) {
