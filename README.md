@@ -45,3 +45,11 @@ npm run test
 To classify a single sentence from your terminal, use the `debug` script:
 ```bash
 npm run debug "this video is sponsored by" "promotional content,neutral content"
+
+
+### Open Issues
+
+*   The detection window is too large. A second pass is needed to hone in on the exact sponsored segment.
+*   Acting on the detected sponsorship window. This may involve a loop on the content script side that checks the current time of the video player and skips the segment if entering a detected sponsored window.
+*   How to embed the model directly so it is not necessary to download it when the extension is first run. 
+*   Configuration of the confidence threshold.
