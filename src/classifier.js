@@ -1,7 +1,11 @@
-import { pipeline } from '@xenova/transformers';
+import { pipeline, env } from '@xenova/transformers';
 
 export const PROMOTIONAL_LABEL = 'sponsor';
 export const NEUTRAL_LABEL = 'neutral';
+
+env.allowLocalModels = true;
+env.allowRemoteModels = false;
+env.localModelPath = 'model/';
 
 /**
  * @class Classifier
@@ -11,13 +15,14 @@ export const NEUTRAL_LABEL = 'neutral';
  */
 export class Classifier {
     static task = 'zero-shot-classification';
-    static model = 'Xenova/mobilebert-uncased-mnli';
+    static model = 'mobilebert-uncased-mnli';
     static instance = null;
 
-    static async getInstance(progress_callback = null) {
+    static async getInstance() {
         if (this.instance === null) {
             this.instance = await pipeline(this.task, this.model, {
-                progress_callback,
+                local_files_only: true,
+                model_file_name: 'model',
                 quantized: false, // Full-precision model for better accuracy
             });
         }

@@ -5,6 +5,7 @@
   "main": "src/background.js",
   "type": "module",
   "scripts": {
+    "setup": "node scripts/download-model.js",
     "build": "webpack --mode production",
     "dev": "webpack --watch",
     "debug": "node debug.js",

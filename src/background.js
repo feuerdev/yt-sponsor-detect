@@ -5,8 +5,6 @@ import { classifyText } from './classifier.js';
 // See https://github.com/microsoft/onnxruntime/issues/14445 for more information.
 env.backends.onnx.wasm.numThreads = 1;
 env.backends.onnx.wasm.wasmPaths = '/ort/';
-env.allowRemoteModels = true;
-env.allowLocalModels = false;
 
 console.log("Background script loaded.");
 

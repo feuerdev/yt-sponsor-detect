@@ -29,9 +29,8 @@ const config = {
         new CopyPlugin({
             patterns: [
                 {
-                    from: '*.js',
-                    context: 'src',
-                    to: '.'
+                    from: 'model',
+                    to: 'model'
                 },
                 {
                     from: `src/manifest.json`,
