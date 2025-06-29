@@ -38,13 +38,26 @@ export class Classifier {
  * @returns {Promise<Record<string, number>>} An object containing the scores for each label.
  */
 export async function classifyText(text, labels) {
-    const classifier = await Classifier.getInstance();
-    const result = await classifier(text, labels);
+    try {
+        const classifier = await Classifier.getInstance();
+        const result = await classifier(text, labels, {
+            padding: true,
+            truncation: true,
+        });
 
-    const scores = result.labels.reduce((obj, label, index) => {
-        obj[label] = result.scores[index];
-        return obj;
-    }, {});
-    
-    return scores;
+        const scores = result.labels.reduce((obj, label, index) => {
+            obj[label] = result.scores[index];
+            return obj;
+        }, {});
+        
+        return scores;
+    } catch (error) {
+        console.error('An error occurred during model execution:', error.message);
+        console.error('Inputs given to model:', text.substring(0, 100) + '...');
+        // Return neutral scores to avoid breaking the flow
+        return labels.reduce((obj, label) => {
+            obj[label] = 0.5;
+            return obj;
+        }, {});
+    }
 } 
