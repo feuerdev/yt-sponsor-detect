@@ -4,6 +4,17 @@ const sponsoredSegments = [];
 const ANALYSIS_INDICATOR_ID = 'analysis-in-progress-indicator';
 const NOTIFICATION_CONTAINER_ID = 'sponsor-block-notification-container';
 
+function addSponsoredSegment(newSegment) {
+    const isDuplicate = sponsoredSegments.some(
+        s => s.startTime === newSegment.startTime && s.endTime === newSegment.endTime
+    );
+    if (!isDuplicate) {
+        // Ensure skipDisabled is initialized
+        newSegment.skipDisabled = false;
+        sponsoredSegments.push(newSegment);
+    }
+}
+
 function formatTime(totalSeconds) {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = Math.floor(totalSeconds % 60);
@@ -13,9 +24,8 @@ function formatTime(totalSeconds) {
 // Listener for commands from the background script
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.type === "SPONSORED_SEGMENT_FOUND") {
-    const { startTime, endTime } = request.payload;
-    console.log(`Received sponsored segment: [${formatTime(startTime)} - ${formatTime(endTime)}]`);
-    sponsoredSegments.push(request.payload);
+    console.log(`Received sponsored segment: [${formatTime(request.payload.startTime)} - ${formatTime(request.payload.endTime)}]`);
+    addSponsoredSegment(request.payload);
   } else if (request.type === "CLEAR_SEGMENTS") {
     console.log("Clearing detected sponsor segments.");
     sponsoredSegments.length = 0;
@@ -142,30 +152,64 @@ function checkForSponsorBlock() {
 
     for (const segment of sponsoredSegments) {
         // A tiny buffer to prevent getting stuck in a skip loop if a segment starts exactly where another ends.
-        const buffer = 0.1; 
-        if (video.currentTime > segment.startTime && video.currentTime < segment.endTime - buffer) {
+        const buffer = 0.1;
+        if (!segment.skipDisabled && video.currentTime > segment.startTime && video.currentTime < segment.endTime - buffer) {
             console.log(`Skipping sponsored segment from ${formatTime(video.currentTime)} to ${formatTime(segment.endTime)}`);
             video.currentTime = segment.endTime;
             showSkipNotification();
-            break; 
+            break;
+        }
+    }
+}
+
+function handleProgressBarClick(event) {
+    const video = document.querySelector('video');
+    const progressBar = event.currentTarget;
+    if (!video || !video.duration || !progressBar) return;
+
+    const rect = progressBar.getBoundingClientRect();
+    const clickX = event.clientX - rect.left;
+    const clickedTime = (clickX / progressBar.clientWidth) * video.duration;
+
+    for (const segment of sponsoredSegments) {
+        if (clickedTime >= segment.startTime && clickedTime <= segment.endTime) {
+            if (segment.skipDisabled) {
+                return; 
+            }
+            console.log(`User clicked segment. Disabling automatic skip for [${formatTime(segment.startTime)} - ${formatTime(segment.endTime)}]`);
+            segment.skipDisabled = true;
+
+            const highlightId = `sponsored-highlight-${segment.startTime}-${segment.endTime}`;
+            const highlight = document.getElementById(highlightId);
+            if (highlight) {
+                highlight.style.backgroundColor = 'rgba(128, 128, 128, 0.6)'; 
+                highlight.title = 'Skipping disabled for this segment.';
+            }
+            break;
         }
     }
 }
 
 let videoElement = null;
 let lastVideoSrc = null;
+let progressBarWithListener = null;
 
 function initializeVideoListener() {
     const video = document.querySelector('video');
-    
+
     if (video) {
-        // Check if it's a new video by looking at the src.
-        // On YouTube, navigating to a new video in the same tab changes the video source.
         if (video.src !== lastVideoSrc) {
             console.log('New video detected.');
             lastVideoSrc = video.src;
 
-            // Clear segments from the previous video
+            if (videoElement) {
+                videoElement.removeEventListener('timeupdate', checkForSponsorBlock);
+            }
+            if (progressBarWithListener) {
+                progressBarWithListener.removeEventListener('click', handleProgressBarClick);
+                progressBarWithListener = null;
+            }
+
             sponsoredSegments.length = 0;
             clearProgressBarHighlights();
 
@@ -179,26 +223,34 @@ function initializeVideoListener() {
                     }
                     if (response && response.segments && response.segments.length > 0) {
                         console.log(`Received ${response.segments.length} cached segments for video ${videoId}.`);
-                        sponsoredSegments.push(...response.segments);
+                        response.segments.forEach(addSponsoredSegment);
                         updateProgressBarHighlights();
                     }
                 });
             }
-            
-            if (videoElement) {
-                videoElement.removeEventListener('timeupdate', checkForSponsorBlock);
-            }
+
             videoElement = video;
             videoElement.addEventListener('timeupdate', checkForSponsorBlock);
             console.log("Attached listener to new video element.");
         }
+
+        const progressBar = document.querySelector('.ytp-progress-bar');
+        if (progressBar && progressBar !== progressBarWithListener) {
+            progressBar.addEventListener('click', handleProgressBarClick);
+            progressBarWithListener = progressBar;
+            console.log("Attached click listener to progress bar.");
+        }
+
     } else if (lastVideoSrc) {
-        // Video has been removed from the page
         console.log('Video element removed.');
         lastVideoSrc = null;
         if (videoElement) {
             videoElement.removeEventListener('timeupdate', checkForSponsorBlock);
             videoElement = null;
+        }
+        if (progressBarWithListener) {
+            progressBarWithListener.removeEventListener('click', handleProgressBarClick);
+            progressBarWithListener = null;
         }
     }
 }
