@@ -77,4 +77,5 @@ npm run debug "this video is sponsored by" "promotional content,neutral content"
 
 *   The detection window is too large. A second pass is needed to hone in on the exact sponsored segment.
 *   Only works when the captions are requested. So we either need to kick off a request for captions when the video starts, or we need to enable the captions silently.
-*   Configuration of the confidence threshold.
+*   Enable users to configure additional labels and confidence thresholds.
+*   Clicking into a blocked segment should disable the skipping for that segment.
