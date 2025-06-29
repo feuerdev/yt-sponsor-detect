@@ -20,7 +20,7 @@
     "default_title": "Sponsor Skipper Settings"
   },
   "content_security_policy": {
-    "extension_pages": "default-src 'self'; worker-src 'self'; style-src 'self'; connect-src *; media-src *; script-src 'self' 'wasm-unsafe-eval'"
+    "extension_pages": "default-src 'self'; worker-src 'self'; style-src 'self' 'unsafe-inline'; connect-src *; media-src *; script-src 'self' 'wasm-unsafe-eval'"
   },
   "web_accessible_resources": [
     {
