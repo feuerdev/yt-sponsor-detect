@@ -8,12 +8,6 @@ env.backends.onnx.wasm.wasmPaths = '/ort/';
 
 console.log("Background script loaded.");
 
-const PROD_LABELS = [
-    "This is a paid promotion, endorsement, or sponsorship.",
-    "This is neutral, normal, or regular content."
-];
-const PROD_PROMOTIONAL_LABEL = PROD_LABELS[0];
-
 const tabState = {}; // Changed from tabSegments to tabState for clarity
 const MIN_TEXT_LENGTH = 1000; // User-defined minimum text length for a chunk
 const MAX_TEXT_LENGTH = 1400; // Failsafe character limit to prevent model errors
@@ -24,8 +18,8 @@ function formatTime(totalSeconds) {
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
-async function analyzeCaptionChunk(tabId, videoId, captions, confidenceThreshold) {
-    if (captions.length === 0) return;
+async function analyzeCaptionChunk(tabId, videoId, captions, labels) {
+    if (captions.length === 0 || labels.length === 0) return;
 
     try {
         await chrome.tabs.sendMessage(tabId, { type: "ANALYSIS_STARTED" });
@@ -39,17 +33,26 @@ async function analyzeCaptionChunk(tabId, videoId, captions, confidenceThreshold
         textToAnalyze = textToAnalyze.substring(0, MAX_TEXT_LENGTH);
     }
 
-    const scores = await classifyText(textToAnalyze, PROD_LABELS);
-    const promotionalScore = scores[PROD_PROMOTIONAL_LABEL] || 0;
+    const classificationLabels = labels.map(l => l.name);
+    const scores = await classifyText(textToAnalyze, classificationLabels);
+    
+    console.debug(`Analyzing segment for video ${videoId} on tab ${tabId}: "${textToAnalyze.substring(0,100)}..."`);
+    console.debug(`Classification scores:`, JSON.stringify(scores));
 
-    console.log(`Analyzing segment for video ${videoId} on tab ${tabId}: "${textToAnalyze.substring(0,100)}..."`);
-    console.log(`Classification scores:`, JSON.stringify(scores));
+    let bestMatch = { score: -1, label: null };
 
-    if (promotionalScore > confidenceThreshold) {
+    for (const label of labels) {
+        const score = scores[label.name] || 0;
+        if (score > label.threshold && score > bestMatch.score) {
+            bestMatch = { score, label };
+        }
+    }
+
+    if (bestMatch.label) {
         const startTime = parseFloat(captions[0].start);
         const lastCaption = captions[captions.length - 1];
         const endTime = parseFloat(lastCaption.start) + parseFloat(lastCaption.duration);
-        const newSegment = { startTime, endTime };
+        const newSegment = { startTime, endTime, label: bestMatch.label.name };
 
         // Save to storage
         (async () => {
@@ -75,7 +78,7 @@ async function analyzeCaptionChunk(tabId, videoId, captions, confidenceThreshold
                 const currentVideoId = currentUrl.searchParams.get('v');
 
                 if (currentVideoId === videoId) {
-                    console.log(`Sponsored segment found for video ${videoId} on tab ${tabId}: [${formatTime(startTime)} - ${formatTime(endTime)}] - Confidence: ${promotionalScore.toFixed(2)}`);
+                    console.log(`Sponsored segment found for video ${videoId} on tab ${tabId}: [${formatTime(startTime)} - ${formatTime(endTime)}] - Category: ${newSegment.label} - Confidence: ${bestMatch.score.toFixed(2)}`);
                     // No need to await, but we want to catch if it fails
                     chrome.tabs.sendMessage(tabId, {
                         type: "SPONSORED_SEGMENT_FOUND",
@@ -108,12 +111,12 @@ chrome.webRequest.onCompleted.addListener(
         return; // Ignore requests from the extension itself
     }
     
-    const { isEnabled, confidenceThreshold } = await chrome.storage.sync.get({ 
+    const { isEnabled, labels } = await chrome.storage.sync.get({ 
         isEnabled: true, 
-        confidenceThreshold: 0.85 
+        labels: []
     });
 
-    if (!isEnabled || details.tabId < 0) {
+    if (!isEnabled || details.tabId < 0 || !labels || labels.length === 0) {
       return;
     }
 
@@ -184,7 +187,7 @@ chrome.webRequest.onCompleted.addListener(
                     if (lastGoodIndex !== -1) {
                         // We have a chunk that's >= MIN_TEXT_LENGTH and <= MAX_TEXT_LENGTH
                         chunkCaptions = allCaptions.slice(0, lastGoodIndex + 1);
-                        await analyzeCaptionChunk(tabId, videoId, chunkCaptions, confidenceThreshold);
+                        await analyzeCaptionChunk(tabId, videoId, chunkCaptions, labels);
                         allCaptions = allCaptions.slice(lastGoodIndex + 1);
                     } else {
                         // Could not form a chunk of MIN_TEXT_LENGTH.

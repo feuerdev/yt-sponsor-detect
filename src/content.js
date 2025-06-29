@@ -85,12 +85,12 @@ function hideAnalysisIndicator() {
     }
 }
 
-const showSkipNotification = () => {
+const showSkipNotification = (label) => {
     const container = getNotificationContainer();
     if (!container) return;
 
     const notification = document.createElement('div');
-    notification.textContent = 'Skipped sponsored segment';
+    notification.textContent = `Skipped sponsored segment: ${label}`;
     notification.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
     notification.style.color = 'white';
     notification.style.padding = '5px 10px';
@@ -103,6 +103,29 @@ const showSkipNotification = () => {
         notification.remove();
     }, 3000);
 };
+
+// Simple hash function to get a color from a string
+function getDeterministicColor(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        hash = str.charCodeAt(i) + ((hash << 5) - hash);
+    }
+    const c = (hash & 0x00FFFFFF).toString(16).toUpperCase();
+    const color = "00000".substring(0, 6 - c.length) + c;
+    
+    // Check luminance to ensure it's not too dark
+    const r = parseInt(color.substring(0, 2), 16);
+    const g = parseInt(color.substring(2, 4), 16);
+    const b = parseInt(color.substring(4, 6), 16);
+    const luminance = 0.299 * r + 0.587 * g + 0.114 * b;
+
+    // If too dark, return a default bright color
+    if (luminance < 40) {
+        return '#FFEA00'; // A bright yellow as a fallback
+    }
+
+    return `#${color}`;
+}
 
 function updateProgressBarHighlights() {
     const progressBar = document.querySelector('.ytp-progress-bar');
@@ -124,10 +147,16 @@ function updateProgressBarHighlights() {
         highlight.id = highlightId;
         highlight.className = 'sponsored-segment-highlight';
         highlight.style.position = 'absolute';
-        highlight.style.backgroundColor = 'rgba(255, 234, 0, 0.8)';
+        
+        // Use deterministic color based on label, or grey if skipping is disabled
+        const color = segment.skipDisabled ? 'rgba(128, 128, 128, 0.6)' : getDeterministicColor(segment.label || 'default');
+        highlight.style.backgroundColor = color;
+        highlight.style.opacity = '0.8';
+
         highlight.style.top = '0';
         highlight.style.bottom = '0';
         highlight.style.zIndex = '9998';
+        highlight.title = segment.skipDisabled ? 'Skipping disabled' : `Category: ${segment.label}`;
 
         const left = (segment.startTime / duration) * 100;
         const width = ((segment.endTime - segment.startTime) / duration) * 100;
@@ -156,7 +185,7 @@ function checkForSponsorBlock() {
         if (!segment.skipDisabled && video.currentTime > segment.startTime && video.currentTime < segment.endTime - buffer) {
             console.log(`Skipping sponsored segment from ${formatTime(video.currentTime)} to ${formatTime(segment.endTime)}`);
             video.currentTime = segment.endTime;
-            showSkipNotification();
+            showSkipNotification(segment.label);
             break;
         }
     }
