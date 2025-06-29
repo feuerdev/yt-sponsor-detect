@@ -7,10 +7,10 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const root = path.resolve(__dirname, '..');
 
 
-const MODEL_ID = 'Xenova/bart-large-mnli';
-const MODEL_SUBFOLDER = 'bart-large-mnli';
-// const MODEL_ID = 'Xenova/mobilebert-uncased-mnli';
-// const MODEL_SUBFOLDER = 'mobilebert-uncased-mnli';
+// const MODEL_ID = 'Xenova/bart-large-mnli';
+// const MODEL_SUBFOLDER = 'bart-large-mnli';
+const MODEL_ID = 'Xenova/mobilebert-uncased-mnli';
+const MODEL_SUBFOLDER = 'mobilebert-uncased-mnli';
 const CACHE_DIR = path.join(root, 'node_modules', '@xenova', 'transformers', '.cache');
 const MODEL_CACHE_PATH = path.join(CACHE_DIR, 'Xenova', MODEL_SUBFOLDER);
 const TARGET_MODEL_DIR = path.join(root, 'model');
