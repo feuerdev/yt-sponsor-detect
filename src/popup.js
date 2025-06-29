@@ -7,9 +7,8 @@ document.addEventListener('DOMContentLoaded', () => {
     let settings = {};
 
     const defaultLabels = [
-        { id: `label-${Date.now()}`, name: 'Sponsored Content', threshold: 0.85 },
-        { id: `label-${Date.now()+1}`, name: 'Advertisement', threshold: 0.85 },
-        { id: `label-${Date.now()+2}`, name: 'This is a paid promotion, endorsement, or sponsorship.', threshold: 0.85 }
+        { id: `label-${Date.now()}`, name: 'contains sponsored content', threshold: 0.98, blocked: true },
+        { id: `label-${Date.now()+1}`, name: 'contains regular content', threshold: 0.85, blocked: false }
     ];
 
     function saveSettings() {
@@ -26,6 +25,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const sliderId = `slider-${label.id}`;
             const valueId = `value-${label.id}`;
             const removeId = `remove-${label.id}`;
+            const blockedId = `blocked-${label.id}`;
 
             const item = document.createElement('div');
             item.classList.add('label-item');
@@ -34,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 <input type="text" id="${nameId}" value="${label.name}" placeholder="Category Name">
                 <input type="range" id="${sliderId}" min="0" max="1" step="0.01" value="${label.threshold}">
                 <span id="${valueId}">${label.threshold}</span>
+                <input type="checkbox" id="${blockedId}" ${label.blocked ? 'checked' : ''} title="If checked, segments with this category will be skipped">
                 <button id="${removeId}">X</button>
             `;
             labelsList.appendChild(item);
@@ -42,6 +43,7 @@ document.addEventListener('DOMContentLoaded', () => {
             const sliderInput = document.getElementById(sliderId);
             const valueSpan = document.getElementById(valueId);
             const removeButton = document.getElementById(removeId);
+            const blockedCheckbox = document.getElementById(blockedId);
 
             nameInput.addEventListener('change', (e) => {
                 label.name = e.target.value;
@@ -59,6 +61,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 clearSegmentsInActiveTab();
             });
 
+            blockedCheckbox.addEventListener('change', (e) => {
+                label.blocked = e.target.checked;
+                saveSettings();
+                clearSegmentsInActiveTab();
+            });
+
             removeButton.addEventListener('click', () => {
                 settings.labels = settings.labels.filter(l => l.id !== label.id);
                 saveSettings();
@@ -73,7 +81,8 @@ document.addEventListener('DOMContentLoaded', () => {
         const newLabel = {
             id: `label-${Date.now()}`,
             name: 'New Category',
-            threshold: 0.9
+            threshold: 0.9,
+            blocked: true
         };
         if (!settings.labels) {
             settings.labels = [];
@@ -94,10 +103,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load saved settings and update the UI
     chrome.storage.sync.get({ isEnabled: true, labels: null }, (data) => {
         settings.isEnabled = data.isEnabled;
-        settings.labels = data.labels === null ? defaultLabels : data.labels;
+        if (data.labels === null) {
+            settings.labels = defaultLabels;
+        } else {
+            // For backwards compatibility, add 'blocked' property if it's missing.
+            settings.labels = data.labels.map(l => ({ ...l, blocked: l.blocked !== undefined ? l.blocked : true }));
+        }
         enabledCheckbox.checked = settings.isEnabled;
         renderLabels();
-        saveSettings(); // Save defaults if they were just loaded
+        saveSettings(); // Save defaults or migrated labels
     });
 
     enabledCheckbox.addEventListener('change', () => {

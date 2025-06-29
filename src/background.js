@@ -36,12 +36,14 @@ async function analyzeCaptionChunk(tabId, videoId, captions, labels) {
     const classificationLabels = labels.map(l => l.name);
     const scores = await classifyText(textToAnalyze, classificationLabels);
     
-    console.debug(`Analyzing segment for video ${videoId} on tab ${tabId}: "${textToAnalyze.substring(0,100)}..."`);
-    console.debug(`Classification scores:`, JSON.stringify(scores));
+    // console.debug(`Analyzing segment for video ${videoId} on tab ${tabId}: "${textToAnalyze.substring(0,100)}..."`);
+    // console.debug(`Classification scores:`, JSON.stringify(scores));
 
     let bestMatch = { score: -1, label: null };
 
     for (const label of labels) {
+        if (!label.blocked) continue; // Only consider blocked labels for skipping
+
         const score = scores[label.name] || 0;
         if (score > label.threshold && score > bestMatch.score) {
             bestMatch = { score, label };
