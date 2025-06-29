@@ -9,7 +9,6 @@ env.backends.onnx.wasm.wasmPaths = '/ort/';
 console.log("Background script loaded.");
 
 const tabState = {};
-const MAX_TEXT_LENGTH = 1400; // Failsafe character limit to prevent model errors
 
 // New constants for sliding window
 const WINDOW_SIZE_CAPTIONS = 20; // Number of captions in a window
@@ -44,9 +43,6 @@ async function processWindowQueue(tabId, videoId, labels) {
             if (textToAnalyze.length < MIN_WINDOW_TEXT_LENGTH) {
                 processedWindows++;
                 continue;
-            }
-            if (textToAnalyze.length > MAX_TEXT_LENGTH) {
-                textToAnalyze = textToAnalyze.substring(0, MAX_TEXT_LENGTH);
             }
             
             const classificationLabels = labels.map(l => l.name);
