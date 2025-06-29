@@ -14,6 +14,10 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     const { startTime, endTime } = request.payload;
     console.log(`Received sponsored segment: [${formatTime(startTime)} - ${formatTime(endTime)}]`);
     sponsoredSegments.push(request.payload);
+  } else if (request.type === "CLEAR_SEGMENTS") {
+    console.log("Clearing detected sponsor segments.");
+    sponsoredSegments.length = 0;
+    clearProgressBarHighlights();
   }
 });
 
@@ -114,8 +118,7 @@ function initializeVideoListener() {
             // Clear segments from the previous video
             sponsoredSegments.length = 0;
             clearProgressBarHighlights();
-            chrome.runtime.sendMessage({ type: "NEW_VIDEO_LOADED" });
-
+            
             if (videoElement) {
                 videoElement.removeEventListener('timeupdate', checkForSponsorBlock);
             }
