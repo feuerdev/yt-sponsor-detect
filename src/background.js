@@ -27,6 +27,12 @@ function formatTime(totalSeconds) {
 async function analyzeCaptionChunk(tabId, videoId, captions, confidenceThreshold) {
     if (captions.length === 0) return;
 
+    try {
+        await chrome.tabs.sendMessage(tabId, { type: "ANALYSIS_STARTED" });
+    } catch (e) {
+        console.log(`Could not send ANALYSIS_STARTED to tab ${tabId}, it might have been closed.`);
+    }
+
     let textToAnalyze = captions.map(c => c.text).join(' ');
     // The chunking logic should prevent this, but as a safeguard:
     if (textToAnalyze.length > MAX_TEXT_LENGTH) {
@@ -87,6 +93,12 @@ async function analyzeCaptionChunk(tabId, videoId, captions, confidenceThreshold
                 console.error(`An unexpected error occurred when sending message to tab ${tabId}:`, error);
             }
         }
+    }
+
+    try {
+        await chrome.tabs.sendMessage(tabId, { type: "ANALYSIS_FINISHED" });
+    } catch (e) {
+        console.log(`Could not send ANALYSIS_FINISHED to tab ${tabId}, it might have been closed.`);
     }
 }
 

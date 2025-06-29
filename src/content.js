@@ -1,6 +1,8 @@
 console.log("Content script loaded.");
 
 const sponsoredSegments = [];
+const ANALYSIS_INDICATOR_ID = 'analysis-in-progress-indicator';
+const NOTIFICATION_CONTAINER_ID = 'sponsor-block-notification-container';
 
 function formatTime(totalSeconds) {
     const minutes = Math.floor(totalSeconds / 60);
@@ -18,26 +20,74 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     console.log("Clearing detected sponsor segments.");
     sponsoredSegments.length = 0;
     clearProgressBarHighlights();
+  } else if (request.type === "ANALYSIS_STARTED") {
+    showAnalysisIndicator();
+  } else if (request.type === "ANALYSIS_FINISHED") {
+    hideAnalysisIndicator();
   }
 });
 
-const showSkipNotification = () => {
+function getNotificationContainer() {
+    let container = document.getElementById(NOTIFICATION_CONTAINER_ID);
+    if (container) return container;
+
     const videoContainer = document.querySelector('#movie_player');
-    if (!videoContainer) return;
+    if (!videoContainer) return null;
+    
+    container = document.createElement('div');
+    container.id = NOTIFICATION_CONTAINER_ID;
+    container.style.position = 'absolute';
+    container.style.top = '10px';
+    container.style.right = '10px';
+    container.style.zIndex = '9999';
+    container.style.display = 'flex';
+    container.style.flexDirection = 'column';
+    container.style.gap = '5px';
+    container.style.alignItems = 'flex-end';
+
+    videoContainer.appendChild(container);
+    return container;
+}
+
+function showAnalysisIndicator() {
+    if (document.getElementById(ANALYSIS_INDICATOR_ID)) {
+        return; // Indicator already exists
+    }
+    const container = getNotificationContainer();
+    if (!container) return;
+
+    const indicator = document.createElement('div');
+    indicator.id = ANALYSIS_INDICATOR_ID;
+    indicator.textContent = 'Looking for sponsored segments...';
+    indicator.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+    indicator.style.color = 'white';
+    indicator.style.padding = '5px 10px';
+    indicator.style.borderRadius = '5px';
+    indicator.style.fontSize = '14px';
+
+    container.appendChild(indicator);
+}
+
+function hideAnalysisIndicator() {
+    const indicator = document.getElementById(ANALYSIS_INDICATOR_ID);
+    if (indicator) {
+        indicator.remove();
+    }
+}
+
+const showSkipNotification = () => {
+    const container = getNotificationContainer();
+    if (!container) return;
 
     const notification = document.createElement('div');
     notification.textContent = 'Skipped sponsored segment';
-    notification.style.position = 'absolute';
-    notification.style.top = '10px';
-    notification.style.right = '10px';
     notification.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
     notification.style.color = 'white';
     notification.style.padding = '5px 10px';
     notification.style.borderRadius = '5px';
-    notification.style.zIndex = '9999';
     notification.style.fontSize = '14px';
     
-    videoContainer.appendChild(notification);
+    container.appendChild(notification);
 
     setTimeout(() => {
         notification.remove();
