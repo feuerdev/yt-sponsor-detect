@@ -76,6 +76,5 @@ npm run debug "this video is sponsored by" "promotional content,neutral content"
 ### Open Issues
 
 *   The detection window is too large. A second pass is needed to hone in on the exact sponsored segment.
-*   Acting on the detected sponsorship window. This may involve a loop on the content script side that checks the current time of the video player and skips the segment if entering a detected sponsored window.
 *   Only works when the captions are requested. So we either need to kick off a request for captions when the video starts, or we need to enable the captions silently.
 *   Configuration of the confidence threshold.
