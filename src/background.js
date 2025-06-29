@@ -43,6 +43,23 @@ async function analyzeCaptionChunk(tabId, videoId, captions, confidenceThreshold
         const startTime = parseFloat(captions[0].start);
         const lastCaption = captions[captions.length - 1];
         const endTime = parseFloat(lastCaption.start) + parseFloat(lastCaption.duration);
+        const newSegment = { startTime, endTime };
+
+        // Save to storage
+        (async () => {
+            try {
+                const result = await chrome.storage.local.get(videoId);
+                const existingSegments = result[videoId] || [];
+                const isDuplicate = existingSegments.some(s => s.startTime === newSegment.startTime && s.endTime === newSegment.endTime);
+                if (!isDuplicate) {
+                    const updatedSegments = [...existingSegments, newSegment];
+                    await chrome.storage.local.set({ [videoId]: updatedSegments });
+                    console.log(`Cached segment for video ${videoId}. Total cached: ${updatedSegments.length}`);
+                }
+            } catch (e) {
+                console.error('Failed to cache segment:', e);
+            }
+        })();
         
         try {
             const tab = await chrome.tabs.get(tabId);
@@ -56,7 +73,7 @@ async function analyzeCaptionChunk(tabId, videoId, captions, confidenceThreshold
                     // No need to await, but we want to catch if it fails
                     chrome.tabs.sendMessage(tabId, {
                         type: "SPONSORED_SEGMENT_FOUND",
-                        payload: { startTime, endTime }
+                        payload: newSegment
                     });
                 } else {
                      console.log(`Tab ${tabId} is no longer on video ${videoId} (now on ${currentVideoId}). Aborting message send.`);
@@ -173,6 +190,41 @@ chrome.webRequest.onCompleted.addListener(
   },
   { urls: ["*://*.youtube.com/*"] }
 );
+
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.type === 'GET_CACHED_SEGMENTS') {
+        const videoId = request.videoId;
+        (async () => {
+            try {
+                const data = await chrome.storage.local.get(videoId);
+                sendResponse({ segments: data[videoId] || [] });
+            } catch (e) {
+                console.error("Error getting cached segments:", e);
+                sendResponse({ segments: [] });
+            }
+        })();
+        return true; // Indicates we will respond asynchronously.
+    } else if (request.type === 'CLEAR_CACHE_FOR_ACTIVE_TAB') {
+        (async () => {
+            try {
+                const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+                if (tab && tab.url && tab.url.includes("youtube.com/watch")) {
+                    const url = new URL(tab.url);
+                    const videoId = url.searchParams.get('v');
+                    if (videoId) {
+                        await chrome.storage.local.remove(videoId);
+                        console.log(`Cleared cache for video ${videoId}.`);
+                        // Also clear segments in the content script
+                        await chrome.tabs.sendMessage(tab.id, { type: "CLEAR_SEGMENTS" });
+                    }
+                }
+            } catch(e) {
+                console.error("Error clearing cache for active tab:", e);
+            }
+        })();
+        return true; // Async response
+    }
+});
 
 // Listen for messages from content scripts - REMOVED as it's no longer needed.
 

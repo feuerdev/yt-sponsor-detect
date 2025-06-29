@@ -6,15 +6,11 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Function to send a message to the active content script to clear segments
     function clearSegmentsInActiveTab() {
-        chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-            if (tabs.length > 0 && tabs[0].id) {
-                chrome.tabs.sendMessage(tabs[0].id, { type: "CLEAR_SEGMENTS" }, () => {
-                    if (chrome.runtime.lastError) {
-                        // This error is expected if the active tab is not a YouTube page.
-                        // We can safely ignore it.
-                        console.log('Could not send CLEAR_SEGMENTS message. Active tab is not a valid target.');
-                    }
-                });
+        // This message now triggers the full cache clearing process in the background script
+        chrome.runtime.sendMessage({ type: "CLEAR_CACHE_FOR_ACTIVE_TAB" }, () => {
+            if (chrome.runtime.lastError) {
+                // This might happen if the background script has an issue, or on unsupported pages.
+                console.log('Could not send CLEAR_CACHE_FOR_ACTIVE_TAB message.', chrome.runtime.lastError.message);
             }
         });
     }

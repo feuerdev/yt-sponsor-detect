@@ -118,6 +118,22 @@ function initializeVideoListener() {
             // Clear segments from the previous video
             sponsoredSegments.length = 0;
             clearProgressBarHighlights();
+
+            const videoId = new URLSearchParams(window.location.search).get('v');
+            if (videoId) {
+                console.log(`Requesting cached segments for video ${videoId}`);
+                chrome.runtime.sendMessage({ type: "GET_CACHED_SEGMENTS", videoId: videoId }, (response) => {
+                    if (chrome.runtime.lastError) {
+                        console.error("Error getting cached segments:", chrome.runtime.lastError.message);
+                        return;
+                    }
+                    if (response && response.segments && response.segments.length > 0) {
+                        console.log(`Received ${response.segments.length} cached segments for video ${videoId}.`);
+                        sponsoredSegments.push(...response.segments);
+                        updateProgressBarHighlights();
+                    }
+                });
+            }
             
             if (videoElement) {
                 videoElement.removeEventListener('timeupdate', checkForSponsorBlock);
