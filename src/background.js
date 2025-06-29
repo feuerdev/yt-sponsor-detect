@@ -28,6 +28,12 @@ async function processWindowQueue(tabId, videoId, labels) {
         return;
     }
     tabData.isAnalyzing = true;
+    const totalWindows = tabData.windowQueue.length;
+    let processedWindows = 0;
+
+    try {
+        await chrome.tabs.sendMessage(tabId, { type: "ANALYSIS_STARTED", payload: { total: totalWindows, processed: 0 } });
+    } catch (e) { /* Tab might be closed, ignore */ }
 
     try {
         // Process all windows currently in the queue
@@ -36,6 +42,7 @@ async function processWindowQueue(tabId, videoId, labels) {
 
             let textToAnalyze = windowCaptions.map(c => c.text).join(' ');
             if (textToAnalyze.length < MIN_WINDOW_TEXT_LENGTH) {
+                processedWindows++;
                 continue;
             }
             if (textToAnalyze.length > MAX_TEXT_LENGTH) {
@@ -56,17 +63,26 @@ async function processWindowQueue(tabId, videoId, labels) {
             };
             
             tabData.windowScores.push(windowScore);
+            processedWindows++;
+            try {
+                await chrome.tabs.sendMessage(tabId, { type: "ANALYSIS_PROGRESS", payload: { total: totalWindows, processed: processedWindows } });
+            } catch(e) { /* Tab might be closed, ignore */ }
         }
 
         tabData.windowScores.sort((a, b) => a.startTime - b.startTime);
 
         // After processing new windows, run the coalescing logic once.
-        await findAndProcessSponsoredSegments(tabId, videoId, labels);
+        if (processedWindows > 0) {
+            await findAndProcessSponsoredSegments(tabId, videoId, labels);
+        }
 
     } catch (error) {
         console.error("Error processing window queue:", error);
     } finally {
         tabData.isAnalyzing = false;
+        try {
+            await chrome.tabs.sendMessage(tabId, { type: "ANALYSIS_FINISHED" });
+        } catch(e) { /* Tab might be closed, ignore */ }
     }
 }
 

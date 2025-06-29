@@ -31,7 +31,9 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sponsoredSegments.length = 0;
     clearProgressBarHighlights();
   } else if (request.type === "ANALYSIS_STARTED") {
-    showAnalysisIndicator();
+    showAnalysisIndicator(request.payload.processed, request.payload.total);
+  } else if (request.type === "ANALYSIS_PROGRESS") {
+    updateAnalysisIndicator(request.payload.processed, request.payload.total);
   } else if (request.type === "ANALYSIS_FINISHED") {
     hideAnalysisIndicator();
   }
@@ -59,29 +61,73 @@ function getNotificationContainer() {
     return container;
 }
 
-function showAnalysisIndicator() {
-    if (document.getElementById(ANALYSIS_INDICATOR_ID)) {
-        return; // Indicator already exists
-    }
-    const container = getNotificationContainer();
+function showAnalysisIndicator(processed, total) {
+    let container = document.getElementById(NOTIFICATION_CONTAINER_ID);
+    if (!container) container = getNotificationContainer();
     if (!container) return;
 
-    const indicator = document.createElement('div');
-    indicator.id = ANALYSIS_INDICATOR_ID;
-    indicator.textContent = 'Looking for sponsored segments...';
-    indicator.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
-    indicator.style.color = 'white';
-    indicator.style.padding = '5px 10px';
-    indicator.style.borderRadius = '5px';
-    indicator.style.fontSize = '14px';
+    let indicator = document.getElementById(ANALYSIS_INDICATOR_ID);
+    if (!indicator) {
+        indicator = document.createElement('div');
+        indicator.id = ANALYSIS_INDICATOR_ID;
+        indicator.style.backgroundColor = 'rgba(0, 0, 0, 0.7)';
+        indicator.style.color = 'white';
+        indicator.style.padding = '8px 12px';
+        indicator.style.borderRadius = '5px';
+        indicator.style.fontSize = '14px';
+        indicator.style.width = '250px';
+        indicator.style.textAlign = 'center';
+        indicator.style.transition = 'opacity 0.3s ease-in-out';
+        indicator.style.opacity = '1';
 
-    container.appendChild(indicator);
+        const text = document.createElement('span');
+        text.id = 'analysis-indicator-text';
+        indicator.appendChild(text);
+
+        const progressBarOuter = document.createElement('div');
+        progressBarOuter.style.backgroundColor = 'rgba(255, 255, 255, 0.3)';
+        progressBarOuter.style.borderRadius = '3px';
+        progressBarOuter.style.marginTop = '5px';
+        progressBarOuter.style.height = '6px';
+        progressBarOuter.style.width = '100%';
+        progressBarOuter.style.overflow = 'hidden';
+
+        const progressBarInner = document.createElement('div');
+        progressBarInner.id = 'analysis-indicator-progress';
+        progressBarInner.style.backgroundColor = '#FFEA00';
+        progressBarInner.style.width = '0%';
+        progressBarInner.style.height = '100%';
+        progressBarInner.style.borderRadius = '3px';
+        progressBarInner.style.transition = 'width 0.2s ease-out';
+        
+        progressBarOuter.appendChild(progressBarInner);
+        indicator.appendChild(progressBarOuter);
+
+        container.appendChild(indicator);
+    }
+    
+    updateAnalysisIndicator(processed, total);
+}
+
+function updateAnalysisIndicator(processed, total) {
+    const indicatorText = document.getElementById('analysis-indicator-text');
+    const progressBar = document.getElementById('analysis-indicator-progress');
+
+    if (indicatorText) {
+        indicatorText.textContent = `Analyzing... (${processed}/${total} windows)`;
+    }
+    if (progressBar) {
+        const percentage = total > 0 ? (processed / total) * 100 : 0;
+        progressBar.style.width = `${percentage}%`;
+    }
 }
 
 function hideAnalysisIndicator() {
     const indicator = document.getElementById(ANALYSIS_INDICATOR_ID);
     if (indicator) {
-        indicator.remove();
+        indicator.style.opacity = '0';
+        // Remove from DOM after transition
+        setTimeout(() => indicator.remove(), 300);
     }
 }
 
