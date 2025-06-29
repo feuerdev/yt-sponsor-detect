@@ -14,7 +14,7 @@ const PROD_LABELS = [
 ];
 const PROD_PROMOTIONAL_LABEL = PROD_LABELS[0];
 
-const tabSegments = {};
+const tabState = {}; // Changed from tabSegments to tabState for clarity
 const MIN_TEXT_LENGTH = 1000; // User-defined minimum text length for a chunk
 const MAX_TEXT_LENGTH = 1400; // Failsafe character limit to prevent model errors
 
@@ -24,7 +24,7 @@ function formatTime(totalSeconds) {
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
-async function analyzeCaptionChunk(tabId, captions, confidenceThreshold) {
+async function analyzeCaptionChunk(tabId, videoId, captions, confidenceThreshold) {
     if (captions.length === 0) return;
 
     let textToAnalyze = captions.map(c => c.text).join(' ');
@@ -36,21 +36,39 @@ async function analyzeCaptionChunk(tabId, captions, confidenceThreshold) {
     const scores = await classifyText(textToAnalyze, PROD_LABELS);
     const promotionalScore = scores[PROD_PROMOTIONAL_LABEL] || 0;
 
-    console.log(`Analyzing segment for tab ${tabId}: "${textToAnalyze.substring(0,100)}..."`);
+    console.log(`Analyzing segment for video ${videoId} on tab ${tabId}: "${textToAnalyze.substring(0,100)}..."`);
     console.log(`Classification scores:`, JSON.stringify(scores));
 
     if (promotionalScore > confidenceThreshold) {
         const startTime = parseFloat(captions[0].start);
         const lastCaption = captions[captions.length - 1];
         const endTime = parseFloat(lastCaption.start) + parseFloat(lastCaption.duration);
+        
+        try {
+            const tab = await chrome.tabs.get(tabId);
+            // Ensure the tab is still on the correct YouTube video page
+            if (tab.url && tab.url.includes("youtube.com/watch")) {
+                const currentUrl = new URL(tab.url);
+                const currentVideoId = currentUrl.searchParams.get('v');
 
-        const tab = await chrome.tabs.get(tabId);
-        if (tab.url && tab.url.includes("youtube.com/watch")) {
-            console.log(`Sponsored segment found for tab ${tabId}: "${textToAnalyze}" [${formatTime(startTime)} - ${formatTime(endTime)}] - Confidence: ${promotionalScore.toFixed(2)}`);
-            chrome.tabs.sendMessage(tabId, {
-                type: "SPONSORED_SEGMENT_FOUND",
-                payload: { startTime, endTime }
-            });
+                if (currentVideoId === videoId) {
+                    console.log(`Sponsored segment found for video ${videoId} on tab ${tabId}: [${formatTime(startTime)} - ${formatTime(endTime)}] - Confidence: ${promotionalScore.toFixed(2)}`);
+                    // No need to await, but we want to catch if it fails
+                    chrome.tabs.sendMessage(tabId, {
+                        type: "SPONSORED_SEGMENT_FOUND",
+                        payload: { startTime, endTime }
+                    });
+                } else {
+                     console.log(`Tab ${tabId} is no longer on video ${videoId} (now on ${currentVideoId}). Aborting message send.`);
+                }
+            }
+        } catch (error) {
+            // This can happen if the tab was closed. It's not a critical error.
+            if (error.message.includes('No tab with id') || error.message.includes('Receiving end does not exist')) {
+                console.log(`Tab ${tabId} not available to send message. It was likely closed.`);
+            } else {
+                console.error(`An unexpected error occurred when sending message to tab ${tabId}:`, error);
+            }
         }
     }
 }
@@ -71,6 +89,12 @@ chrome.webRequest.onCompleted.addListener(
     }
 
     if (details.url.includes("youtube.com/api/timedtext")) {
+      const url = new URL(details.url);
+      const videoId = url.searchParams.get('v');
+      if (!videoId) {
+        return; // Not a video caption request we can use
+      }
+
       // The webRequest API doesn't provide the response body, so we re-fetch the URL to get the captions.
       try {
         const response = await fetch(details.url);
@@ -93,17 +117,19 @@ chrome.webRequest.onCompleted.addListener(
             if (captions.length === 0) return;
 
             const tabId = details.tabId;
-            if (!tabSegments[tabId]) {
-                tabSegments[tabId] = { captions: [] };
+            // If we have no state for this tab or the video ID has changed, reset it.
+            if (!tabState[tabId] || tabState[tabId].videoId !== videoId) {
+                console.log(`New video detected (${videoId}) on tab ${tabId}. Resetting caption buffer.`);
+                tabState[tabId] = { videoId: videoId, captions: [] };
             }
 
-            tabSegments[tabId].captions.push(...captions);
+            tabState[tabId].captions.push(...captions);
             
-            const accumulatedTextLength = tabSegments[tabId].captions.reduce((sum, cap) => sum + cap.text.length + 1, 0);
+            const accumulatedTextLength = tabState[tabId].captions.reduce((sum, cap) => sum + cap.text.length + 1, 0);
 
             if (accumulatedTextLength >= MIN_TEXT_LENGTH) {
-                let allCaptions = tabSegments[tabId].captions;
-                tabSegments[tabId] = { captions: [] }; // Reset for next segment
+                let allCaptions = tabState[tabId].captions;
+                tabState[tabId].captions = []; // Reset for next segment
 
                 while (allCaptions.length > 0) {
                     let chunkCaptions = [];
@@ -129,12 +155,12 @@ chrome.webRequest.onCompleted.addListener(
                     if (lastGoodIndex !== -1) {
                         // We have a chunk that's >= MIN_TEXT_LENGTH and <= MAX_TEXT_LENGTH
                         chunkCaptions = allCaptions.slice(0, lastGoodIndex + 1);
-                        await analyzeCaptionChunk(tabId, chunkCaptions, confidenceThreshold);
+                        await analyzeCaptionChunk(tabId, videoId, chunkCaptions, confidenceThreshold);
                         allCaptions = allCaptions.slice(lastGoodIndex + 1);
                     } else {
                         // Could not form a chunk of MIN_TEXT_LENGTH.
                         // Put remaining captions back to be processed with the next batch.
-                        tabSegments[tabId].captions = allCaptions;
+                        tabState[tabId].captions = allCaptions;
                         break; // Exit the while loop
                     }
                 }
@@ -148,21 +174,12 @@ chrome.webRequest.onCompleted.addListener(
   { urls: ["*://*.youtube.com/*"] }
 );
 
-// Listen for messages from content scripts
-chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
-    if (request.type === "NEW_VIDEO_LOADED" && sender.tab) {
-        const tabId = sender.tab.id;
-        if (tabSegments[tabId]) {
-            delete tabSegments[tabId];
-            console.log(`Cleaned up segment data for new video on tab: ${tabId}`);
-        }
-    }
-});
+// Listen for messages from content scripts - REMOVED as it's no longer needed.
 
 // Clean up buffer when a tab is closed
 chrome.tabs.onRemoved.addListener((tabId) => {
-    if (tabSegments[tabId]) {
-        delete tabSegments[tabId];
-        console.log(`Cleaned up segment data for closed tab: ${tabId}`);
+    if (tabState[tabId]) {
+        delete tabState[tabId];
+        console.log(`Cleaned up state for closed tab: ${tabId}`);
     }
 });
