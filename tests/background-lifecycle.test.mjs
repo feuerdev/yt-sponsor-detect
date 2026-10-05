@@ -65,3 +65,61 @@ test('current analysis still emits and caches a successful segment', async () =>
     assert.equal(f.writes[0].first[0].endTime, 2);
     assert.equal(f.run('tabState[1].isAnalyzing'), false);
 });
+
+function captionFixture() {
+    let listener, removed;
+    const requests = [], messages = [];
+    const context = vm.createContext({ URL, console: { log() {}, error() {} },
+        env: { backends: { onnx: { wasm: {} } } },
+        classifyText: async () => ({ sponsor: 0 }),
+        fetch: url => { const work = deferred(); requests.push({ url, ...work }); return work.promise; },
+        chrome: {
+            tabs: { async sendMessage(id, message) { messages.push(message); },
+                onRemoved: { addListener(fn) { removed = fn; } } },
+            storage: { sync: { async get() { return { isEnabled: true,
+                labels: [{ name: 'sponsor', blocked: true, threshold: 0.5 }] }; } },
+                local: { async get() { return {}; }, async set() {} } },
+            webRequest: { onCompleted: { addListener(fn) { listener = fn; } } },
+            runtime: { id: 'fixture', onMessage: { addListener() {} } },
+        },
+    });
+    vm.runInContext(source, context);
+    const reply = () => ({ ok: true, async text() { return JSON.stringify({ events:
+        Array.from({ length: 20 }, (_, i) => ({ tStartMs: i * 1000, dDurationMs: 1000,
+            segs: [{ utf8: 'caption fixture text' }] })) }); } });
+    return { context, requests, messages, reply, removed: id => removed(id),
+        request: videoId => listener({ tabId: 1, url: `https://www.youtube.com/api/timedtext?v=${videoId}` }),
+        run: text => vm.runInContext(text, context),
+    };
+}
+
+test('a slower caption fetch cannot restore the previous video state', async () => {
+    const f = captionFixture();
+    const old = f.request('old'); await new Promise(setImmediate);
+    const current = f.request('current'); await new Promise(setImmediate);
+    f.requests[1].resolve(f.reply()); await current;
+    f.requests[0].resolve(f.reply()); await old;
+    assert.equal(f.run('tabState[1].videoId'), 'current');
+    assert.equal(f.run('tabState[1].allCaptions.length'), 20);
+    assert.equal(f.messages.filter(m => m.type === 'ANALYSIS_STARTED').length, 1);
+});
+
+for (const cancellation of ['removed', 'cleared']) {
+    test(`${cancellation} tab does not revive after an in-flight caption fetch`, async () => {
+        const f = captionFixture();
+        const work = f.request('first'); await new Promise(setImmediate);
+        if (cancellation === 'removed') f.removed(1);
+        else f.run('delete tabState[1]');
+        f.requests[0].resolve(f.reply()); await work;
+        assert.equal(f.run('tabState[1]'), undefined);
+        assert.equal(f.messages.length, 0);
+    });
+}
+
+test('current caption fetch still collects and analyzes captions', async () => {
+    const f = captionFixture();
+    const work = f.request('current'); await new Promise(setImmediate);
+    f.requests[0].resolve(f.reply()); await work;
+    assert.equal(f.run('tabState[1].allCaptions.length'), 20);
+    assert.equal(f.messages[0].type, 'ANALYSIS_STARTED');
+});

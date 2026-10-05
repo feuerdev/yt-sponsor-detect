@@ -177,21 +177,38 @@ chrome.webRequest.onCompleted.addListener(
         return; // Ignore requests from the extension itself
     }
     
+    if (details.tabId < 0 || !details.url.includes("youtube.com/api/timedtext")) return;
+    const url = new URL(details.url);
+    const videoId = url.searchParams.get('v');
+    if (!videoId) return;
+
+    // Capture state before the first await: older responses must not revive a tab.
+    const tabId = details.tabId;
+    if (!tabState[tabId] || tabState[tabId].videoId !== videoId) {
+        console.log(`New video detected (${videoId}) on tab ${tabId}. Resetting state.`);
+        tabState[tabId] = { 
+            videoId: videoId, 
+            allCaptions: [], 
+            windowScores: [], 
+            foundSegments: [],
+            lastWindowStartCaptionIndex: -1,
+            windowQueue: [],
+            isAnalyzing: false
+        };
+    }
+    
+    const tabData = tabState[tabId];
+
     const { isEnabled, labels } = await chrome.storage.sync.get({ 
         isEnabled: true, 
         labels: []
     });
 
-    if (!isEnabled || details.tabId < 0 || !labels || labels.length === 0) {
+    if (tabState[tabId] !== tabData || !isEnabled || !labels || labels.length === 0) {
       return;
     }
 
     if (details.url.includes("youtube.com/api/timedtext")) {
-      const url = new URL(details.url);
-      const videoId = url.searchParams.get('v');
-      if (!videoId) {
-        return; // Not a video caption request we can use
-      }
 
       // The webRequest API doesn't provide the response body, so we re-fetch the URL to get the captions.
       try {
@@ -200,6 +217,7 @@ chrome.webRequest.onCompleted.addListener(
             throw new Error(`HTTP error! status: ${response.status}`);
         }
         const responseText = await response.text();
+        if (tabState[tabId] !== tabData) return;
         const data = JSON.parse(responseText);
         
         if (data && data.events) {
@@ -214,21 +232,6 @@ chrome.webRequest.onCompleted.addListener(
             
             if (captions.length === 0) return;
 
-            const tabId = details.tabId;
-            if (!tabState[tabId] || tabState[tabId].videoId !== videoId) {
-                console.log(`New video detected (${videoId}) on tab ${tabId}. Resetting state.`);
-                tabState[tabId] = { 
-                    videoId: videoId, 
-                    allCaptions: [], 
-                    windowScores: [], 
-                    foundSegments: [],
-                    lastWindowStartCaptionIndex: -1,
-                    windowQueue: [],
-                    isAnalyzing: false
-                };
-            }
-            
-            const tabData = tabState[tabId];
             const firstNewCaptionIndex = tabData.allCaptions.length;
             tabData.allCaptions.push(...captions);
 
