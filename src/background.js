@@ -36,7 +36,7 @@ async function processWindowQueue(tabId, videoId, labels) {
 
     try {
         // Process all windows currently in the queue
-        while (tabData.windowQueue.length > 0) {
+        while (tabState[tabId] === tabData && tabData.windowQueue.length > 0) {
             const windowCaptions = tabData.windowQueue.shift(); // Get next window
 
             let textToAnalyze = windowCaptions.map(c => c.text).join(' ');
@@ -47,6 +47,7 @@ async function processWindowQueue(tabId, videoId, labels) {
             
             const classificationLabels = labels.map(l => l.name);
             const allScores = await classifyText(textToAnalyze, classificationLabels);
+            if (tabState[tabId] !== tabData) return;
 
             const windowStartTime = parseFloat(windowCaptions[0].start);
             const lastCaption = windowCaptions[windowCaptions.length - 1];
@@ -68,7 +69,7 @@ async function processWindowQueue(tabId, videoId, labels) {
         tabData.windowScores.sort((a, b) => a.startTime - b.startTime);
 
         // After processing new windows, run the coalescing logic once.
-        if (processedWindows > 0) {
+        if (tabState[tabId] === tabData && processedWindows > 0) {
             await findAndProcessSponsoredSegments(tabId, videoId, labels);
         }
 
@@ -76,9 +77,11 @@ async function processWindowQueue(tabId, videoId, labels) {
         console.error("Error processing window queue:", error);
     } finally {
         tabData.isAnalyzing = false;
-        try {
-            await chrome.tabs.sendMessage(tabId, { type: "ANALYSIS_FINISHED" });
-        } catch(e) { /* Tab might be closed, ignore */ }
+        if (tabState[tabId] === tabData) {
+            try {
+                await chrome.tabs.sendMessage(tabId, { type: "ANALYSIS_FINISHED" });
+            } catch(e) { /* Tab might be closed, ignore */ }
+        }
     }
 }
 
@@ -93,6 +96,7 @@ async function findAndProcessSponsoredSegments(tabId, videoId, labels) {
         const scoreThreshold = label.threshold;
 
         for (const window of tabData.windowScores) {
+            if (tabState[tabId] !== tabData) return;
             const score = window.scores[label.name] || 0;
 
             if (score > scoreThreshold) {
@@ -117,7 +121,7 @@ async function findAndProcessSponsoredSegments(tabId, videoId, labels) {
             }
         }
         // Process any segment that was active at the very end
-        if (currentSegment) {
+        if (currentSegment && tabState[tabId] === tabData) {
             await processNewSegment(tabId, videoId, currentSegment);
         }
     }
@@ -156,7 +160,9 @@ async function processNewSegment(tabId, videoId, newSegment) {
     
     // Save to local storage
     try {
+        if (tabState[tabId] !== tabData) return;
         const result = await chrome.storage.local.get(videoId);
+        if (tabState[tabId] !== tabData) return;
         const existingSegments = result[videoId] || [];
         const updatedSegments = [...existingSegments, newSegment];
         await chrome.storage.local.set({ [videoId]: updatedSegments });

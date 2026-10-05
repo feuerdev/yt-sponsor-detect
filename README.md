@@ -19,7 +19,7 @@ npm run setup
 npm run build
 ```
 
-`npm test` runs dependency-free syntax and configuration checks. It performs no model inference or download. `npm run setup` is a heavier step: it loads a Transformers pipeline to download/cache a model, then copies assets into `model/`. Run it on a suitable development machine, not a memory-constrained shared server.
+`npm test` runs dependency-free syntax/configuration checks and real-source lifecycle regression fixtures with one test worker. It performs no model inference or download. `npm run setup` is a heavier step: it loads a Transformers pipeline to download/cache a model, then copies assets into `model/`. Run it on a suitable development machine, not a memory-constrained shared server.
 
 Known model-setup gap: the setup script chooses the first cached `.onnx` file and renames it `model.onnx`, while the classifier asks for a full-precision artifact. The quantization/artifact contract is not verified. A successful webpack build alone cannot prove that inference loads the correct weights. Resolve this before claiming reproducible classifier results. The build requires real local model assets; model files and generated `dist/` are ignored by Git.
 
@@ -28,7 +28,7 @@ Load `dist/` through `chrome://extensions` → Developer mode → Load unpacked.
 ## Checks and experiments
 
 ```bash
-npm test               # fast syntax/manifest/package checks; no ML
+npm test               # syntax/configuration + lifecycle regressions; no ML
 npm run evaluate       # existing exploratory classifier experiment; needs model
 npm run debug -- "this video is sponsored by" "promotional content,neutral content"
 npm run build          # webpack bundle, requires actual model files
@@ -39,3 +39,7 @@ The evaluation script tries labels/thresholds against `test_data.js`. It tunes a
 ## Next milestone
 
 Make model setup deterministic; add fixture-driven caption/window/interval checks; prove disable, cache and navigation behavior; then measure precision, boundary errors, latency and memory on held-out examples. Start with suggested intervals and reversible manual skipping. Store submission and automatic-skipping reliability claims come after those acceptance gates.
+
+## Verified lifecycle fixes
+
+Real-source Node fixtures cover player replacement, same-player navigation, late cached responses, rapid return to a video, player/progress-bar removal and background state cancellation. The content script releases detached listeners and rejects obsolete cache callbacks; background analysis stops emitting results or restoring cache after its state is cleared/replaced. These fixtures do not establish browser integration, YouTube compatibility or classifier accuracy.

@@ -244,15 +244,20 @@ function handleProgressBarClick(event) {
 
 let videoElement = null;
 let lastVideoSrc = null;
+let lastVideoId = null;
+let videoGeneration = 0;
 let progressBarWithListener = null;
 
 function initializeVideoListener() {
     const video = document.querySelector('video');
+    const videoId = new URLSearchParams(window.location.search).get('v');
 
     if (video) {
-        if (video.src !== lastVideoSrc) {
+        if (video !== videoElement || video.src !== lastVideoSrc || videoId !== lastVideoId) {
             console.log('New video detected.');
             lastVideoSrc = video.src;
+            lastVideoId = videoId;
+            const generation = ++videoGeneration;
 
             if (videoElement) {
                 videoElement.removeEventListener('timeupdate', checkForSponsorBlock);
@@ -265,10 +270,12 @@ function initializeVideoListener() {
             sponsoredSegments.length = 0;
             clearProgressBarHighlights();
 
-            const videoId = new URLSearchParams(window.location.search).get('v');
             if (videoId) {
                 console.log(`Requesting cached segments for video ${videoId}`);
                 chrome.runtime.sendMessage({ type: "GET_CACHED_SEGMENTS", videoId: videoId }, (response) => {
+                    if (generation !== videoGeneration ||
+                        document.querySelector('video') !== video ||
+                        new URLSearchParams(window.location.search).get('v') !== videoId) return;
                     if (chrome.runtime.lastError) {
                         console.error("Error getting cached segments:", chrome.runtime.lastError.message);
                         return;
@@ -287,15 +294,22 @@ function initializeVideoListener() {
         }
 
         const progressBar = document.querySelector('.ytp-progress-bar');
-        if (progressBar && progressBar !== progressBarWithListener) {
-            progressBar.addEventListener('click', handleProgressBarClick);
+        if (progressBar !== progressBarWithListener) {
+            if (progressBarWithListener) {
+                progressBarWithListener.removeEventListener('click', handleProgressBarClick);
+            }
             progressBarWithListener = progressBar;
-            console.log("Attached click listener to progress bar.");
+            if (progressBar) progressBar.addEventListener('click', handleProgressBarClick);
         }
 
-    } else if (lastVideoSrc) {
+    } else if (videoElement) {
         console.log('Video element removed.');
         lastVideoSrc = null;
+        lastVideoId = null;
+        videoGeneration++;
+        sponsoredSegments.length = 0;
+        clearProgressBarHighlights();
+        hideAnalysisIndicator();
         if (videoElement) {
             videoElement.removeEventListener('timeupdate', checkForSponsorBlock);
             videoElement = null;

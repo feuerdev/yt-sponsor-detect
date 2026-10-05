@@ -9,7 +9,7 @@
     "build": "webpack --mode production",
     "dev": "webpack --watch",
     "debug": "node debug.js",
-    "test": "node scripts/check.mjs",
+    "test": "node scripts/check.mjs && node --test --test-concurrency=1 tests/*.test.mjs",
     "evaluate": "node test_classifier.js"
   },
   "keywords": [],
