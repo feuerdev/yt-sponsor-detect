@@ -6,11 +6,12 @@
   "type": "module",
   "scripts": {
     "setup": "node scripts/download-model.js",
-    "build": "webpack --mode production",
+    "build": "npm run verify:model && webpack --mode production",
     "dev": "webpack --watch",
     "debug": "node debug.js",
     "test": "node scripts/check.mjs && node --test --test-concurrency=1 tests/*.test.mjs",
-    "evaluate": "node test_classifier.js"
+    "evaluate": "node test_classifier.js",
+    "verify:model": "node scripts/verify-model.mjs"
   },
   "keywords": [],
   "author": "",

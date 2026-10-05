@@ -29,9 +29,10 @@ async function processWindowQueue(tabId, videoId, labels) {
     tabData.isAnalyzing = true;
     const totalWindows = tabData.windowQueue.length;
     let processedWindows = 0;
+    let failed = false;
 
     try {
-        await chrome.tabs.sendMessage(tabId, { type: "ANALYSIS_STARTED", payload: { total: totalWindows, processed: 0 } });
+        await chrome.tabs.sendMessage(tabId, { type: "ANALYSIS_STARTED", videoId, payload: { total: totalWindows, processed: 0 } });
     } catch (e) { /* Tab might be closed, ignore */ }
 
     try {
@@ -62,7 +63,7 @@ async function processWindowQueue(tabId, videoId, labels) {
             tabData.windowScores.push(windowScore);
             processedWindows++;
             try {
-                await chrome.tabs.sendMessage(tabId, { type: "ANALYSIS_PROGRESS", payload: { total: totalWindows, processed: processedWindows } });
+                await chrome.tabs.sendMessage(tabId, { type: "ANALYSIS_PROGRESS", videoId, payload: { total: totalWindows, processed: processedWindows } });
             } catch(e) { /* Tab might be closed, ignore */ }
         }
 
@@ -74,12 +75,25 @@ async function processWindowQueue(tabId, videoId, labels) {
         }
 
     } catch (error) {
-        console.error("Error processing window queue:", error);
+        failed = true;
+        if (tabState[tabId] === tabData) {
+            tabData.windowQueue.length = 0;
+            tabData.windowScores.length = 0;
+            tabData.foundSegments.length = 0;
+            const codes = ['model_unavailable', 'inference_failed', 'invalid_output'];
+            const code = codes.includes(error?.code) ? error.code : 'analysis_failed';
+            try {
+                await chrome.tabs.sendMessage(tabId, { type: 'CLEAR_SEGMENTS', videoId });
+                if (tabState[tabId] === tabData) {
+                    await chrome.tabs.sendMessage(tabId, { type: 'ANALYSIS_ERROR', videoId, payload: { code } });
+                }
+            } catch { /* Closed tabs require no playback action. */ }
+        }
     } finally {
         tabData.isAnalyzing = false;
-        if (tabState[tabId] === tabData) {
+        if (tabState[tabId] === tabData && !failed) {
             try {
-                await chrome.tabs.sendMessage(tabId, { type: "ANALYSIS_FINISHED" });
+                await chrome.tabs.sendMessage(tabId, { type: "ANALYSIS_FINISHED", videoId });
             } catch(e) { /* Tab might be closed, ignore */ }
         }
     }
@@ -148,6 +162,7 @@ async function processNewSegment(tabId, videoId, newSegment) {
     try {
         await chrome.tabs.sendMessage(tabId, {
             type: "SPONSORED_SEGMENT_FOUND",
+            videoId,
             payload: newSegment
         });
     } catch (e) {

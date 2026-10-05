@@ -123,3 +123,12 @@ test('current caption fetch still collects and analyzes captions', async () => {
     assert.equal(f.run('tabState[1].allCaptions.length'), 20);
     assert.equal(f.messages[0].type, 'ANALYSIS_STARTED');
 });
+
+test('classifier failure clears partial evidence and reports unavailable instead of finished', async () => {
+    const f = fixture();
+    f.context.classifyText = async () => { throw Object.assign(new Error('inert failure'), { code: 'model_unavailable' }); };
+    await f.run("processWindowQueue(1, 'first', [{ name: 'sponsor', blocked: true, threshold: 0.5 }])");
+    assert.deepEqual(f.messages.map(message => message.type), ['ANALYSIS_STARTED', 'CLEAR_SEGMENTS', 'ANALYSIS_ERROR']);
+    assert.equal(f.run('tabState[1].windowScores.length'), 0);
+    assert.equal(f.run('tabState[1].isAnalyzing'), false);
+});

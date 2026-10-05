@@ -6,21 +6,22 @@ import vm from 'node:vm';
 const source = readFileSync(new URL('../src/content.js', import.meta.url), 'utf8');
 function element(src = '') {
     const listeners = new Map();
-    return { src, duration: 0, listeners,
+    return { src, duration: 0, listeners, style: {},
+        appendChild() {}, remove() {},
         addEventListener(type, handler) { listeners.set(type, handler); },
         removeEventListener(type, handler) { if (listeners.get(type) === handler) listeners.delete(type); },
     };
 }
-function fixture(enabled = true) {
+function fixture(enabled = true, autoSkip = false) {
     const state = { video: element(), bar: element(), requests: [] };
     let resolveSettings;
     const settings = new Promise(resolve => { resolveSettings = resolve; });
-    state.loadSettings = () => resolveSettings({ isEnabled: enabled });
+    state.loadSettings = () => resolveSettings({ isEnabled: enabled, autoSkip });
     state.changeSettings = (changes, area = 'sync') => state.settingsChanged?.(changes, area);
     const context = vm.createContext({
         console: { log() {}, error() {} }, URLSearchParams, setTimeout,
         window: { location: { search: '?v=first' } },
-        document: { body: {},
+        document: { body: {}, createElement() { return element(); },
             querySelector(selector) { return selector === 'video' ? state.video : selector === '.ytp-progress-bar' ? state.bar : null; },
             querySelectorAll() { return []; }, getElementById() { return null; },
         },
@@ -103,6 +104,7 @@ test('cache callbacks after player removal cannot restore segments', () => {
 function prepareSkip(f) {
     f.requests[0].callback({ segments: [{ startTime: 1, endTime: 2 }] });
     f.video.readyState = 1;
+    f.video.duration = 10;
     f.video.currentTime = 1.5;
     return () => vm.runInContext('checkForSponsorBlock()', f.context);
 }
@@ -114,7 +116,7 @@ test('saved disabled setting prevents skips of cached segments', async () => {
 });
 
 test('live enable toggle immediately controls cached skips', async () => {
-    const f = fixture(), skip = prepareSkip(f);
+    const f = fixture(true, true), skip = prepareSkip(f);
     f.loadSettings(); await Promise.resolve(); await Promise.resolve();
     skip(); assert.equal(f.video.currentTime, 2);
     f.video.currentTime = 1.5;
