@@ -1,6 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
     const enabledCheckbox = document.getElementById('enabled-checkbox');
-    const autoSkipCheckbox = document.getElementById('auto-skip-checkbox');
     const clearButton = document.getElementById('clear-segments-btn');
     const labelsList = document.getElementById('labels-list');
     const addLabelButton = document.getElementById('add-label-btn');
@@ -104,8 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // Load saved settings and update the UI
     chrome.storage.sync.get({ isEnabled: true, autoSkip: false, labels: null }, (data) => {
         settings.isEnabled = data.isEnabled;
-        settings.autoSkip = data.autoSkip === true;
-        autoSkipCheckbox.checked = settings.autoSkip;
+        settings.autoSkip = false; // Ignore legacy opt-in until independent reliability gates pass.
         if (data.labels === null) {
             settings.labels = defaultLabels;
         } else {
@@ -122,10 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
         saveSettings();
     });
     
-    autoSkipCheckbox.addEventListener('change', () => {
-        settings.autoSkip = autoSkipCheckbox.checked;
-        saveSettings();
-    });
 
     clearButton.addEventListener('click', () => {
         clearSegmentsInActiveTab();

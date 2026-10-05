@@ -2,17 +2,18 @@ import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import vm from 'node:vm';
+import {MODEL_SPEC} from '../src/model-spec.js';
 const source = readFileSync(new URL('../src/background.js', import.meta.url), 'utf8')
     .replace(/^import .*;\n/gm, '');
 const deferred = () => { let resolve; const promise = new Promise(done => { resolve = done; }); return { promise, resolve }; };
 function fixture() {
     const pending = deferred(), cache = deferred(), messages = [], writes = [];
-    const context = vm.createContext({ console: { log() {}, error() {} },
+    const context = vm.createContext({ MODEL_SPEC, console: { log() {}, error() {} },
         env: { backends: { onnx: { wasm: {} } } },
         classifyText: () => pending.promise,
         chrome: {
             tabs: { async sendMessage(id, message) { messages.push(message); }, onRemoved: { addListener() {} } },
-            storage: { local: { get: () => cache.promise, async set(value) { writes.push(value); } } },
+            storage: { sync: { async get() { return {isEnabled: true, labels: [{name:'sponsor',threshold:0.5,blocked:true}]}; } }, local: { get: () => cache.promise, async remove() {}, async set(value) { writes.push(value); } } },
             webRequest: { onCompleted: { addListener() {} } },
             runtime: { onMessage: { addListener() {} } },
         },
@@ -62,14 +63,14 @@ test('current analysis still emits and caches a successful segment', async () =>
         'ANALYSIS_STARTED', 'ANALYSIS_PROGRESS', 'SPONSORED_SEGMENT_FOUND', 'ANALYSIS_FINISHED',
     ]);
     assert.equal(f.writes.length, 1);
-    assert.equal(f.writes[0].first[0].endTime, 2);
+    assert.equal(f.writes[0]['sponsor-cache:first'].segments[0].endTime, 2);
     assert.equal(f.run('tabState[1].isAnalyzing'), false);
 });
 
 function captionFixture() {
     let listener, removed;
     const requests = [], messages = [];
-    const context = vm.createContext({ URL, console: { log() {}, error() {} },
+    const context = vm.createContext({ URL, MODEL_SPEC, console: { log() {}, error() {} },
         env: { backends: { onnx: { wasm: {} } } },
         classifyText: async () => ({ sponsor: 0 }),
         fetch: url => { const work = deferred(); requests.push({ url, ...work }); return work.promise; },
@@ -78,7 +79,7 @@ function captionFixture() {
                 onRemoved: { addListener(fn) { removed = fn; } } },
             storage: { sync: { async get() { return { isEnabled: true,
                 labels: [{ name: 'sponsor', blocked: true, threshold: 0.5 }] }; } },
-                local: { async get() { return {}; }, async set() {} } },
+                local: { async get() { return {}; }, async remove() {}, async set() {} } },
             webRequest: { onCompleted: { addListener(fn) { listener = fn; } } },
             runtime: { id: 'fixture', onMessage: { addListener() {} } },
         },

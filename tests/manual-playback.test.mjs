@@ -53,11 +53,10 @@ test('manual skip has Undo which replays the segment without another skip', asyn
     assert.equal(f.video.currentTime, 1.5); f.check();
     assert.equal(f.video.currentTime, 1.5);
 });
-test('automatic skipping requires opt-in and keeps the same Undo protection', async () => {
+test('legacy automatic opt-in remains manual until independent reliability evidence exists', async () => {
     const f = fixture({ isEnabled: true, autoSkip: true }); await ready(f);
-    assert.equal(f.video.currentTime, 4);
-    const undo = f.button('Undo'); assert.ok(undo); undo.click(); f.check();
     assert.equal(f.video.currentTime, 1.5);
+    assert.ok(f.button('Skip suggestion'));
 });
 test('a retained suggestion cannot seek after disable', async () => {
     const f = fixture(); await ready(f);
@@ -67,6 +66,7 @@ test('a retained suggestion cannot seek after disable', async () => {
 });
 test('a retained Undo cannot seek a new video in a reused player', async () => {
     const f = fixture({ isEnabled: true, autoSkip: true }); await ready(f);
+    const skip = f.button('Skip suggestion'); assert.ok(skip); skip.click();
     const undo = f.button('Undo'); assert.ok(undo);
     f.context.window.location.search = '?v=second'; f.video.currentTime = 7;
     f.run('initializeVideoListener()'); undo.click();
@@ -77,4 +77,13 @@ test('model failure is visible and leaves playback unchanged', async () => {
     f.message({ type: 'ANALYSIS_ERROR', payload: { code: 'model_unavailable' } });
     assert.equal(f.video.currentTime, 1.5);
     assert.ok(f.all().some(node => node.role === 'status' && node.textContent.includes('unavailable')));
+});
+
+test('label changes invalidate retained suggestions and obsolete cache callbacks', async () => {
+    const f = fixture(); await ready(f);
+    const skip = f.button('Skip suggestion'); assert.ok(skip);
+    f.change({ labels: { newValue: [{name: 'other', threshold: 0.9, blocked: true}] } });
+    skip.click();
+    assert.equal(f.video.currentTime, 1.5);
+    f.check(); assert.equal(f.button('Skip suggestion'), undefined);
 });

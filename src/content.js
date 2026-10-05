@@ -6,14 +6,10 @@ const NOTIFICATION_CONTAINER_ID = 'sponsor-block-notification-container';
 
 // Wait for saved settings before changing playback, and prefer newer toggle events.
 let isEnabled = false;
-let autoSkip = false;
 let settingsGeneration = 0;
-let autoSkipGeneration = 0;
 const initialSettingsGeneration = settingsGeneration;
-const initialAutoSkipGeneration = autoSkipGeneration;
 chrome.storage.sync.get({ isEnabled: true, autoSkip: false }).then(settings => {
     if (settingsGeneration === initialSettingsGeneration) isEnabled = settings.isEnabled === true;
-    if (autoSkipGeneration === initialAutoSkipGeneration) autoSkip = settings.autoSkip === true;
 }).catch(() => console.error('Unable to load sponsor settings. Playback unchanged.'));
 chrome.storage.onChanged.addListener((changes, area) => {
     if (area !== 'sync') return;
@@ -22,10 +18,12 @@ chrome.storage.onChanged.addListener((changes, area) => {
         isEnabled = (changes.isEnabled.newValue ?? true) === true;
         if (!isEnabled) clearPlaybackControls();
     }
-    if (changes.autoSkip) {
-        autoSkipGeneration++;
-        autoSkip = changes.autoSkip.newValue === true;
-        document.getElementById('sponsor-skip-suggestion')?.remove();
+    if (changes.labels || changes.isEnabled) {
+        videoGeneration++;
+        sponsoredSegments.length = 0;
+        clearPlaybackControls();
+        clearProgressBarHighlights();
+        hideAnalysisIndicator();
     }
 });
 
@@ -317,8 +315,7 @@ function checkForSponsorBlock() {
     updateProgressBarHighlights();
     for (const segment of sponsoredSegments) {
         if (!segment.skipDisabled && video.currentTime >= segment.startTime && video.currentTime < segment.endTime - 0.1) {
-            if (autoSkip) performSkip(video, segment);
-            else showSkipSuggestion(video, segment);
+            showSkipSuggestion(video, segment);
             return;
         }
     }
@@ -339,7 +336,7 @@ function handleProgressBarClick(event) {
             if (segment.skipDisabled) {
                 return; 
             }
-            console.log(`User clicked segment. Disabling automatic skip for [${formatTime(segment.startTime)} - ${formatTime(segment.endTime)}]`);
+            console.log(`User clicked segment. Disabling suggestion for [${formatTime(segment.startTime)} - ${formatTime(segment.endTime)}]`);
             segment.skipDisabled = true;
 
             const highlightId = `sponsored-highlight-${segment.startTime}-${segment.endTime}`;

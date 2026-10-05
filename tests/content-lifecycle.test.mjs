@@ -115,15 +115,16 @@ test('saved disabled setting prevents skips of cached segments', async () => {
     skip(); assert.equal(f.video.currentTime, 1.5);
 });
 
-test('live enable toggle immediately controls cached skips', async () => {
+test('live enable toggles invalidate previous cached suggestions', async () => {
     const f = fixture(true, true), skip = prepareSkip(f);
     f.loadSettings(); await Promise.resolve(); await Promise.resolve();
-    skip(); assert.equal(f.video.currentTime, 2);
+    skip(); assert.equal(f.video.currentTime, 1.5);
     f.video.currentTime = 1.5;
     f.changeSettings({ isEnabled: { newValue: false } });
     skip(); assert.equal(f.video.currentTime, 1.5);
     f.changeSettings({ isEnabled: { newValue: true } });
-    skip(); assert.equal(f.video.currentTime, 2);
+    skip(); assert.equal(f.video.currentTime, 1.5);
+    assert.equal(f.segments(), 0);
 });
 
 test('an older settings read cannot undo a newer disable event', async () => {
