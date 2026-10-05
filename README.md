@@ -1,80 +1,41 @@
-# YouTube Sponsor Skipper
+# YouTube sponsor detection prototype
 
-This is a browser extension that automatically detects and skips sponsored segments in YouTube videos using a locally-run machine learning model.
+A Chromium Manifest V3 extension experimenting with local MobileBERT classification of YouTube captions. It observes caption requests, scores overlapping windows, caches estimated intervals and attempts to skip configured categories. The popup supports labels, thresholds, and an enable toggle.
 
-## Features
+**Prototype status:** segment boundaries, caption acquisition, navigation/session handling and settings/cache behavior need verification. Detection accuracy has not been established on a held-out dataset. Do not assume that every sponsor is detected or that an estimated interval contains only sponsored content.
 
-- **Automatic Sponsor Detection**: Uses a zero-shot classification model to identify promotional content in video transcripts in real-time.
-- **Self-Contained**: The machine learning model is bundled with the extension, so it works offline and sends no data to external servers.
-- **Automatic Skipping**: Once a sponsored segment is detected, the video player automatically jumps past it.
-- **Configurable Confidence Threshold**: You can adjust the sensitivity of the sponsor detection from the extension's popup menu.
-- **Enable/Disable Toggle**: Easily turn the functionality on or off at any time.
+Inference is configured to use local model files and disallow remote model loading. Model setup downloads files, and captions come from YouTube; the complete extension is not an offline video-analysis tool. No transcript upload is implemented, but a formal privacy/network review is still a release requirement.
 
-## How It Works
+See [the continuation plan and technical specification](docs/project-readiness.md). The repository is currently marked `UNLICENSED`; model/data rights and code licensing must be decided before distribution.
 
-The extension fetches YouTube's auto-generated captions as they become available. It then analyzes the text of these captions using the `mobilebert-uncased-mnli` zero-shot classification model.
+## Build from source
 
-This model is run entirely within the browser—no data is sent to an external server. We provide it the labels `['promotional content', 'neutral content']` on the fly. If the model classifies the caption text as "promotional content" with a score higher than the user-set confidence threshold, the extension skips that segment of the video.
-
-## Building and Installing from Source
-
-To build and install this extension, you'll need to have Node.js and npm installed.
-
-1.  **Clone the repository:**
-    ```bash
-    git clone https://github.com/feuerdev/adblock.git
-    cd adblock
-    ```
-
-2.  **Install dependencies:**
-    ```bash
-    npm install
-    ```
-
-3.  **Download the ML Model:**
-    This step downloads the necessary machine learning model and places it in the correct directory for the extension to use.
-    ```bash
-    npm run setup
-    ```
-
-4.  **Build the extension:**
-    This command bundles all the files into the `dist/` directory.
-    ```bash
-    npm run build
-    ```
-
-5.  **Load the extension in your browser:**
-    - Open your Chrome/Chromium-based browser and navigate to `chrome://extensions`.
-    - Enable **Developer mode** (usually a toggle in the top-right corner).
-    - Click the **Load unpacked** button.
-    - Select the `dist/` folder that was created by the build process.
-    - The extension's icon will appear in your browser's toolbar.
-
-## Development
-
-The project includes a Node.js-based testing environment to evaluate the classifier's performance without needing to load the extension.
-
-### Setup
-
-First, install the required dependencies:
 ```bash
-npm install
+git clone https://github.com/feuerdev/yt-sponsor-detect.git
+cd yt-sponsor-detect
+npm ci
+npm test
+npm run setup
+npm run build
 ```
 
-### Testing the Classifier
+`npm test` runs dependency-free syntax and configuration checks. It performs no model inference or download. `npm run setup` is a heavier step: it loads a Transformers pipeline to download/cache a model, then copies assets into `model/`. Run it on a suitable development machine, not a memory-constrained shared server.
 
-To run a batch test against the sample data in `test_data.js`, use:
+Known model-setup gap: the setup script chooses the first cached `.onnx` file and renames it `model.onnx`, while the classifier asks for a full-precision artifact. The quantization/artifact contract is not verified. A successful webpack build alone cannot prove that inference loads the correct weights. Resolve this before claiming reproducible classifier results. The build requires real local model assets; model files and generated `dist/` are ignored by Git.
+
+Load `dist/` through `chrome://extensions` → Developer mode → Load unpacked. Verify in a disposable browser profile. The current prototype relies on captions being requested by the player; videos without suitable captions may produce no result.
+
+## Checks and experiments
+
 ```bash
-npm run test
+npm test               # fast syntax/manifest/package checks; no ML
+npm run evaluate       # existing exploratory classifier experiment; needs model
+npm run debug -- "this video is sponsored by" "promotional content,neutral content"
+npm run build          # webpack bundle, requires actual model files
 ```
 
-To classify a single sentence from your terminal, use the `debug` script:
-```bash
-npm run debug "this video is sponsored by" "promotional content,neutral content"
-```
+The evaluation script tries labels/thresholds against `test_data.js`. It tunes and scores on the same sample sentences, prints results, and has no pass/fail accuracy assertion. It is an experiment, not a regression suite or independent accuracy benchmark. Model errors currently fall back to 0.5 scores, so output can be misleading when weights fail to load.
 
-### Open Issues
+## Next milestone
 
-*   The detection window is too large. A second pass is needed to hone in on the exact sponsored segment.
-*   Only works when the captions are requested. So we either need to kick off a request for captions when the video starts, or we need to enable the captions silently.
-*   Enable users to configure additional labels and confidence thresholds.
+Make model setup deterministic; add fixture-driven caption/window/interval checks; prove disable, cache and navigation behavior; then measure precision, boundary errors, latency and memory on held-out examples. Start with suggested intervals and reversible manual skipping. Store submission and automatic-skipping reliability claims come after those acceptance gates.
