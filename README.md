@@ -43,3 +43,5 @@ Make model setup deterministic; add fixture-driven caption/window/interval check
 ## Verified lifecycle fixes
 
 Real-source Node fixtures cover player replacement, same-player navigation, late cached responses, rapid return to a video, player/progress-bar removal and background state cancellation. The content script releases detached listeners and rejects obsolete cache callbacks; background analysis stops emitting results or restoring cache after its state is cleared/replaced. These fixtures do not establish browser integration, YouTube compatibility or classifier accuracy.
+
+The global enable toggle now also controls cached skipping in an already-open player. Playback changes wait for saved settings, and live toggles take precedence over an older settings read. Label changes and cross-tab cache invalidation still need integration checks.

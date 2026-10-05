@@ -11,8 +11,12 @@ function element(src = '') {
         removeEventListener(type, handler) { if (listeners.get(type) === handler) listeners.delete(type); },
     };
 }
-function fixture() {
+function fixture(enabled = true) {
     const state = { video: element(), bar: element(), requests: [] };
+    let resolveSettings;
+    const settings = new Promise(resolve => { resolveSettings = resolve; });
+    state.loadSettings = () => resolveSettings({ isEnabled: enabled });
+    state.changeSettings = (changes, area = 'sync') => state.settingsChanged?.(changes, area);
     const context = vm.createContext({
         console: { log() {}, error() {} }, URLSearchParams, setTimeout,
         window: { location: { search: '?v=first' } },
@@ -22,6 +26,8 @@ function fixture() {
         },
         chrome: { runtime: { onMessage: { addListener() {} },
             sendMessage(request, callback) { state.requests.push({ request, callback }); },
+        }, storage: { sync: { get: () => settings },
+            onChanged: { addListener(listener) { state.settingsChanged = listener; } },
         } },
         MutationObserver: class { observe() {} },
     });
@@ -92,4 +98,40 @@ test('cache callbacks after player removal cannot restore segments', () => {
     f.video = null; f.refresh();
     f.requests[0].callback({ segments: [{ startTime: 1, endTime: 2 }] });
     assert.equal(f.segments(), 0);
+});
+
+function prepareSkip(f) {
+    f.requests[0].callback({ segments: [{ startTime: 1, endTime: 2 }] });
+    f.video.readyState = 1;
+    f.video.currentTime = 1.5;
+    return () => vm.runInContext('checkForSponsorBlock()', f.context);
+}
+
+test('saved disabled setting prevents skips of cached segments', async () => {
+    const f = fixture(false), skip = prepareSkip(f);
+    f.loadSettings(); await Promise.resolve(); await Promise.resolve();
+    skip(); assert.equal(f.video.currentTime, 1.5);
+});
+
+test('live enable toggle immediately controls cached skips', async () => {
+    const f = fixture(), skip = prepareSkip(f);
+    f.loadSettings(); await Promise.resolve(); await Promise.resolve();
+    skip(); assert.equal(f.video.currentTime, 2);
+    f.video.currentTime = 1.5;
+    f.changeSettings({ isEnabled: { newValue: false } });
+    skip(); assert.equal(f.video.currentTime, 1.5);
+    f.changeSettings({ isEnabled: { newValue: true } });
+    skip(); assert.equal(f.video.currentTime, 2);
+});
+
+test('an older settings read cannot undo a newer disable event', async () => {
+    const f = fixture(), skip = prepareSkip(f);
+    f.changeSettings({ isEnabled: { newValue: false } });
+    f.loadSettings(); await Promise.resolve(); await Promise.resolve();
+    skip(); assert.equal(f.video.currentTime, 1.5);
+});
+
+test('skipping waits for the initial settings read', () => {
+    const f = fixture(), skip = prepareSkip(f);
+    skip(); assert.equal(f.video.currentTime, 1.5);
 });

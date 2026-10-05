@@ -4,6 +4,21 @@ const sponsoredSegments = [];
 const ANALYSIS_INDICATOR_ID = 'analysis-in-progress-indicator';
 const NOTIFICATION_CONTAINER_ID = 'sponsor-block-notification-container';
 
+// Wait for saved settings before changing playback, and prefer newer toggle events.
+let isEnabled = false;
+let settingsGeneration = 0;
+const initialSettingsGeneration = settingsGeneration;
+chrome.storage.sync.get({ isEnabled: true }).then(settings => {
+    if (settingsGeneration === initialSettingsGeneration) isEnabled = settings.isEnabled === true;
+}).catch(error => console.error('Unable to load sponsor settings:', error));
+chrome.storage.onChanged.addListener((changes, area) => {
+    if (area === 'sync' && changes.isEnabled) {
+        settingsGeneration++;
+        isEnabled = (changes.isEnabled.newValue ?? true) === true;
+    }
+});
+
+
 function addSponsoredSegment(newSegment) {
     const isDuplicate = sponsoredSegments.some(
         s => s.startTime === newSegment.startTime && s.endTime === newSegment.endTime
@@ -197,6 +212,7 @@ function clearProgressBarHighlights() {
 }
 
 function checkForSponsorBlock() {
+    if (!isEnabled) return;
     const video = document.querySelector('video');
     if (!video || video.readyState < 1) return; // No video or not ready to play
 
