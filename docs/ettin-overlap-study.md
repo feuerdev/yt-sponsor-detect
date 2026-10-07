@@ -108,3 +108,23 @@ model inference, following the existing uncertain-category policy. They do not
 count as a new paid positive or as reviewed ordinary content. This new private
 seven-track development manifest is a subsequent phase and is not part of the
 six-track scores above. The original frozen manifest remains untouched.
+
+## Disputed-category stress check
+
+Both native Chrome backends completed the seven-track development run. The
+existing0.8 baseline matched4/5 paid references and produced one additional
+suggestion in the disputed region, giving provisional segment agreementF1
+0.800. That additional suggestion is unknown, not a confirmed ordinary-content
+false skip.
+
+The in-sample selection moved to the original Flow decoder at0.95. Channel-held-out
+selection then matched only3/5 references, with agreementF1 0.667 on both
+backends. This recall regression rejects promotion as well. The preferred
+configuration changing materially when one uncertain transcript is added is
+another sign that the small, partial annotation sample cannot justify tuning
+the production algorithm. [Numeric record](ettin-evidence/overlap-study-disputed.json).
+
+No automatic skipping or new production operating point is enabled. The next
+quality phase needs more sponsor-positive channels, resolved category disputes
+and reviewed ordinary exposure. Caption acquisition/live-extension behavior is
+a separate application requirement and remains to be verified.
