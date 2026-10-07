@@ -3,6 +3,8 @@ import {readFileSync} from 'node:fs';
 import test from 'node:test';
 import vm from 'node:vm';
 import {MODEL_SPEC} from '../src/model-spec.js';
+import {sponsorLabels} from '../src/sponsor-policy.js';
+import {validateSegments} from '../src/caption-contract.js';
 const source=readFileSync(new URL('../src/background.js',import.meta.url),'utf8').replace(/^import .*;\n/gm,'');
 const settle=async()=> {for(let i=0;i<4;i++) await new Promise(setImmediate);};
 function fixture(saved={}, score=async()=>({sponsor:0.99})) {
@@ -10,8 +12,8 @@ function fixture(saved={}, score=async()=>({sponsor:0.99})) {
     const settings={isEnabled:true, labels:[{name:'sponsor',threshold:0.9,blocked:true}]};
     let request, message, changed, fetches=0;
     let events=Array.from({length:20},(_,i)=>({tStartMs:i*1000,dDurationMs:1000,segs:[{utf8:'synthetic caption fixture'}]}));
-    const context=vm.createContext({URL, Date, MODEL_SPEC,console:{log(){},error(){}},
-        env:{backends:{onnx:{wasm:{}}}},classifyText:score,
+    const context=vm.createContext({URL, Date, MODEL_SPEC,sponsorLabels,validateSegments,console:{log(){},error(){}},
+        env:{backends:{onnx:{wasm:{}}}},classifyCaptions:async(captions,threshold,onProgress)=>{const s=await score(captions);onProgress?.({processed:1,total:1});return s.segments?s:{segments:s.sponsor>threshold?[{start:Number(captions[0].start),end:Number(captions.at(-1).start)+Number(captions.at(-1).duration),category:'sponsor',score:s.sponsor}]:[]};},
         fetch:async()=> {fetches++;return {ok:true,text:async()=>JSON.stringify({events})};},
         chrome:{runtime:{id:'fixture',onMessage:{addListener(fn){message=fn;}}},
             webRequest:{onCompleted:{addListener(fn){request=fn;}}},
@@ -22,7 +24,7 @@ function fixture(saved={}, score=async()=>({sponsor:0.99})) {
                     remove:async keys=> {for(const key of [].concat(keys)) delete saved[key];}}}}});
     vm.runInContext(source,context);
     return {context,saved,messages,writes,settings,get fetches(){return fetches;},
-        request:(tabId=1,videoId='fixture')=>request({tabId,url:`https://www.youtube.com/api/timedtext?v=${videoId}`}),
+        request:(tabId=1,videoId='fixture',language='en')=>request({tabId,url:`https://www.youtube.com/api/timedtext?v=${videoId}&lang=${language}`}),
         change: updates=>{Object.assign(settings,updates); changed(Object.fromEntries(Object.entries(updates).map(([k,v])=>[k,{newValue:v}])),'sync');},
         captions:value=>{events=value;},
         cache:()=>new Promise(resolve=>message({type:'GET_CACHED_SEGMENTS',videoId:'fixture'},{},resolve))};
@@ -67,13 +69,10 @@ test('invalid caption boundaries fail visibly without segment or completed cache
     }
 });
 
-test('a gap between detected windows never becomes a suggested skip interval', async()=>{
-    const f=fixture();
-    vm.runInContext(`tabState[1]={videoId:'fixture',foundSegments:[],windowScores:[
-        {startTime:0,endTime:2,scores:{sponsor:0.99}},
-        {startTime:20,endTime:22,scores:{sponsor:0.99}}]}`,f.context);
-    await vm.runInContext(`findAndProcessSponsoredSegments(1,'fixture',[{name:'sponsor',threshold:0.9,blocked:true}])`,f.context);
-    assert.deepEqual(f.messages.map(m=>[m.payload.startTime,m.payload.endTime]),[[0,2],[20,22]]);
+test('separated model intervals are not expanded across ordinary time',async()=>{
+ const f=fixture({},async()=>({segments:[{start:0,end:2,category:'sponsor',score:.99},{start:18,end:20,category:'sponsor',score:.99}]}));
+ await f.request();await settle();
+ assert.deepEqual(f.messages.filter(m=>m.type==='SPONSORED_SEGMENT_FOUND').map(m=>[m.payload.startTime,m.payload.endTime]),[[0,2],[18,20]]);
 });
 test('completed cache evicts oldest entries to stay bounded',async()=>{
     const saved=Object.fromEntries(Array.from({length:35},(_,i)=>['sponsor-cache:old'+i,{createdAt:i}]));
@@ -150,4 +149,21 @@ test('policy changes cancel cache writes waiting behind another tab',async()=>{
     release({});await settle();
     assert.equal(f.writes.length,0);
     assert.equal(Object.keys(f.saved).length,0);
+});
+
+test('short tracks and the final captions are included in full-track classification',async()=>{
+ for(const count of [3,27]){
+  let seen;const f=fixture({},async captions=>{seen=captions;return {segments:[{start:count-1,end:count,category:'sponsor',score:.99}]};});
+  f.captions(Array.from({length:count},(_,i)=>({tStartMs:i*1000,dDurationMs:1000,segs:[{utf8:'short'}]})));
+  await f.request();await settle();
+  assert.equal(seen.length,count);assert.equal((await f.cache()).segments[0].startTime,count-1);
+ }
+});
+
+test('non-English and unidentified caption languages do not load the English-only model',async()=>{
+ for(const language of ['de','']){
+  let calls=0;const f=fixture({},async()=>{calls++;return {sponsor:.99};});
+  await f.request(1,'fixture',language);await settle();
+  assert.equal(calls,0);assert.equal(f.writes.length,0);assert.equal(f.messages.at(-1).type,'ANALYSIS_ERROR');
+ }
 });

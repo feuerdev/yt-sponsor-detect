@@ -1,10 +1,10 @@
 # Sponsor detection: measured, reversible local ML demo
 
-> Current direction (7 October 2026): the isolated full-track benchmark in `bench/` takes precedence over historical sentence threshold tuning and automatic-skipping plans. See `bench/README.md` and `docs/benchmark-evidence.md`. Seven learned model/backend paths now run in Chrome on the Mac, with 14/50 pilot captions and a frozen provisional test comparison. Missing captions, human-reviewed negatives and installed-extension validation remain open; automatic skipping stays disabled.
+> Current direction (8 October 2026): the extension now uses Ettin INT8 and token intervals; [integration details](ettin-integration.md). The historical proposal below predates that switch. Benchmark quality remains provisional and automatic skipping stays disabled.
 
 Status: proposed implementation spec, 5 October 2026. Primary endpoint: portfolio demonstration of on-device classification, measured errors and browser lifecycle design. Commercial launch is deferred until differentiation, accuracy and licensing are established.
 
-## Existing system and cleanup
+## Historical system and cleanup (before the Ettin switch)
 
 Manifest V3 extension with a background service worker, caption-request observation/refetch, 20-caption windows stepped by five, local MobileBERT classification, interval coalescing/cache and video seeking. Popup already supports categories and per-label thresholds. Model setup and YouTube captions need network access; inference is configured to disallow remote models. This does not make the complete product offline.
 

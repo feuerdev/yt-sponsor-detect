@@ -1,5 +1,7 @@
 # Sponsor browser benchmark — macOS continuation, 7 October 2026
 
+> Subsequent change, 8 October: the extension now integrates Ettin INT8; see [integration evidence](ettin-integration.md). The measurements below describe the original isolated benchmark snapshot, before that integration. Its frozen configuration and exposure ledger are preserved.
+
 The browser benchmark completed the supported learned matrix on the available pilot tracks, with a configuration frozen before test inference. This is an **incomplete, provisional pilot comparison**: only 14 of 50 captions were acquired, and no human-reviewed negatives exist. No reliable model winner or automatic-skipping release is established. Production classifier/playback source remains unchanged. Draft PR #2 remains open and draft.
 
 ## Current acquisition and evaluation

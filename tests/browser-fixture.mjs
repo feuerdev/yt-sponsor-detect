@@ -15,13 +15,15 @@ let source=await readFile(new URL('src/background.js',repo),'utf8');
 source=source.replace(/^import .*;\n/gm,'').replace('chrome.webRequest.onCompleted.addListener(', 'registerReviewCaptionListener(');
 const prelude=`
 const MODEL_SPEC=${JSON.stringify(MODEL_SPEC)};
-const env={backends:{onnx:{wasm:{}}}};
+${(await readFile(new URL('src/sponsor-policy.js',repo),'utf8')).replace(/^export /gm,'')}
+${(await readFile(new URL('src/caption-contract.js',repo),'utf8')).replace(/^export /gm,'')}
 let reviewCaptionListener;
 function registerReviewCaptionListener(fn,...args) { reviewCaptionListener=fn;chrome.webRequest.onCompleted.addListener(fn,...args); }
 let attempts=0;
-async function classifyText(text) {
+async function classifyCaptions(captions,threshold,onProgress) {
+  const text=captions.map(c=>c.text).join(' ');
   if(text.includes('retry-fixture') && ++attempts===1) throw Object.assign(new Error('synthetic transient failure'),{code:'model_unavailable'});
-  return {sponsor:0.99};
+  onProgress?.({processed:1,total:1});return {segments:[{start:0,end:20,category:'sponsor',score:.99}]};
 }
 async function fetch(url) {
   const videoId=new URL(url).searchParams.get('v');
@@ -45,7 +47,7 @@ chrome.runtime.onMessage.addListener((request,sender,respond)=>{
     await chrome.storage.sync.set({isEnabled:true,labels:[{name:'sponsor',threshold:0.9,blocked:true}]});
     await sleep(100);
     const tabId=sender.tab.id;
-    const caption=id=>reviewCaptionListener({tabId,url:'https://www.youtube.com/api/timedtext?v='+id});
+    const caption=id=>reviewCaptionListener({tabId,url:'https://www.youtube.com/api/timedtext?lang=en&v='+id});
     await caption('retry-fixture');
     await waitFor(()=>!tabState[tabId]);
     if((await chrome.storage.local.get(null))['sponsor-cache:retry-fixture']) throw new Error('Failed inference was cached');
@@ -58,8 +60,8 @@ chrome.runtime.onMessage.addListener((request,sender,respond)=>{
     try {
       await waitFor(async()=> (await chrome.tabs.get(second.id)).status==='complete');
       await Promise.all([
-        reviewCaptionListener({tabId,url:'https://www.youtube.com/api/timedtext?v=first'}),
-        reviewCaptionListener({tabId:second.id,url:'https://www.youtube.com/api/timedtext?v=second'})
+        reviewCaptionListener({tabId,url:'https://www.youtube.com/api/timedtext?lang=en&v=first'}),
+        reviewCaptionListener({tabId:second.id,url:'https://www.youtube.com/api/timedtext?lang=en&v=second'})
       ]);
       const cache=await waitFor(async()=> {const all=await chrome.storage.local.get(null);return all['sponsor-cache:first']&&all['sponsor-cache:second']?all:false;});
       const count=Object.keys(cache).filter(key=>key.startsWith('sponsor-cache:')).length;

@@ -1,56 +1,38 @@
 import assert from 'node:assert/strict';
-import { readFileSync } from 'node:fs';
+import {readFileSync} from 'node:fs';
 import test from 'node:test';
 import vm from 'node:vm';
-import { MODEL_SPEC } from '../src/model-spec.js';
-
-const source = readFileSync(new URL('../src/classifier.js', import.meta.url), 'utf8')
-    .replace(/^import .*;\n/gm, '').replace(/^export /gm, '');
-function fixture(pipeline) {
-    const logs = [];
-    const context = vm.createContext({ MODEL_SPEC, pipeline, env: {}, console: { error: (...args) => logs.push(args), log: (...args) => logs.push(args) } });
-    vm.runInContext(source, context);
-    return { classifier: vm.runInContext('Classifier', context), classify: vm.runInContext('classifyText', context), logs };
+import {MODEL_SPEC} from '../src/model-spec.js';
+import {validateCaptions,validateSegments} from '../src/caption-contract.js';
+const source=readFileSync(new URL('../src/classifier.js',import.meta.url),'utf8').replace(/^import .*;\n/gm,'').replace(/^export /gm,'');
+const captions=[{start:'0',duration:'10',text:'synthetic caption'}];
+function fixture({create=async()=>{},reply=async()=>({ok:true,segments:[{start:2,end:4,category:'sponsor',score:.99}],backend:'wasm',model:MODEL_SPEC.revision,pipelineVersion:MODEL_SPEC.pipelineVersion})}={}){
+ const listeners=new Set();let creations=0;
+ const chrome={runtime:{id:'fixture',getURL:f=>'chrome-extension://fixture/'+f,getContexts:async()=>[],sendMessage:reply,onMessage:{addListener:f=>listeners.add(f),removeListener:f=>listeners.delete(f)}},offscreen:{createDocument:async options=>{creations++;await create(options);}}};
+ const context=vm.createContext({MODEL_SPEC,validateCaptions,validateSegments,chrome,crypto,setTimeout,clearTimeout});
+ vm.runInContext(source,context);
+ return {instance:vm.runInContext('Classifier',context),classify:vm.runInContext('classifyCaptions',context),get creations(){return creations;},listeners};
 }
-
-test('concurrent requests share one model initialization', async () => {
-    let loads = 0, release;
-    const model = () => {};
-    const f = fixture(() => { loads++; return new Promise(resolve => { release = resolve; }); });
-    const first = f.classifier.getInstance(), second = f.classifier.getInstance();
-    await Promise.resolve();
-    assert.equal(loads, 1);
-    release(model);
-    assert.equal(await first, model); assert.equal(await second, model);
+test('concurrent requests create a single offscreen inference document',async()=>{
+ let release;const f=fixture({create:()=>new Promise(r=>release=r)});
+ const a=f.instance.getInstance(),b=f.instance.getInstance();await new Promise(setImmediate);assert.equal(f.creations,1);release();await Promise.all([a,b]);
 });
-
-test('missing model fails explicitly instead of producing sponsor-like neutral scores', async () => {
-    const f = fixture(async () => { throw new Error('private-provider-payload'); });
-    await assert.rejects(f.classify('private caption content', ['sponsor', 'neutral']), error => error.code === 'model_unavailable');
-    assert.equal(JSON.stringify(f.logs).includes('private-provider-payload'), false);
-    assert.equal(JSON.stringify(f.logs).includes('private caption content'), false);
+test('the classifier accepts timed sponsor segments and reports the actual backend',async()=>{
+ const f=fixture();const r=await f.classify(captions,.8);
+ assert.deepEqual(r.segments,[{start:2,end:4,category:'sponsor',score:.99}]);assert.equal(r.backend,'wasm');assert.equal(f.listeners.size,0);
 });
-
-test('inference failure emits no caption or provider text and no scores', async () => {
-    const f = fixture(async () => async () => { throw new Error('private-provider-payload'); });
-    await assert.rejects(f.classify('private caption content', ['sponsor']), error => error.code === 'inference_failed');
-    assert.equal(JSON.stringify(f.logs).includes('private'), false);
+test('missing model and inference errors are sanitized with no provider or caption text',async()=>{
+ for(const options of [{create:async()=>{throw Error('private provider caption');}},{reply:async()=>({ok:false,code:'inference_failed',detail:'private caption'})}]){
+  const f=fixture(options);await assert.rejects(f.classify(captions,.8),e=>['model_unavailable','inference_failed'].includes(e.code)&&!e.message.includes('private'));
+ }
 });
-
-test('malformed and non-finite output is not accepted as classification evidence', async () => {
-    for (const result of [{ labels: ['sponsor'], scores: [NaN] },
-        { labels: ['different'], scores: [0.99] }, { labels: ['sponsor'], scores: [1.5] }]) {
-        const f = fixture(async () => async () => result);
-        await assert.rejects(f.classify('synthetic caption', ['sponsor']), error => error.code === 'invalid_output');
-    }
+test('malformed, out-of-track, unsupported or foreign-model results fail closed',async()=>{
+ for(const patch of [{segments:[{start:2,end:20,category:'sponsor',score:.9}]},{segments:[{start:2,end:4,category:'selfpromo',score:.9}]},{segments:[{start:2,end:4,category:'sponsor',score:NaN}]},{model:'old-model'},{backend:'cpu'}]){
+  const f=fixture({reply:async()=>({ok:true,segments:[],backend:'wasm',model:MODEL_SPEC.revision,pipelineVersion:MODEL_SPEC.pipelineVersion,...patch})});
+  await assert.rejects(f.classify(captions,.8),e=>e.code==='invalid_output');assert.equal(f.listeners.size,0);
+ }
 });
-
-
-test('failed initialization can be retried without caching failure', async () => {
-    let attempts = 0;
-    const model = async () => ({ labels: ['neutral', 'sponsor'], scores: [0.8, 0.2] });
-    const f = fixture(async () => { if (++attempts === 1) throw new Error('unavailable'); return model; });
-    await assert.rejects(f.classifier.getInstance(), error => error.code === 'model_unavailable');
-    const scores = await f.classify('synthetic caption', ['sponsor', 'neutral']);
-    assert.equal(scores.sponsor, 0.2); assert.equal(scores.neutral, 0.8); assert.equal(attempts, 2);
+test('failed offscreen creation is retryable',async()=>{
+ let calls=0;const f=fixture({create:async()=>{if(++calls===1)throw Error('missing');}});
+ await assert.rejects(f.instance.getInstance());await f.instance.getInstance();assert.equal(calls,2);
 });

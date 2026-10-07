@@ -1,14 +1,23 @@
 # YouTube sponsor detection prototype
 
-> Current direction (7 October 2026): the isolated full-track benchmark in `bench/` takes precedence over historical sentence threshold tuning and automatic-skipping plans. See `bench/README.md` and `docs/benchmark-evidence.md`. Seven learned model/backend paths now run in Chrome on the Mac, with 14/50 pilot captions and a frozen provisional test comparison. Missing captions, human-reviewed negatives and installed-extension validation remain open; automatic skipping stays disabled.
+The Chrome 116+ extension now uses **Ettin INT8** for paid-sponsor suggestions.
+Automatic skipping stays disabled; every Skip requires a click and has Undo.
+The benchmark is provisional: 14/50 pilot captions, nine acquired test videos,
+and only one paid-sponsor holdout reference. See [integration and rights](docs/ettin-integration.md)
+and [benchmark evidence](docs/benchmark-evidence.md).
 
-A Chromium Manifest V3 extension experimenting with local MobileBERT classification of YouTube captions. It observes caption requests, scores overlapping windows, caches estimated intervals and offers manual skip suggestions for configured categories. Every manual skip has Undo. Automatic skipping is unavailable until independent reliability evidence supports it; legacy opt-in settings are ignored. The popup supports labels, thresholds, and an enable toggle.
+The extension observes English caption requests, processes the complete transcript
+in overlapping token windows, caches estimated intervals and offers manual
+suggestions. Self-promotion and custom categories are unsupported. The popup
+controls enable, paid-sponsor suggestions and minimum confidence. Legacy
+zero-shot labels migrate to a sponsor-only policy; automatic opt-ins are ignored.
 
-**Prototype status:** segment boundaries, caption acquisition, navigation/session handling and settings/cache behavior need verification. Detection accuracy has not been established on a held-out dataset. Do not assume that every sponsor is detected or that an estimated interval contains only sponsored content.
-
-Inference is configured to use local model files and disallow remote model loading. Model setup downloads files, and captions come from YouTube; the complete extension is not an offline video-analysis tool. No transcript upload is implemented, but a formal privacy/network review is still a release requirement.
-
-See [the continuation plan and technical specification](docs/project-readiness.md). The repository is currently marked `UNLICENSED`; model/data rights and code licensing must be decided before distribution.
+Suggestions can be wrong or miss sponsors. Caption acquisition still depends on
+YouTube/player requests. Inference uses bundled local assets; setup and YouTube
+need network access. No caption upload or remote model loading is implemented.
+A formal privacy/network review and independent accuracy evidence remain release
+gates. The project is UNLICENSED pending an owner decision; model weights and
+GPL-derived code have separate obligations before any distribution.
 
 ## Build from source
 
@@ -21,37 +30,49 @@ npm run setup
 npm run build
 ```
 
-`npm test` runs dependency-free syntax/configuration checks and real-source lifecycle regression fixtures with one test worker. It performs no model inference or download. `npm run setup` streams four exact assets from the revision in `src/model-spec.js`, checks their sizes and SHA-256 hashes, then publishes the complete directory. It never initializes inference. Existing damaged/incomplete assets are diagnosed rather than overwritten. `npm run verify:model` checks existing assets; the build runs it first.
+Setup streams four exact assets from the immutable revision in `src/model-spec.js`,
+checks sizes/SHA-256, and publishes a complete directory. Damaged existing assets
+are diagnosed, not overwritten. Setup/tests do not run model inference. Build
+verifies real model assets first; never build with placeholder weights.
 
-The setup and runtime contract specifies the full-precision `onnx/model.onnx` artifact at revision `8b0ea66ab7b190bba77418ba03b67d69cfc9a1ee`. A real download and hash verification, followed by the production webpack build, passed on Node 24.15.0 with a 192 MiB heap limit. The bundle includes roughly 95 MiB of model assets and 37 MiB of WASM; size warnings remain. A successful build does not establish inference loading or browser compatibility. The build requires real local model assets; model files and generated `dist/` are ignored by Git.
+The graph is `sponsor_detector_combined.int8.onnx` at revision
+`d4939256c49e92d158429a55fcf39477d003dd58`, about 32 MiB including tokenizer/config.
+ORT 1.29.0's local GPU/CPU loaders and WASM are bundled separately, so the total
+extension is larger. An offscreen document owns a dedicated inference worker.
+Native WebGPU is preferred; unavailable GPU or GPU graph initialization failure
+selects WASM. The idle worker releases its model after 60 seconds.
 
-Load `dist/` through `chrome://extensions` → Developer mode → Load unpacked. Verify in a disposable browser profile. The current prototype relies on captions being requested by the player; videos without suitable captions may produce no result.
+Load `dist/` using `chrome://extensions` → Developer mode → Load unpacked in a
+disposable profile. Model files and generated `dist/` remain ignored. Reload a
+video after changing detection settings or clearing suggestions.
 
 ## Checks and experiments
 
 ```bash
-npm test               # syntax/configuration + lifecycle regressions; no ML
-npm run evaluate       # existing exploratory classifier experiment; needs model
-npm run debug -- "this video is sponsored by" "promotional content,neutral content"
-npm run build          # webpack bundle, requires actual model files
+npm test               # source/configuration, decoder and lifecycle checks; no model inference
+npm run verify:model   # verify existing production assets
+npm run build          # local extension bundle; requires verified real assets
 ```
 
-The evaluation script tries labels/thresholds against `test_data.js`. It tunes and scores on the same sample sentences, prints results, and has no pass/fail accuracy assertion. It is an experiment, not a regression suite or independent accuracy benchmark. Model initialization/inference/malformed output now fails explicitly with sanitized errors. Partial segments are cleared and the player shows an unavailable status; playback remains unchanged. Concurrent calls share one initialization, and a failed initialization can be retried.
+The old `evaluate`/`debug` sentence-label experiments are retired. Ettin emits
+timed token intervals and supports paid sponsorships only. Use the Chrome
+benchmark runner with the documented resource policy for real model experiments;
+see [bench/README.md](bench/README.md).
 
-## Next milestone
+## Reliability and evidence
 
-Make model setup deterministic; add fixture-driven caption/window/interval checks; prove disable, cache and navigation behavior; then measure precision, boundary errors, latency and memory on held-out examples. Start with suggested intervals and reversible manual skipping. Store submission and automatic-skipping reliability claims come after those acceptance gates.
+Cache keys bind the model revision/graph, pipeline version, decoder gaps and
+threshold/category policy. Old MobileBERT, expired, incomplete and malformed
+entries are rejected. Completed-cache read/evict/write is serialized, with 30
+videos retained for 48 hours. Disable, settings changes, navigation, closed tabs
+and player replacement invalidate obsolete results and playback controls.
+Failures clear partial suggestions and allow caption-request retries. Whitespace
+JSON3 separators are filtered before speech-boundary validation.
 
-## Verified lifecycle fixes
-
-Real-source Node fixtures cover player replacement, same-player navigation, late cached responses, rapid return to a video, player/progress-bar removal and background state cancellation. The content script releases detached listeners and rejects obsolete cache callbacks; background analysis stops emitting results or restoring cache after its state is cleared/replaced. These fixtures do not establish browser integration, YouTube compatibility or classifier accuracy.
-
-The global enable toggle now also controls cached skipping in an already-open player. Playback changes wait for saved settings, and live toggles take precedence over an older settings read. Label and enable changes cancel in-flight work and invalidate current suggestions. Completed caches bind the model revision/hash and label names, thresholds and blocked status; legacy, expired, incomplete or malformed entries are ignored. Caches retain at most 30 videos for 48 hours. After category changes or clearing suggestions, reload the video to request captions again.
-
-## Current draft evidence and remaining gates
-
-The default playback mode highlights suggestions and requires a click. Undo restores the prior playback position and suppresses another skip of the same segment. Disable, navigation and player replacement invalidate retained controls. Real-source fixtures cover these paths, legacy opt-in rejection, failure messages, single model initialization and bounded streaming asset verification. All six test files pass; these are fixtures, not a live browser run.
-
-A real model was downloaded from [the pinned upstream repository](https://huggingface.co/Xenova/mobilebert-uncased-mnli/tree/8b0ea66ab7b190bba77418ba03b67d69cfc9a1ee). Its model card/API has no license declaration. Code remains UNLICENSED; model redistribution and any store release stay blocked pending rights review. No model weights or bundle are committed or uploaded by this PR.
-
-Still required: actual local inference/load evidence, browser/YouTube smoke checks, real browser service-worker restart and settings/cache-policy checks, representative caption/boundary checks, and independent held-out channel annotations/evaluation. Automatic skipping remains unavailable before the held-out accuracy and browser Undo gates pass. Node fixtures simulate worker restart with shared persisted storage, settings changes during inference, repeated caption requests, invalid intervals and bounded cache eviction; they do not substitute for browser or held-out detection evidence.
+The prior [PR #1 synthetic browser evidence](docs/review-evidence/README.md),
+[isolated browser benchmark](docs/benchmark-evidence.md) and
+[current integration evidence](docs/ettin-integration.md) describe distinct
+checks. Passing fixtures or a synthetic installed-browser smoke does not prove
+live YouTube reliability, worker suspension, general detection accuracy or safe
+automatic skipping. Common human-reviewed references/negative exposure, more
+captions, campaign/training-overlap review and numeric release gates remain open.

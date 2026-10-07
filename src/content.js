@@ -149,7 +149,7 @@ function updateAnalysisIndicator(processed, total) {
     const progressBar = document.getElementById('analysis-indicator-progress');
 
     if (indicatorText) {
-        indicatorText.textContent = `Analyzing... (${processed}/${total} windows)`;
+        indicatorText.textContent = total > 0 ? `Analyzing... (${processed}/${total} windows)` : 'Loading sponsor detector...';
     }
     if (progressBar) {
         const percentage = total > 0 ? (processed / total) * 100 : 0;

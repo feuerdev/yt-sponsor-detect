@@ -1,11 +1,7 @@
-import { env } from '@xenova/transformers';
-import { classifyText } from './classifier.js';
+import { classifyCaptions } from './classifier.js';
+import { sponsorLabels } from './sponsor-policy.js';
+import { validateSegments } from './caption-contract.js';
 import { MODEL_SPEC } from './model-spec.js';
-
-// Due to a bug in onnxruntime-web, we must disable multithreading for now.
-// See https://github.com/microsoft/onnxruntime/issues/14445 for more information.
-env.backends.onnx.wasm.numThreads = 1;
-env.backends.onnx.wasm.wasmPaths = '/ort/';
 
 console.log("Background script loaded.");
 
@@ -15,13 +11,10 @@ const CACHE_PREFIX = 'sponsor-cache:';
 const CACHE_MAX_ENTRIES = 30;
 const CACHE_TTL_MS = 48 * 3600000;
 function policyKey(labels) {
-    if (!Array.isArray(labels) || labels.length === 0 || labels.length > 30
-        || labels.some(label => !label || typeof label.name !== 'string' || !label.name.trim()
-            || label.name.length > 160 || !Number.isFinite(label.threshold)
-            || label.threshold < 0 || label.threshold > 1 || typeof label.blocked !== 'boolean')
-        || new Set(labels.map(label => label.name)).size !== labels.length) return null;
-    return JSON.stringify([2, MODEL_SPEC.revision, MODEL_SPEC.files.at(-1).sha256,
-        labels.map(({name, threshold, blocked}) => ({name, threshold, blocked}))]);
+    const policy=sponsorLabels(labels);
+    if (!policy) return null;
+    return JSON.stringify([3, MODEL_SPEC.revision, MODEL_SPEC.files.at(-1).sha256,
+        MODEL_SPEC.pipelineVersion,MODEL_SPEC.decoding.mergeGapCharacters,MODEL_SPEC.decoding.mergeGapSeconds,policy]);
 }
 function validSegments(segments) {
     return Array.isArray(segments) && segments.length <= 1000 && segments.every(segment =>
@@ -49,7 +42,7 @@ async function writeCompletedCache(tabId, videoId, labels, tabData) {
         await chrome.storage.local.remove(others.slice(0, others.length - CACHE_MAX_ENTRIES + 1).map(([name]) => name));
     if (tabState[tabId] !== tabData) return;
     await chrome.storage.local.set({[CACHE_PREFIX + videoId]: {
-        policyKey: key, complete: true, createdAt: Date.now(), segments: tabData.foundSegments.map(segment => ({...segment}))
+        policyKey: key, complete: true, createdAt: Date.now(), backend: tabData.backend || null, model: MODEL_SPEC.revision, segments: tabData.foundSegments.map(segment => ({...segment}))
     }});
 }
 chrome.storage.onChanged?.addListener((changes, area) => {
@@ -61,143 +54,41 @@ chrome.storage.onChanged?.addListener((changes, area) => {
     }
 });
 
-// New constants for sliding window
-const WINDOW_SIZE_CAPTIONS = 20; // Number of captions in a window
-const WINDOW_STEP_CAPTIONS = 5;  // Number of captions to slide forward for the next window
-const MIN_WINDOW_TEXT_LENGTH = 50; // Minimum number of characters in a window to be worth analyzing
-
 function formatTime(totalSeconds) {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = Math.floor(totalSeconds % 60);
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
-async function processWindowQueue(tabId, videoId, labels) {
-    const tabData = tabState[tabId];
-    if (!tabData || tabData.isAnalyzing || tabData.windowQueue.length === 0) {
-        return;
-    }
-    tabData.isAnalyzing = true;
-    const totalWindows = tabData.windowQueue.length;
-    let processedWindows = 0;
-    let failed = false;
-
+async function processCaptions(tabId,videoId,labels) {
+    const tabData=tabState[tabId],policy=sponsorLabels(labels);
+    if (!tabData || tabData.isAnalyzing || !policy || !tabData.allCaptions.length) return;
+    tabData.isAnalyzing=true;
+    let failed=false;
+    const send=async(type,payload)=>{if(tabState[tabId]===tabData)await chrome.tabs.sendMessage(tabId,{type,videoId,payload}).catch(()=>{});};
+    await send('ANALYSIS_STARTED',{total:0,processed:0});
     try {
-        await chrome.tabs.sendMessage(tabId, { type: "ANALYSIS_STARTED", videoId, payload: { total: totalWindows, processed: 0 } });
-    } catch (e) { /* Tab might be closed, ignore */ }
-
-    try {
-        // Process all windows currently in the queue
-        while (tabState[tabId] === tabData && tabData.windowQueue.length > 0) {
-            const windowCaptions = tabData.windowQueue.shift(); // Get next window
-
-            let textToAnalyze = windowCaptions.map(c => c.text).join(' ');
-            if (textToAnalyze.length < MIN_WINDOW_TEXT_LENGTH) {
-                processedWindows++;
-                continue;
-            }
-            
-            const classificationLabels = labels.map(l => l.name);
-            const allScores = await classifyText(textToAnalyze, classificationLabels);
-            if (tabState[tabId] !== tabData) return;
-
-            const windowStartTime = parseFloat(windowCaptions[0].start);
-            const lastCaption = windowCaptions[windowCaptions.length - 1];
-            const windowEndTime = parseFloat(lastCaption.start) + parseFloat(lastCaption.duration);
-
-            const windowScore = {
-                startTime: windowStartTime,
-                endTime: windowEndTime,
-                scores: allScores
-            };
-            
-            tabData.windowScores.push(windowScore);
-            processedWindows++;
-            try {
-                await chrome.tabs.sendMessage(tabId, { type: "ANALYSIS_PROGRESS", videoId, payload: { total: totalWindows, processed: processedWindows } });
-            } catch(e) { /* Tab might be closed, ignore */ }
+        const result=policy[0].blocked?await classifyCaptions(tabData.allCaptions,policy[0].threshold,p=>{send('ANALYSIS_PROGRESS',p);}):{segments:[]};
+        if(tabState[tabId]!==tabData)return;
+        validateSegments(result.segments,tabData.allCaptions);
+        tabData.backend=result.backend;
+        for(const segment of result.segments){
+            if(tabState[tabId]!==tabData)return;
+            await processNewSegment(tabId,videoId,{startTime:segment.start,endTime:segment.end,label:'sponsor'});
         }
-
-        tabData.windowScores.sort((a, b) => a.startTime - b.startTime);
-
-        // After processing new windows, run the coalescing logic once.
-        if (tabState[tabId] === tabData && processedWindows > 0) {
-            await findAndProcessSponsoredSegments(tabId, videoId, labels);
-            if (tabState[tabId] === tabData) await cacheCompleted(tabId, videoId, labels, tabData);
-        }
-
-    } catch (error) {
-        failed = true;
-        if (tabState[tabId] === tabData) {
-            tabData.windowQueue.length = 0;
-            tabData.windowScores.length = 0;
-            tabData.foundSegments.length = 0;
-            await chrome.storage.local.remove(CACHE_PREFIX + videoId).catch(() => {});
-            const codes = ['model_unavailable', 'inference_failed', 'invalid_output'];
-            const code = codes.includes(error?.code) ? error.code : 'analysis_failed';
-            try {
-                await chrome.tabs.sendMessage(tabId, { type: 'CLEAR_SEGMENTS', videoId });
-                if (tabState[tabId] === tabData) {
-                    await chrome.tabs.sendMessage(tabId, { type: 'ANALYSIS_ERROR', videoId, payload: { code } });
-                }
-            } catch { /* Closed tabs require no playback action. */ }
-            // Allow the next caption request to rebuild a failed analysis from scratch.
-            if (tabState[tabId] === tabData) delete tabState[tabId];
+        if(tabState[tabId]===tabData)await cacheCompleted(tabId,videoId,labels,tabData);
+    } catch(error) {
+        failed=true;
+        if(tabState[tabId]===tabData){
+            tabData.foundSegments.length=0;
+            await chrome.storage.local.remove(CACHE_PREFIX+videoId).catch(()=>{});
+            const code=['model_unavailable','inference_failed','invalid_output'].includes(error?.code)?error.code:'analysis_failed';
+            await send('CLEAR_SEGMENTS');await send('ANALYSIS_ERROR',{code});
+            if(tabState[tabId]===tabData)delete tabState[tabId];
         }
     } finally {
-        tabData.isAnalyzing = false;
-        if (tabState[tabId] === tabData && !failed) {
-            try {
-                await chrome.tabs.sendMessage(tabId, { type: "ANALYSIS_FINISHED", videoId });
-            } catch(e) { /* Tab might be closed, ignore */ }
-        }
-    }
-}
-
-async function findAndProcessSponsoredSegments(tabId, videoId, labels) {
-    const tabData = tabState[tabId];
-    if (!tabData || tabData.videoId !== videoId) return;
-
-    for (const label of labels) {
-        if (!label.blocked) continue;
-
-        let currentSegment = null;
-        const scoreThreshold = label.threshold;
-
-        for (const window of tabData.windowScores) {
-            if (tabState[tabId] !== tabData) return;
-            const score = window.scores[label.name] || 0;
-
-            if (score > scoreThreshold) {
-                // Window is a candidate for this label
-                if (currentSegment) {
-                    if (window.startTime > currentSegment.endTime) {
-                        await processNewSegment(tabId, videoId, currentSegment);
-                        if (tabState[tabId] !== tabData) return;
-                        currentSegment = {startTime: window.startTime, endTime: window.endTime, label: label.name};
-                    } else {
-                        currentSegment.endTime = Math.max(currentSegment.endTime, window.endTime);
-                    }
-                } else {
-                    // Start a new potential segment
-                    currentSegment = {
-                        startTime: window.startTime,
-                        endTime: window.endTime,
-                        label: label.name
-                    };
-                }
-            } else {
-                // Window is not a candidate, so any active segment ends here
-                if (currentSegment) {
-                    await processNewSegment(tabId, videoId, currentSegment);
-                    currentSegment = null;
-                }
-            }
-        }
-        // Process any segment that was active at the very end
-        if (currentSegment && tabState[tabId] === tabData) {
-            await processNewSegment(tabId, videoId, currentSegment);
-        }
+        tabData.isAnalyzing=false;
+        if(!failed)await send('ANALYSIS_FINISHED');
     }
 }
 
@@ -257,15 +148,19 @@ chrome.webRequest.onCompleted.addListener(
             captionsFetched: false,
             captionRequestPending: false,
             allCaptions: [],
-            windowScores: [],
             foundSegments: [],
-            lastWindowStartCaptionIndex: -1,
-            windowQueue: [],
             isAnalyzing: false
         };
     }
 
     const tabData = tabState[tabId];
+    const language=url.searchParams.get('tlang') || url.searchParams.get('lang');
+    if(!/^en(?:[-_]|$)/i.test(language || '')){
+        delete tabState[tabId];
+        await chrome.tabs.sendMessage(tabId,{type:'CLEAR_SEGMENTS',videoId}).catch(()=>{});
+        await chrome.tabs.sendMessage(tabId,{type:'ANALYSIS_ERROR',videoId,payload:{code:'unsupported_language'}}).catch(()=>{});
+        return;
+    }
     if (tabData.captionsFetched || tabData.captionRequestPending) return;
     tabData.captionRequestPending = true;
     const generation = policyGeneration;
@@ -315,24 +210,8 @@ chrome.webRequest.onCompleted.addListener(
             tabData.captionsFetched = true;
             tabData.allCaptions.push(...captions);
 
-            // Determine where to start creating new windows from
-            const startFromIndex = tabData.lastWindowStartCaptionIndex === -1
-                ? 0
-                : tabData.lastWindowStartCaptionIndex + WINDOW_STEP_CAPTIONS;
-            
-            let windowsAdded = 0;
-            for (let i = startFromIndex; i <= tabData.allCaptions.length - WINDOW_SIZE_CAPTIONS; i += WINDOW_STEP_CAPTIONS) {
-                const windowCaptions = tabData.allCaptions.slice(i, i + WINDOW_SIZE_CAPTIONS);
-                tabData.windowQueue.push(windowCaptions);
-                tabData.lastWindowStartCaptionIndex = i;
-                windowsAdded++;
-            }
-
-            if (windowsAdded > 0) {
-                 console.log(`Added ${windowsAdded} new windows to the queue for video ${videoId}.`);
-                 // This is fire-and-forget; the function handles its own concurrency.
-                 processWindowQueue(tabId, videoId, labels);
-            }
+            // Analyze every speech cue, including short tracks and the tail.
+            processCaptions(tabId,videoId,labels);
         }
       } catch (error) {
         if (tabState[tabId] === tabData) {

@@ -1,0 +1,9 @@
+✔ a failed post resolves its request once and content-script requests are ignored (0.955583ms)
+ℹ tests 99
+ℹ suites 0
+ℹ pass 99
+ℹ fail 0
+ℹ cancelled 0
+ℹ skipped 0
+ℹ todo 0
+ℹ duration_ms 9799.611042

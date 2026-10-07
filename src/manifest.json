@@ -2,17 +2,28 @@
   "manifest_version": 3,
   "name": "YouTube Sponsor Skipper",
   "version": "0.1.0",
-  "description": "Automatically skips sponsored segments in YouTube videos.",
-  "permissions": ["scripting", "webRequest", "storage"],
-  "host_permissions": ["*://*.youtube.com/*"],
+  "description": "Suggests paid-sponsor intervals using a local model. Skipping requires a click and supports Undo.",
+  "permissions": [
+    "scripting",
+    "webRequest",
+    "storage",
+    "offscreen"
+  ],
+  "host_permissions": [
+    "*://*.youtube.com/*"
+  ],
   "background": {
     "service_worker": "background.js",
     "type": "module"
   },
   "content_scripts": [
     {
-      "matches": ["*://*.youtube.com/watch*"],
-      "js": ["content.js"]
+      "matches": [
+        "*://*.youtube.com/watch*"
+      ],
+      "js": [
+        "content.js"
+      ]
     }
   ],
   "action": {
@@ -20,12 +31,7 @@
     "default_title": "Sponsor Skipper Settings"
   },
   "content_security_policy": {
-    "extension_pages": "default-src 'self'; worker-src 'self'; style-src 'self' 'unsafe-inline'; connect-src *; media-src *; script-src 'self' 'wasm-unsafe-eval'"
+    "extension_pages": "default-src 'self'; worker-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.youtube.com; media-src *; script-src 'self' 'wasm-unsafe-eval'"
   },
-  "web_accessible_resources": [
-    {
-      "resources": ["model/*"],
-      "matches": ["<all_urls>"]
-    }
-  ]
+  "minimum_chrome_version": "116"
 }
