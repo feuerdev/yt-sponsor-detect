@@ -85,3 +85,26 @@ separate private development manifest and is not in the above scores. Its exact
 selected caption-track ID remains unknown, all listed player tracks were ASR,
 and its crowd labels remain provisional. Neither the original manifest nor
 reviewed-negative exposure was changed.
+
+## Expanded development sample
+
+The second sponsor-positive channel was then evaluated with real Chrome INT8
+inference on both WebGPU and CPU/WASM, at source33973c8. All six acquired tune
+tracks completed, with 24 missing-caption records retained. The same fixed21
+candidates were scored without reading the original test set.
+
+The shipped baseline matched4/5 references, with segment agreementF1 0.889 and
+84.48% sponsor seconds covered. The new in-sample choice (mean consensus/0.7)
+matched5/5 and covered92.18%, again adding8.056 unknown predicted seconds.
+Channel-held-out selection matched4/5 and covered only82.84%. GPU agreementF1
+was0.800 and CPU0.889. Promotion remains rejected. Two positive channels and
+five references are still insufficient, and validation coverage decreased.
+See the [expanded caption-free record](ettin-evidence/overlap-study-expanded.json).
+The complete21-point traces per backend remain in the private development output.
+
+Another English transcript was acquired from Real Engineering. Its crowd
+sponsor/self-promotion intervals overlap. Both were marked disputed before
+model inference, following the existing uncertain-category policy. They do not
+count as a new paid positive or as reviewed ordinary content. This new private
+seven-track development manifest is a subsequent phase and is not part of the
+six-track scores above. The original frozen manifest remains untouched.

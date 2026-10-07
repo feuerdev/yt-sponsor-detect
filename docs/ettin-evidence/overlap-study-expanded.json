@@ -1,0 +1,1924 @@
+{
+  "schemaVersion": 1,
+  "registeredPlan": {
+    "schemaVersion": 1,
+    "registeredAt": "2026-10-07T22:44:26.973498+00:00",
+    "sourceHead": "67e5d21cd67c44d4ca17b9c1565858d0fad58ac7",
+    "purpose": "Improve overlap decoding without tuning on exposed test channels",
+    "split": "tune only; old test remains exposed and excluded",
+    "model": "ettin-int8",
+    "backends": [
+      "webgpu",
+      "wasm"
+    ],
+    "candidateFamilies": [
+      "flow-window-union",
+      "mean-logit-consensus",
+      "context-logit-consensus"
+    ],
+    "thresholds": [
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.9,
+      0.95,
+      0.99
+    ],
+    "mergeGapCharacters": 24,
+    "mergeGapSeconds": 1.5,
+    "candidateBudget": 21,
+    "inferenceBudget": "Reuse authenticated cached browser logits only. No Node/cloud ML inference. No repeated inference for thresholds.",
+    "baseline": {
+      "family": "flow-window-union",
+      "threshold": 0.8
+    },
+    "folds": "Leave one channel out; choose only on remaining channels and evaluate excluded channel once per fixed candidate",
+    "trainingSelection": "At least one matched sponsor at IoU>=0.5 and provisional agreement precision>=0.95; maximize recall, then coverage recall, then minimize unknown predicted seconds, then prefer baseline family/threshold closest to 0.8",
+    "promotionRequirements": [
+      "At least 3 positive channels and 12 sponsor references",
+      "Out-of-fold provisional precision>=0.95 and recall not below baseline",
+      "Out-of-fold coverage recall increases and unknown predicted seconds not above baseline",
+      "Reviewed negative exposure and independent fresh test before automatic skipping"
+    ],
+    "unknownRegions": "Unmatched predictions remain unknown, never relabeled as false positives or ordinary content",
+    "trainingOverlap": "Unknown upstream training overlap explicitly retained; no independent-generalization claim",
+    "frozenBenchmark": "No modification of original manifest, frozen config, adapters, test ledger or old results"
+  },
+  "planHash": "41747ee9f38c1fc530f2a5523c15e8617f1a5ac96bb071fe34ae2efef3b552c6",
+  "startedAt": "2026-10-07T23:02:31.852Z",
+  "manifestSelectionHash": "013b92e97f22267616fe70f665b5d719f7f1ead983718fbd1147d948884f6f66",
+  "registryHash": "8c851b363db380136ba7a973c2982133f823c5d7a85c55918dcd38b609d53ba6",
+  "scope": "Development tune channels only. Existing test data not read. Cached Chrome logits only, no inference.",
+  "resourcePolicy": {
+    "maximumAccountMiB": 28672,
+    "minimumAvailableMiB": 4096
+  },
+  "before": {
+    "availableMiB": 10948.484375,
+    "accountMiB": 21109.09375,
+    "processes": 639,
+    "method": "RSS sum (ps KiB); vm_stat native pages",
+    "scope": "same-UID process RSS including unrelated apps and shared-page duplication; host availability proxy = free + inactive + speculative pages, not guaranteed allocatable memory; purgeable pages not added twice",
+    "platform": "darwin"
+  },
+  "peakAccountMiB": 21463.671875,
+  "limitations": [
+    "SponsorBlock references are provisional and partial",
+    "No reviewed negative exposure",
+    "Unknown upstream training overlap",
+    "Cross-validation is development evidence, not a fresh independent test"
+  ],
+  "finishedAt": "2026-10-07T23:02:39.844Z",
+  "backends": [
+    {
+      "runId": "mac-20261008-v4-tune-ettin-int8-webgpu",
+      "backend": "webgpu",
+      "metadataHash": "c86594f7a8b741d87425d2b8f246c92217489f950c214ec0eb790ddb95606471",
+      "inferenceKey": "f95d7e62a40a7d5c7ded8a3ee1ddb6fdc2f4b1053bd2046700af31a76264f752",
+      "rawHashes": {
+        "xfPKwJ7Qukc": "0d0fa98a9623fce9f94b2e8f0205ed6f27c3c00518235556f3321505cab0bcb6",
+        "NvkZaWLe0Sk": "6960d2fa8af75d6486c734c48dd696c98a8afca8da5f51f60ef544681e41d3cf",
+        "t28bEMboL9Y": "d95ee862fc3cac97702eb8e78059d0e8538d19f539da94b151241a3fa653c010",
+        "ijFSEb2W6_8": "59465e25219a30bf07dfd96667400b6a4b4884b43ca02715f04f40599f5ac52d",
+        "-HzHFSxRcro": "e31fc6e50ce1e0ab9d72d3f59b70cabd39d5ca0f2f5a4025533fceb7e3296b0c",
+        "m3NGxgb3O1Y": "7dbb11711ab05da2432224e3439423434833f53d4646787cb19a9220738ccfd9"
+      },
+      "availableTuneVideos": 6,
+      "totalTuneVideos": 30,
+      "channels": 5,
+      "positiveChannels": 2,
+      "referenceSegments": 5,
+      "baseline": {
+        "attempted": 6,
+        "scored": 6,
+        "statusCounts": {
+          "abstained": 3,
+          "ok": 3
+        },
+        "metrics": {
+          "0.3": {
+            "matched": 4,
+            "predicted": 4,
+            "reference": 5,
+            "precision": 1,
+            "recall": 0.8,
+            "f1": 0.8888888888888888
+          },
+          "0.5": {
+            "matched": 4,
+            "predicted": 4,
+            "reference": 5,
+            "precision": 1,
+            "recall": 0.8,
+            "f1": 0.8888888888888888
+          },
+          "0.7": {
+            "matched": 4,
+            "predicted": 4,
+            "reference": 5,
+            "precision": 1,
+            "recall": 0.8,
+            "f1": 0.8888888888888888
+          }
+        },
+        "referenceSeconds": 224.4090000000001,
+        "coveredReferenceSeconds": 189.56999999999994,
+        "missedReferenceSeconds": 34.83900000000017,
+        "coverageRecall": 0.8447522158202204,
+        "reviewedNegativeHours": 0,
+        "confirmedFalseSkips": 0,
+        "falseSkipsPerHour": null,
+        "ordinaryRemovedSeconds": 0,
+        "ordinarySecondsPerHour": null,
+        "predictedUnknownSeconds": 0,
+        "boundaries": {
+          "matched": 4,
+          "start": {
+            "biasSeconds": 2.098750000000006,
+            "absoluteMedianSeconds": 2.315000000000019,
+            "absoluteP95Seconds": 3.713700000000012
+          },
+          "end": {
+            "biasSeconds": -1.812250000000013,
+            "absoluteMedianSeconds": 0.9760000000000133,
+            "absoluteP95Seconds": 4.167050000000016
+          }
+        },
+        "worstOrdinaryLoss": [],
+        "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+      },
+      "allTuneSelection": {
+        "point": "mean-logit-consensus/0.7",
+        "reason": "selected",
+        "summary": {
+          "attempted": 6,
+          "scored": 6,
+          "statusCounts": {
+            "abstained": 3,
+            "ok": 3
+          },
+          "metrics": {
+            "0.3": {
+              "matched": 5,
+              "predicted": 5,
+              "reference": 5,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "0.5": {
+              "matched": 5,
+              "predicted": 5,
+              "reference": 5,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "0.7": {
+              "matched": 4,
+              "predicted": 5,
+              "reference": 5,
+              "precision": 0.8,
+              "recall": 0.8,
+              "f1": 0.8
+            }
+          },
+          "referenceSeconds": 224.4090000000001,
+          "coveredReferenceSeconds": 206.85799999999995,
+          "missedReferenceSeconds": 17.55100000000016,
+          "coverageRecall": 0.9217901242820022,
+          "reviewedNegativeHours": 0,
+          "confirmedFalseSkips": 0,
+          "falseSkipsPerHour": null,
+          "ordinaryRemovedSeconds": 0,
+          "ordinarySecondsPerHour": null,
+          "predictedUnknownSeconds": 8.05600000000004,
+          "boundaries": {
+            "matched": 5,
+            "start": {
+              "biasSeconds": 2.060400000000004,
+              "absoluteMedianSeconds": 1.9069999999999965,
+              "absoluteP95Seconds": 3.7066000000000114
+            },
+            "end": {
+              "biasSeconds": 0.16139999999998905,
+              "absoluteMedianSeconds": 1.2490000000000236,
+              "absoluteP95Seconds": 7.381200000000001
+            }
+          },
+          "worstOrdinaryLoss": [],
+          "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+        },
+        "interpretation": "In-sample diagnostic only. This is not a deployment recommendation."
+      },
+      "crossValidation": {
+        "folds": [
+          {
+            "channelId": "UC2C_jShtL725hvbm1arSV9w",
+            "trainingVideos": [
+              "NvkZaWLe0Sk",
+              "t28bEMboL9Y",
+              "ijFSEb2W6_8",
+              "-HzHFSxRcro",
+              "m3NGxgb3O1Y"
+            ],
+            "validationVideos": [
+              "xfPKwJ7Qukc"
+            ],
+            "selectedPoint": "mean-logit-consensus/0.7",
+            "selectionReason": "selected",
+            "summary": {
+              "attempted": 1,
+              "scored": 1,
+              "statusCounts": {
+                "abstained": 1
+              },
+              "metrics": {
+                "0.3": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                },
+                "0.5": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                },
+                "0.7": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                }
+              },
+              "referenceSeconds": 0,
+              "coveredReferenceSeconds": 0,
+              "missedReferenceSeconds": 0,
+              "coverageRecall": null,
+              "reviewedNegativeHours": 0,
+              "confirmedFalseSkips": 0,
+              "falseSkipsPerHour": null,
+              "ordinaryRemovedSeconds": 0,
+              "ordinarySecondsPerHour": null,
+              "predictedUnknownSeconds": 0,
+              "boundaries": {
+                "matched": 0,
+                "start": {
+                  "biasSeconds": null,
+                  "absoluteMedianSeconds": null,
+                  "absoluteP95Seconds": null
+                },
+                "end": {
+                  "biasSeconds": null,
+                  "absoluteMedianSeconds": null,
+                  "absoluteP95Seconds": null
+                }
+              },
+              "worstOrdinaryLoss": [],
+              "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+            },
+            "baseline": {
+              "attempted": 1,
+              "scored": 1,
+              "statusCounts": {
+                "abstained": 1
+              },
+              "metrics": {
+                "0.3": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                },
+                "0.5": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                },
+                "0.7": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                }
+              },
+              "referenceSeconds": 0,
+              "coveredReferenceSeconds": 0,
+              "missedReferenceSeconds": 0,
+              "coverageRecall": null,
+              "reviewedNegativeHours": 0,
+              "confirmedFalseSkips": 0,
+              "falseSkipsPerHour": null,
+              "ordinaryRemovedSeconds": 0,
+              "ordinarySecondsPerHour": null,
+              "predictedUnknownSeconds": 0,
+              "boundaries": {
+                "matched": 0,
+                "start": {
+                  "biasSeconds": null,
+                  "absoluteMedianSeconds": null,
+                  "absoluteP95Seconds": null
+                },
+                "end": {
+                  "biasSeconds": null,
+                  "absoluteMedianSeconds": null,
+                  "absoluteP95Seconds": null
+                }
+              },
+              "worstOrdinaryLoss": [],
+              "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+            }
+          },
+          {
+            "channelId": "UCEIwxahdLz7bap-VDs9h35A",
+            "trainingVideos": [
+              "xfPKwJ7Qukc",
+              "t28bEMboL9Y",
+              "ijFSEb2W6_8",
+              "-HzHFSxRcro",
+              "m3NGxgb3O1Y"
+            ],
+            "validationVideos": [
+              "NvkZaWLe0Sk"
+            ],
+            "selectedPoint": "context-logit-consensus/0.7",
+            "selectionReason": "selected",
+            "summary": {
+              "attempted": 1,
+              "scored": 1,
+              "statusCounts": {
+                "ok": 1
+              },
+              "metrics": {
+                "0.3": {
+                  "matched": 1,
+                  "predicted": 1,
+                  "reference": 1,
+                  "precision": 1,
+                  "recall": 1,
+                  "f1": 1
+                },
+                "0.5": {
+                  "matched": 1,
+                  "predicted": 1,
+                  "reference": 1,
+                  "precision": 1,
+                  "recall": 1,
+                  "f1": 1
+                },
+                "0.7": {
+                  "matched": 1,
+                  "predicted": 1,
+                  "reference": 1,
+                  "precision": 1,
+                  "recall": 1,
+                  "f1": 1
+                }
+              },
+              "referenceSeconds": 75.70299999999997,
+              "coveredReferenceSeconds": 63.61099999999999,
+              "missedReferenceSeconds": 12.091999999999985,
+              "coverageRecall": 0.8402705308904537,
+              "reviewedNegativeHours": 0,
+              "confirmedFalseSkips": 0,
+              "falseSkipsPerHour": null,
+              "ordinaryRemovedSeconds": 0,
+              "ordinarySecondsPerHour": null,
+              "predictedUnknownSeconds": 0,
+              "boundaries": {
+                "matched": 1,
+                "start": {
+                  "biasSeconds": 3.7350000000000136,
+                  "absoluteMedianSeconds": 3.7350000000000136,
+                  "absoluteP95Seconds": 3.7350000000000136
+                },
+                "end": {
+                  "biasSeconds": -8.356999999999971,
+                  "absoluteMedianSeconds": 8.356999999999971,
+                  "absoluteP95Seconds": 8.356999999999971
+                }
+              },
+              "worstOrdinaryLoss": [],
+              "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+            },
+            "baseline": {
+              "attempted": 1,
+              "scored": 1,
+              "statusCounts": {
+                "ok": 1
+              },
+              "metrics": {
+                "0.3": {
+                  "matched": 1,
+                  "predicted": 1,
+                  "reference": 1,
+                  "precision": 1,
+                  "recall": 1,
+                  "f1": 1
+                },
+                "0.5": {
+                  "matched": 1,
+                  "predicted": 1,
+                  "reference": 1,
+                  "precision": 1,
+                  "recall": 1,
+                  "f1": 1
+                },
+                "0.7": {
+                  "matched": 1,
+                  "predicted": 1,
+                  "reference": 1,
+                  "precision": 1,
+                  "recall": 1,
+                  "f1": 1
+                }
+              },
+              "referenceSeconds": 75.70299999999997,
+              "coveredReferenceSeconds": 67.28599999999994,
+              "missedReferenceSeconds": 8.41700000000003,
+              "coverageRecall": 0.8888155026881361,
+              "reviewedNegativeHours": 0,
+              "confirmedFalseSkips": 0,
+              "falseSkipsPerHour": null,
+              "ordinaryRemovedSeconds": 0,
+              "ordinarySecondsPerHour": null,
+              "predictedUnknownSeconds": 0,
+              "boundaries": {
+                "matched": 1,
+                "start": {
+                  "biasSeconds": 3.7350000000000136,
+                  "absoluteMedianSeconds": 3.7350000000000136,
+                  "absoluteP95Seconds": 3.7350000000000136
+                },
+                "end": {
+                  "biasSeconds": -4.682000000000016,
+                  "absoluteMedianSeconds": 4.682000000000016,
+                  "absoluteP95Seconds": 4.682000000000016
+                }
+              },
+              "worstOrdinaryLoss": [],
+              "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+            }
+          },
+          {
+            "channelId": "UCI8iQa1hv7oV_Z8D35vVuSg",
+            "trainingVideos": [
+              "xfPKwJ7Qukc",
+              "NvkZaWLe0Sk",
+              "t28bEMboL9Y",
+              "ijFSEb2W6_8",
+              "-HzHFSxRcro"
+            ],
+            "validationVideos": [
+              "m3NGxgb3O1Y"
+            ],
+            "selectedPoint": "mean-logit-consensus/0.7",
+            "selectionReason": "selected",
+            "summary": {
+              "attempted": 1,
+              "scored": 1,
+              "statusCounts": {
+                "abstained": 1
+              },
+              "metrics": {
+                "0.3": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                },
+                "0.5": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                },
+                "0.7": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                }
+              },
+              "referenceSeconds": 0,
+              "coveredReferenceSeconds": 0,
+              "missedReferenceSeconds": 0,
+              "coverageRecall": null,
+              "reviewedNegativeHours": 0,
+              "confirmedFalseSkips": 0,
+              "falseSkipsPerHour": null,
+              "ordinaryRemovedSeconds": 0,
+              "ordinarySecondsPerHour": null,
+              "predictedUnknownSeconds": 0,
+              "boundaries": {
+                "matched": 0,
+                "start": {
+                  "biasSeconds": null,
+                  "absoluteMedianSeconds": null,
+                  "absoluteP95Seconds": null
+                },
+                "end": {
+                  "biasSeconds": null,
+                  "absoluteMedianSeconds": null,
+                  "absoluteP95Seconds": null
+                }
+              },
+              "worstOrdinaryLoss": [],
+              "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+            },
+            "baseline": {
+              "attempted": 1,
+              "scored": 1,
+              "statusCounts": {
+                "abstained": 1
+              },
+              "metrics": {
+                "0.3": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                },
+                "0.5": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                },
+                "0.7": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                }
+              },
+              "referenceSeconds": 0,
+              "coveredReferenceSeconds": 0,
+              "missedReferenceSeconds": 0,
+              "coverageRecall": null,
+              "reviewedNegativeHours": 0,
+              "confirmedFalseSkips": 0,
+              "falseSkipsPerHour": null,
+              "ordinaryRemovedSeconds": 0,
+              "ordinarySecondsPerHour": null,
+              "predictedUnknownSeconds": 0,
+              "boundaries": {
+                "matched": 0,
+                "start": {
+                  "biasSeconds": null,
+                  "absoluteMedianSeconds": null,
+                  "absoluteP95Seconds": null
+                },
+                "end": {
+                  "biasSeconds": null,
+                  "absoluteMedianSeconds": null,
+                  "absoluteP95Seconds": null
+                }
+              },
+              "worstOrdinaryLoss": [],
+              "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+            }
+          },
+          {
+            "channelId": "UCXuqSBlHAE6Xw-yeJA0Tunw",
+            "trainingVideos": [
+              "xfPKwJ7Qukc",
+              "NvkZaWLe0Sk",
+              "-HzHFSxRcro",
+              "m3NGxgb3O1Y"
+            ],
+            "validationVideos": [
+              "t28bEMboL9Y",
+              "ijFSEb2W6_8"
+            ],
+            "selectedPoint": "flow-window-union/0.8",
+            "selectionReason": "selected",
+            "summary": {
+              "attempted": 2,
+              "scored": 2,
+              "statusCounts": {
+                "ok": 2
+              },
+              "metrics": {
+                "0.3": {
+                  "matched": 3,
+                  "predicted": 3,
+                  "reference": 4,
+                  "precision": 1,
+                  "recall": 0.75,
+                  "f1": 0.8571428571428571
+                },
+                "0.5": {
+                  "matched": 3,
+                  "predicted": 3,
+                  "reference": 4,
+                  "precision": 1,
+                  "recall": 0.75,
+                  "f1": 0.8571428571428571
+                },
+                "0.7": {
+                  "matched": 3,
+                  "predicted": 3,
+                  "reference": 4,
+                  "precision": 1,
+                  "recall": 0.75,
+                  "f1": 0.8571428571428571
+                }
+              },
+              "referenceSeconds": 148.70600000000013,
+              "coveredReferenceSeconds": 122.28399999999999,
+              "missedReferenceSeconds": 26.42200000000014,
+              "coverageRecall": 0.8223205519615878,
+              "reviewedNegativeHours": 0,
+              "confirmedFalseSkips": 0,
+              "falseSkipsPerHour": null,
+              "ordinaryRemovedSeconds": 0,
+              "ordinarySecondsPerHour": null,
+              "predictedUnknownSeconds": 0,
+              "boundaries": {
+                "matched": 3,
+                "start": {
+                  "biasSeconds": 1.553333333333337,
+                  "absoluteMedianSeconds": 1.0370000000000346,
+                  "absoluteP95Seconds": 3.3374000000000064
+                },
+                "end": {
+                  "biasSeconds": -0.8556666666666786,
+                  "absoluteMedianSeconds": 0.703000000000003,
+                  "absoluteP95Seconds": 1.1944000000000217
+                }
+              },
+              "worstOrdinaryLoss": [],
+              "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+            },
+            "baseline": {
+              "attempted": 2,
+              "scored": 2,
+              "statusCounts": {
+                "ok": 2
+              },
+              "metrics": {
+                "0.3": {
+                  "matched": 3,
+                  "predicted": 3,
+                  "reference": 4,
+                  "precision": 1,
+                  "recall": 0.75,
+                  "f1": 0.8571428571428571
+                },
+                "0.5": {
+                  "matched": 3,
+                  "predicted": 3,
+                  "reference": 4,
+                  "precision": 1,
+                  "recall": 0.75,
+                  "f1": 0.8571428571428571
+                },
+                "0.7": {
+                  "matched": 3,
+                  "predicted": 3,
+                  "reference": 4,
+                  "precision": 1,
+                  "recall": 0.75,
+                  "f1": 0.8571428571428571
+                }
+              },
+              "referenceSeconds": 148.70600000000013,
+              "coveredReferenceSeconds": 122.28399999999999,
+              "missedReferenceSeconds": 26.42200000000014,
+              "coverageRecall": 0.8223205519615878,
+              "reviewedNegativeHours": 0,
+              "confirmedFalseSkips": 0,
+              "falseSkipsPerHour": null,
+              "ordinaryRemovedSeconds": 0,
+              "ordinarySecondsPerHour": null,
+              "predictedUnknownSeconds": 0,
+              "boundaries": {
+                "matched": 3,
+                "start": {
+                  "biasSeconds": 1.553333333333337,
+                  "absoluteMedianSeconds": 1.0370000000000346,
+                  "absoluteP95Seconds": 3.3374000000000064
+                },
+                "end": {
+                  "biasSeconds": -0.8556666666666786,
+                  "absoluteMedianSeconds": 0.703000000000003,
+                  "absoluteP95Seconds": 1.1944000000000217
+                }
+              },
+              "worstOrdinaryLoss": [],
+              "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+            }
+          },
+          {
+            "channelId": "UChIs72whgZI9w6d6FhwGGHA",
+            "trainingVideos": [
+              "xfPKwJ7Qukc",
+              "NvkZaWLe0Sk",
+              "t28bEMboL9Y",
+              "ijFSEb2W6_8",
+              "m3NGxgb3O1Y"
+            ],
+            "validationVideos": [
+              "-HzHFSxRcro"
+            ],
+            "selectedPoint": "flow-window-union/0.7",
+            "selectionReason": "selected",
+            "summary": {
+              "attempted": 1,
+              "scored": 1,
+              "statusCounts": {
+                "ok": 1
+              },
+              "metrics": {
+                "0.3": {
+                  "matched": 0,
+                  "predicted": 1,
+                  "reference": 0,
+                  "precision": 0,
+                  "recall": null,
+                  "f1": 0
+                },
+                "0.5": {
+                  "matched": 0,
+                  "predicted": 1,
+                  "reference": 0,
+                  "precision": 0,
+                  "recall": null,
+                  "f1": 0
+                },
+                "0.7": {
+                  "matched": 0,
+                  "predicted": 1,
+                  "reference": 0,
+                  "precision": 0,
+                  "recall": null,
+                  "f1": 0
+                }
+              },
+              "referenceSeconds": 0,
+              "coveredReferenceSeconds": 0,
+              "missedReferenceSeconds": 0,
+              "coverageRecall": null,
+              "reviewedNegativeHours": 0,
+              "confirmedFalseSkips": 0,
+              "falseSkipsPerHour": null,
+              "ordinaryRemovedSeconds": 0,
+              "ordinarySecondsPerHour": null,
+              "predictedUnknownSeconds": 0,
+              "boundaries": {
+                "matched": 0,
+                "start": {
+                  "biasSeconds": null,
+                  "absoluteMedianSeconds": null,
+                  "absoluteP95Seconds": null
+                },
+                "end": {
+                  "biasSeconds": null,
+                  "absoluteMedianSeconds": null,
+                  "absoluteP95Seconds": null
+                }
+              },
+              "worstOrdinaryLoss": [],
+              "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+            },
+            "baseline": {
+              "attempted": 1,
+              "scored": 1,
+              "statusCounts": {
+                "abstained": 1
+              },
+              "metrics": {
+                "0.3": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                },
+                "0.5": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                },
+                "0.7": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                }
+              },
+              "referenceSeconds": 0,
+              "coveredReferenceSeconds": 0,
+              "missedReferenceSeconds": 0,
+              "coverageRecall": null,
+              "reviewedNegativeHours": 0,
+              "confirmedFalseSkips": 0,
+              "falseSkipsPerHour": null,
+              "ordinaryRemovedSeconds": 0,
+              "ordinarySecondsPerHour": null,
+              "predictedUnknownSeconds": 0,
+              "boundaries": {
+                "matched": 0,
+                "start": {
+                  "biasSeconds": null,
+                  "absoluteMedianSeconds": null,
+                  "absoluteP95Seconds": null
+                },
+                "end": {
+                  "biasSeconds": null,
+                  "absoluteMedianSeconds": null,
+                  "absoluteP95Seconds": null
+                }
+              },
+              "worstOrdinaryLoss": [],
+              "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+            }
+          }
+        ],
+        "summary": {
+          "attempted": 6,
+          "scored": 6,
+          "statusCounts": {
+            "abstained": 2,
+            "ok": 4
+          },
+          "metrics": {
+            "0.3": {
+              "matched": 4,
+              "predicted": 5,
+              "reference": 5,
+              "precision": 0.8,
+              "recall": 0.8,
+              "f1": 0.8
+            },
+            "0.5": {
+              "matched": 4,
+              "predicted": 5,
+              "reference": 5,
+              "precision": 0.8,
+              "recall": 0.8,
+              "f1": 0.8
+            },
+            "0.7": {
+              "matched": 4,
+              "predicted": 5,
+              "reference": 5,
+              "precision": 0.8,
+              "recall": 0.8,
+              "f1": 0.8
+            }
+          },
+          "referenceSeconds": 224.4090000000001,
+          "coveredReferenceSeconds": 185.89499999999998,
+          "missedReferenceSeconds": 38.514000000000124,
+          "coverageRecall": 0.8283758672780499,
+          "reviewedNegativeHours": 0,
+          "confirmedFalseSkips": 0,
+          "falseSkipsPerHour": null,
+          "ordinaryRemovedSeconds": 0,
+          "ordinarySecondsPerHour": null,
+          "predictedUnknownSeconds": 0,
+          "boundaries": {
+            "matched": 4,
+            "start": {
+              "biasSeconds": 2.098750000000006,
+              "absoluteMedianSeconds": 2.315000000000019,
+              "absoluteP95Seconds": 3.713700000000012
+            },
+            "end": {
+              "biasSeconds": -2.7310000000000016,
+              "absoluteMedianSeconds": 0.9760000000000133,
+              "absoluteP95Seconds": 7.290799999999976
+            }
+          },
+          "worstOrdinaryLoss": [],
+          "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+        },
+        "uncertainty": {
+          "available": true,
+          "channels": 5,
+          "iterations": 500,
+          "seed": 42,
+          "method": "percentile channel cluster bootstrap; limited precision with few channels",
+          "intervals": {
+            "precision": {
+              "low": 0,
+              "high": 1,
+              "definedReplicates": 498
+            },
+            "recall": {
+              "low": 0.75,
+              "high": 1,
+              "definedReplicates": 465
+            },
+            "coverageRecall": {
+              "low": 0.8223205519615878,
+              "high": 0.8402705308904537,
+              "definedReplicates": 465
+            },
+            "ordinarySecondsPerHour": {
+              "low": null,
+              "high": null,
+              "definedReplicates": 0
+            }
+          }
+        },
+        "pairedChange": {
+          "available": true,
+          "channels": 5,
+          "pairedVideos": 6,
+          "iterations": 500,
+          "method": "paired channel cluster bootstrap; right minus left",
+          "intervals": {
+            "precision": {
+              "low": -0.6666666666666667,
+              "high": 0,
+              "definedReplicates": 465
+            },
+            "recall": {
+              "low": 0,
+              "high": 0,
+              "definedReplicates": 465
+            },
+            "ordinarySecondsPerHour": {
+              "low": null,
+              "high": null,
+              "definedReplicates": 0
+            }
+          }
+        },
+        "promotionGate": {
+          "eligible": false,
+          "reasons": [
+            "too_few_positive_channels",
+            "too_few_references",
+            "agreement_precision_below_0.95",
+            "no_coverage_improvement"
+          ],
+          "automaticSkippingEligible": false,
+          "automaticSkippingReason": "Independent fresh test and reviewed negative exposure are separate required gates"
+        }
+      },
+      "pureDecodingSeconds": 3.854996875
+    },
+    {
+      "runId": "mac-20261008-v4-tune-ettin-int8-wasm",
+      "backend": "wasm",
+      "metadataHash": "43582b65ebd3596f951be57efacb2618c11c26cc2d7c83764eee0376475513af",
+      "inferenceKey": "0d7fbe2f106d0798d3528fd714a4f7483b09942868e758a15f803ce26ede3ef6",
+      "rawHashes": {
+        "xfPKwJ7Qukc": "13978f94273836031957f07f7b3927cbbde04631ac63205d260a74bdd5b714af",
+        "NvkZaWLe0Sk": "9256fed99895187f71ef38ee0824d1b75d1adbe4b0336c319d10f7d14b66ae8b",
+        "t28bEMboL9Y": "f81041a766c5c25449a8ba399d11a33ff4f7246a8bea3db4bff6745d569cacd0",
+        "ijFSEb2W6_8": "398c15cd4a97e788808eec364fc5ddfab6e3a1581551fa37ef3731fb0385e465",
+        "-HzHFSxRcro": "b9ca23dabdcab79030847259aa40cd42f9fd2aed5287f858003afd4389ed995a",
+        "m3NGxgb3O1Y": "974891c84a0f093352201d2a549919e72d759c7a8dc8af0069cfe789c86a6dce"
+      },
+      "availableTuneVideos": 6,
+      "totalTuneVideos": 30,
+      "channels": 5,
+      "positiveChannels": 2,
+      "referenceSegments": 5,
+      "baseline": {
+        "attempted": 6,
+        "scored": 6,
+        "statusCounts": {
+          "abstained": 3,
+          "ok": 3
+        },
+        "metrics": {
+          "0.3": {
+            "matched": 4,
+            "predicted": 4,
+            "reference": 5,
+            "precision": 1,
+            "recall": 0.8,
+            "f1": 0.8888888888888888
+          },
+          "0.5": {
+            "matched": 4,
+            "predicted": 4,
+            "reference": 5,
+            "precision": 1,
+            "recall": 0.8,
+            "f1": 0.8888888888888888
+          },
+          "0.7": {
+            "matched": 4,
+            "predicted": 4,
+            "reference": 5,
+            "precision": 1,
+            "recall": 0.8,
+            "f1": 0.8888888888888888
+          }
+        },
+        "referenceSeconds": 224.4090000000001,
+        "coveredReferenceSeconds": 189.56999999999994,
+        "missedReferenceSeconds": 34.83900000000017,
+        "coverageRecall": 0.8447522158202204,
+        "reviewedNegativeHours": 0,
+        "confirmedFalseSkips": 0,
+        "falseSkipsPerHour": null,
+        "ordinaryRemovedSeconds": 0,
+        "ordinarySecondsPerHour": null,
+        "predictedUnknownSeconds": 0,
+        "boundaries": {
+          "matched": 4,
+          "start": {
+            "biasSeconds": 2.098750000000006,
+            "absoluteMedianSeconds": 2.315000000000019,
+            "absoluteP95Seconds": 3.713700000000012
+          },
+          "end": {
+            "biasSeconds": -1.812250000000013,
+            "absoluteMedianSeconds": 0.9760000000000133,
+            "absoluteP95Seconds": 4.167050000000016
+          }
+        },
+        "worstOrdinaryLoss": [],
+        "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+      },
+      "allTuneSelection": {
+        "point": "mean-logit-consensus/0.7",
+        "reason": "selected",
+        "summary": {
+          "attempted": 6,
+          "scored": 6,
+          "statusCounts": {
+            "abstained": 3,
+            "ok": 3
+          },
+          "metrics": {
+            "0.3": {
+              "matched": 5,
+              "predicted": 5,
+              "reference": 5,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "0.5": {
+              "matched": 5,
+              "predicted": 5,
+              "reference": 5,
+              "precision": 1,
+              "recall": 1,
+              "f1": 1
+            },
+            "0.7": {
+              "matched": 4,
+              "predicted": 5,
+              "reference": 5,
+              "precision": 0.8,
+              "recall": 0.8,
+              "f1": 0.8
+            }
+          },
+          "referenceSeconds": 224.4090000000001,
+          "coveredReferenceSeconds": 206.85799999999995,
+          "missedReferenceSeconds": 17.55100000000016,
+          "coverageRecall": 0.9217901242820022,
+          "reviewedNegativeHours": 0,
+          "confirmedFalseSkips": 0,
+          "falseSkipsPerHour": null,
+          "ordinaryRemovedSeconds": 0,
+          "ordinarySecondsPerHour": null,
+          "predictedUnknownSeconds": 8.05600000000004,
+          "boundaries": {
+            "matched": 5,
+            "start": {
+              "biasSeconds": 2.060400000000004,
+              "absoluteMedianSeconds": 1.9069999999999965,
+              "absoluteP95Seconds": 3.7066000000000114
+            },
+            "end": {
+              "biasSeconds": 0.16139999999998905,
+              "absoluteMedianSeconds": 1.2490000000000236,
+              "absoluteP95Seconds": 7.381200000000001
+            }
+          },
+          "worstOrdinaryLoss": [],
+          "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+        },
+        "interpretation": "In-sample diagnostic only. This is not a deployment recommendation."
+      },
+      "crossValidation": {
+        "folds": [
+          {
+            "channelId": "UC2C_jShtL725hvbm1arSV9w",
+            "trainingVideos": [
+              "NvkZaWLe0Sk",
+              "t28bEMboL9Y",
+              "ijFSEb2W6_8",
+              "-HzHFSxRcro",
+              "m3NGxgb3O1Y"
+            ],
+            "validationVideos": [
+              "xfPKwJ7Qukc"
+            ],
+            "selectedPoint": "mean-logit-consensus/0.7",
+            "selectionReason": "selected",
+            "summary": {
+              "attempted": 1,
+              "scored": 1,
+              "statusCounts": {
+                "abstained": 1
+              },
+              "metrics": {
+                "0.3": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                },
+                "0.5": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                },
+                "0.7": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                }
+              },
+              "referenceSeconds": 0,
+              "coveredReferenceSeconds": 0,
+              "missedReferenceSeconds": 0,
+              "coverageRecall": null,
+              "reviewedNegativeHours": 0,
+              "confirmedFalseSkips": 0,
+              "falseSkipsPerHour": null,
+              "ordinaryRemovedSeconds": 0,
+              "ordinarySecondsPerHour": null,
+              "predictedUnknownSeconds": 0,
+              "boundaries": {
+                "matched": 0,
+                "start": {
+                  "biasSeconds": null,
+                  "absoluteMedianSeconds": null,
+                  "absoluteP95Seconds": null
+                },
+                "end": {
+                  "biasSeconds": null,
+                  "absoluteMedianSeconds": null,
+                  "absoluteP95Seconds": null
+                }
+              },
+              "worstOrdinaryLoss": [],
+              "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+            },
+            "baseline": {
+              "attempted": 1,
+              "scored": 1,
+              "statusCounts": {
+                "abstained": 1
+              },
+              "metrics": {
+                "0.3": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                },
+                "0.5": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                },
+                "0.7": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                }
+              },
+              "referenceSeconds": 0,
+              "coveredReferenceSeconds": 0,
+              "missedReferenceSeconds": 0,
+              "coverageRecall": null,
+              "reviewedNegativeHours": 0,
+              "confirmedFalseSkips": 0,
+              "falseSkipsPerHour": null,
+              "ordinaryRemovedSeconds": 0,
+              "ordinarySecondsPerHour": null,
+              "predictedUnknownSeconds": 0,
+              "boundaries": {
+                "matched": 0,
+                "start": {
+                  "biasSeconds": null,
+                  "absoluteMedianSeconds": null,
+                  "absoluteP95Seconds": null
+                },
+                "end": {
+                  "biasSeconds": null,
+                  "absoluteMedianSeconds": null,
+                  "absoluteP95Seconds": null
+                }
+              },
+              "worstOrdinaryLoss": [],
+              "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+            }
+          },
+          {
+            "channelId": "UCEIwxahdLz7bap-VDs9h35A",
+            "trainingVideos": [
+              "xfPKwJ7Qukc",
+              "t28bEMboL9Y",
+              "ijFSEb2W6_8",
+              "-HzHFSxRcro",
+              "m3NGxgb3O1Y"
+            ],
+            "validationVideos": [
+              "NvkZaWLe0Sk"
+            ],
+            "selectedPoint": "context-logit-consensus/0.7",
+            "selectionReason": "selected",
+            "summary": {
+              "attempted": 1,
+              "scored": 1,
+              "statusCounts": {
+                "ok": 1
+              },
+              "metrics": {
+                "0.3": {
+                  "matched": 1,
+                  "predicted": 1,
+                  "reference": 1,
+                  "precision": 1,
+                  "recall": 1,
+                  "f1": 1
+                },
+                "0.5": {
+                  "matched": 1,
+                  "predicted": 1,
+                  "reference": 1,
+                  "precision": 1,
+                  "recall": 1,
+                  "f1": 1
+                },
+                "0.7": {
+                  "matched": 1,
+                  "predicted": 1,
+                  "reference": 1,
+                  "precision": 1,
+                  "recall": 1,
+                  "f1": 1
+                }
+              },
+              "referenceSeconds": 75.70299999999997,
+              "coveredReferenceSeconds": 63.61099999999999,
+              "missedReferenceSeconds": 12.091999999999985,
+              "coverageRecall": 0.8402705308904537,
+              "reviewedNegativeHours": 0,
+              "confirmedFalseSkips": 0,
+              "falseSkipsPerHour": null,
+              "ordinaryRemovedSeconds": 0,
+              "ordinarySecondsPerHour": null,
+              "predictedUnknownSeconds": 0,
+              "boundaries": {
+                "matched": 1,
+                "start": {
+                  "biasSeconds": 3.7350000000000136,
+                  "absoluteMedianSeconds": 3.7350000000000136,
+                  "absoluteP95Seconds": 3.7350000000000136
+                },
+                "end": {
+                  "biasSeconds": -8.356999999999971,
+                  "absoluteMedianSeconds": 8.356999999999971,
+                  "absoluteP95Seconds": 8.356999999999971
+                }
+              },
+              "worstOrdinaryLoss": [],
+              "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+            },
+            "baseline": {
+              "attempted": 1,
+              "scored": 1,
+              "statusCounts": {
+                "ok": 1
+              },
+              "metrics": {
+                "0.3": {
+                  "matched": 1,
+                  "predicted": 1,
+                  "reference": 1,
+                  "precision": 1,
+                  "recall": 1,
+                  "f1": 1
+                },
+                "0.5": {
+                  "matched": 1,
+                  "predicted": 1,
+                  "reference": 1,
+                  "precision": 1,
+                  "recall": 1,
+                  "f1": 1
+                },
+                "0.7": {
+                  "matched": 1,
+                  "predicted": 1,
+                  "reference": 1,
+                  "precision": 1,
+                  "recall": 1,
+                  "f1": 1
+                }
+              },
+              "referenceSeconds": 75.70299999999997,
+              "coveredReferenceSeconds": 67.28599999999994,
+              "missedReferenceSeconds": 8.41700000000003,
+              "coverageRecall": 0.8888155026881361,
+              "reviewedNegativeHours": 0,
+              "confirmedFalseSkips": 0,
+              "falseSkipsPerHour": null,
+              "ordinaryRemovedSeconds": 0,
+              "ordinarySecondsPerHour": null,
+              "predictedUnknownSeconds": 0,
+              "boundaries": {
+                "matched": 1,
+                "start": {
+                  "biasSeconds": 3.7350000000000136,
+                  "absoluteMedianSeconds": 3.7350000000000136,
+                  "absoluteP95Seconds": 3.7350000000000136
+                },
+                "end": {
+                  "biasSeconds": -4.682000000000016,
+                  "absoluteMedianSeconds": 4.682000000000016,
+                  "absoluteP95Seconds": 4.682000000000016
+                }
+              },
+              "worstOrdinaryLoss": [],
+              "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+            }
+          },
+          {
+            "channelId": "UCI8iQa1hv7oV_Z8D35vVuSg",
+            "trainingVideos": [
+              "xfPKwJ7Qukc",
+              "NvkZaWLe0Sk",
+              "t28bEMboL9Y",
+              "ijFSEb2W6_8",
+              "-HzHFSxRcro"
+            ],
+            "validationVideos": [
+              "m3NGxgb3O1Y"
+            ],
+            "selectedPoint": "mean-logit-consensus/0.7",
+            "selectionReason": "selected",
+            "summary": {
+              "attempted": 1,
+              "scored": 1,
+              "statusCounts": {
+                "abstained": 1
+              },
+              "metrics": {
+                "0.3": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                },
+                "0.5": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                },
+                "0.7": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                }
+              },
+              "referenceSeconds": 0,
+              "coveredReferenceSeconds": 0,
+              "missedReferenceSeconds": 0,
+              "coverageRecall": null,
+              "reviewedNegativeHours": 0,
+              "confirmedFalseSkips": 0,
+              "falseSkipsPerHour": null,
+              "ordinaryRemovedSeconds": 0,
+              "ordinarySecondsPerHour": null,
+              "predictedUnknownSeconds": 0,
+              "boundaries": {
+                "matched": 0,
+                "start": {
+                  "biasSeconds": null,
+                  "absoluteMedianSeconds": null,
+                  "absoluteP95Seconds": null
+                },
+                "end": {
+                  "biasSeconds": null,
+                  "absoluteMedianSeconds": null,
+                  "absoluteP95Seconds": null
+                }
+              },
+              "worstOrdinaryLoss": [],
+              "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+            },
+            "baseline": {
+              "attempted": 1,
+              "scored": 1,
+              "statusCounts": {
+                "abstained": 1
+              },
+              "metrics": {
+                "0.3": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                },
+                "0.5": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                },
+                "0.7": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                }
+              },
+              "referenceSeconds": 0,
+              "coveredReferenceSeconds": 0,
+              "missedReferenceSeconds": 0,
+              "coverageRecall": null,
+              "reviewedNegativeHours": 0,
+              "confirmedFalseSkips": 0,
+              "falseSkipsPerHour": null,
+              "ordinaryRemovedSeconds": 0,
+              "ordinarySecondsPerHour": null,
+              "predictedUnknownSeconds": 0,
+              "boundaries": {
+                "matched": 0,
+                "start": {
+                  "biasSeconds": null,
+                  "absoluteMedianSeconds": null,
+                  "absoluteP95Seconds": null
+                },
+                "end": {
+                  "biasSeconds": null,
+                  "absoluteMedianSeconds": null,
+                  "absoluteP95Seconds": null
+                }
+              },
+              "worstOrdinaryLoss": [],
+              "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+            }
+          },
+          {
+            "channelId": "UCXuqSBlHAE6Xw-yeJA0Tunw",
+            "trainingVideos": [
+              "xfPKwJ7Qukc",
+              "NvkZaWLe0Sk",
+              "-HzHFSxRcro",
+              "m3NGxgb3O1Y"
+            ],
+            "validationVideos": [
+              "t28bEMboL9Y",
+              "ijFSEb2W6_8"
+            ],
+            "selectedPoint": "flow-window-union/0.8",
+            "selectionReason": "selected",
+            "summary": {
+              "attempted": 2,
+              "scored": 2,
+              "statusCounts": {
+                "ok": 2
+              },
+              "metrics": {
+                "0.3": {
+                  "matched": 3,
+                  "predicted": 3,
+                  "reference": 4,
+                  "precision": 1,
+                  "recall": 0.75,
+                  "f1": 0.8571428571428571
+                },
+                "0.5": {
+                  "matched": 3,
+                  "predicted": 3,
+                  "reference": 4,
+                  "precision": 1,
+                  "recall": 0.75,
+                  "f1": 0.8571428571428571
+                },
+                "0.7": {
+                  "matched": 3,
+                  "predicted": 3,
+                  "reference": 4,
+                  "precision": 1,
+                  "recall": 0.75,
+                  "f1": 0.8571428571428571
+                }
+              },
+              "referenceSeconds": 148.70600000000013,
+              "coveredReferenceSeconds": 122.28399999999999,
+              "missedReferenceSeconds": 26.42200000000014,
+              "coverageRecall": 0.8223205519615878,
+              "reviewedNegativeHours": 0,
+              "confirmedFalseSkips": 0,
+              "falseSkipsPerHour": null,
+              "ordinaryRemovedSeconds": 0,
+              "ordinarySecondsPerHour": null,
+              "predictedUnknownSeconds": 0,
+              "boundaries": {
+                "matched": 3,
+                "start": {
+                  "biasSeconds": 1.553333333333337,
+                  "absoluteMedianSeconds": 1.0370000000000346,
+                  "absoluteP95Seconds": 3.3374000000000064
+                },
+                "end": {
+                  "biasSeconds": -0.8556666666666786,
+                  "absoluteMedianSeconds": 0.703000000000003,
+                  "absoluteP95Seconds": 1.1944000000000217
+                }
+              },
+              "worstOrdinaryLoss": [],
+              "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+            },
+            "baseline": {
+              "attempted": 2,
+              "scored": 2,
+              "statusCounts": {
+                "ok": 2
+              },
+              "metrics": {
+                "0.3": {
+                  "matched": 3,
+                  "predicted": 3,
+                  "reference": 4,
+                  "precision": 1,
+                  "recall": 0.75,
+                  "f1": 0.8571428571428571
+                },
+                "0.5": {
+                  "matched": 3,
+                  "predicted": 3,
+                  "reference": 4,
+                  "precision": 1,
+                  "recall": 0.75,
+                  "f1": 0.8571428571428571
+                },
+                "0.7": {
+                  "matched": 3,
+                  "predicted": 3,
+                  "reference": 4,
+                  "precision": 1,
+                  "recall": 0.75,
+                  "f1": 0.8571428571428571
+                }
+              },
+              "referenceSeconds": 148.70600000000013,
+              "coveredReferenceSeconds": 122.28399999999999,
+              "missedReferenceSeconds": 26.42200000000014,
+              "coverageRecall": 0.8223205519615878,
+              "reviewedNegativeHours": 0,
+              "confirmedFalseSkips": 0,
+              "falseSkipsPerHour": null,
+              "ordinaryRemovedSeconds": 0,
+              "ordinarySecondsPerHour": null,
+              "predictedUnknownSeconds": 0,
+              "boundaries": {
+                "matched": 3,
+                "start": {
+                  "biasSeconds": 1.553333333333337,
+                  "absoluteMedianSeconds": 1.0370000000000346,
+                  "absoluteP95Seconds": 3.3374000000000064
+                },
+                "end": {
+                  "biasSeconds": -0.8556666666666786,
+                  "absoluteMedianSeconds": 0.703000000000003,
+                  "absoluteP95Seconds": 1.1944000000000217
+                }
+              },
+              "worstOrdinaryLoss": [],
+              "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+            }
+          },
+          {
+            "channelId": "UChIs72whgZI9w6d6FhwGGHA",
+            "trainingVideos": [
+              "xfPKwJ7Qukc",
+              "NvkZaWLe0Sk",
+              "t28bEMboL9Y",
+              "ijFSEb2W6_8",
+              "m3NGxgb3O1Y"
+            ],
+            "validationVideos": [
+              "-HzHFSxRcro"
+            ],
+            "selectedPoint": "mean-logit-consensus/0.7",
+            "selectionReason": "selected",
+            "summary": {
+              "attempted": 1,
+              "scored": 1,
+              "statusCounts": {
+                "abstained": 1
+              },
+              "metrics": {
+                "0.3": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                },
+                "0.5": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                },
+                "0.7": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                }
+              },
+              "referenceSeconds": 0,
+              "coveredReferenceSeconds": 0,
+              "missedReferenceSeconds": 0,
+              "coverageRecall": null,
+              "reviewedNegativeHours": 0,
+              "confirmedFalseSkips": 0,
+              "falseSkipsPerHour": null,
+              "ordinaryRemovedSeconds": 0,
+              "ordinarySecondsPerHour": null,
+              "predictedUnknownSeconds": 0,
+              "boundaries": {
+                "matched": 0,
+                "start": {
+                  "biasSeconds": null,
+                  "absoluteMedianSeconds": null,
+                  "absoluteP95Seconds": null
+                },
+                "end": {
+                  "biasSeconds": null,
+                  "absoluteMedianSeconds": null,
+                  "absoluteP95Seconds": null
+                }
+              },
+              "worstOrdinaryLoss": [],
+              "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+            },
+            "baseline": {
+              "attempted": 1,
+              "scored": 1,
+              "statusCounts": {
+                "abstained": 1
+              },
+              "metrics": {
+                "0.3": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                },
+                "0.5": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                },
+                "0.7": {
+                  "matched": 0,
+                  "predicted": 0,
+                  "reference": 0,
+                  "precision": null,
+                  "recall": null,
+                  "f1": null
+                }
+              },
+              "referenceSeconds": 0,
+              "coveredReferenceSeconds": 0,
+              "missedReferenceSeconds": 0,
+              "coverageRecall": null,
+              "reviewedNegativeHours": 0,
+              "confirmedFalseSkips": 0,
+              "falseSkipsPerHour": null,
+              "ordinaryRemovedSeconds": 0,
+              "ordinarySecondsPerHour": null,
+              "predictedUnknownSeconds": 0,
+              "boundaries": {
+                "matched": 0,
+                "start": {
+                  "biasSeconds": null,
+                  "absoluteMedianSeconds": null,
+                  "absoluteP95Seconds": null
+                },
+                "end": {
+                  "biasSeconds": null,
+                  "absoluteMedianSeconds": null,
+                  "absoluteP95Seconds": null
+                }
+              },
+              "worstOrdinaryLoss": [],
+              "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+            }
+          }
+        ],
+        "summary": {
+          "attempted": 6,
+          "scored": 6,
+          "statusCounts": {
+            "abstained": 3,
+            "ok": 3
+          },
+          "metrics": {
+            "0.3": {
+              "matched": 4,
+              "predicted": 4,
+              "reference": 5,
+              "precision": 1,
+              "recall": 0.8,
+              "f1": 0.8888888888888888
+            },
+            "0.5": {
+              "matched": 4,
+              "predicted": 4,
+              "reference": 5,
+              "precision": 1,
+              "recall": 0.8,
+              "f1": 0.8888888888888888
+            },
+            "0.7": {
+              "matched": 4,
+              "predicted": 4,
+              "reference": 5,
+              "precision": 1,
+              "recall": 0.8,
+              "f1": 0.8888888888888888
+            }
+          },
+          "referenceSeconds": 224.4090000000001,
+          "coveredReferenceSeconds": 185.89499999999998,
+          "missedReferenceSeconds": 38.514000000000124,
+          "coverageRecall": 0.8283758672780499,
+          "reviewedNegativeHours": 0,
+          "confirmedFalseSkips": 0,
+          "falseSkipsPerHour": null,
+          "ordinaryRemovedSeconds": 0,
+          "ordinarySecondsPerHour": null,
+          "predictedUnknownSeconds": 0,
+          "boundaries": {
+            "matched": 4,
+            "start": {
+              "biasSeconds": 2.098750000000006,
+              "absoluteMedianSeconds": 2.315000000000019,
+              "absoluteP95Seconds": 3.713700000000012
+            },
+            "end": {
+              "biasSeconds": -2.7310000000000016,
+              "absoluteMedianSeconds": 0.9760000000000133,
+              "absoluteP95Seconds": 7.290799999999976
+            }
+          },
+          "worstOrdinaryLoss": [],
+          "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+        },
+        "uncertainty": {
+          "available": true,
+          "channels": 5,
+          "iterations": 500,
+          "seed": 42,
+          "method": "percentile channel cluster bootstrap; limited precision with few channels",
+          "intervals": {
+            "precision": {
+              "low": 1,
+              "high": 1,
+              "definedReplicates": 465
+            },
+            "recall": {
+              "low": 0.75,
+              "high": 1,
+              "definedReplicates": 465
+            },
+            "coverageRecall": {
+              "low": 0.8223205519615878,
+              "high": 0.8402705308904537,
+              "definedReplicates": 465
+            },
+            "ordinarySecondsPerHour": {
+              "low": null,
+              "high": null,
+              "definedReplicates": 0
+            }
+          }
+        },
+        "pairedChange": {
+          "available": true,
+          "channels": 5,
+          "pairedVideos": 6,
+          "iterations": 500,
+          "method": "paired channel cluster bootstrap; right minus left",
+          "intervals": {
+            "precision": {
+              "low": 0,
+              "high": 0,
+              "definedReplicates": 465
+            },
+            "recall": {
+              "low": 0,
+              "high": 0,
+              "definedReplicates": 465
+            },
+            "ordinarySecondsPerHour": {
+              "low": null,
+              "high": null,
+              "definedReplicates": 0
+            }
+          }
+        },
+        "promotionGate": {
+          "eligible": false,
+          "reasons": [
+            "too_few_positive_channels",
+            "too_few_references",
+            "no_coverage_improvement"
+          ],
+          "automaticSkippingEligible": false,
+          "automaticSkippingReason": "Independent fresh test and reviewed negative exposure are separate required gates"
+        }
+      },
+      "pureDecodingSeconds": 3.879191167
+    }
+  ]
+}
