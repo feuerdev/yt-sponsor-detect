@@ -59,6 +59,10 @@ timed token intervals and supports paid sponsorships only. Use the Chrome
 benchmark runner with the documented resource policy for real model experiments;
 see [bench/README.md](bench/README.md).
 
+The [guarded overlap study](docs/ettin-overlap-study.md) explores decoding improvements
+without using the exposed test set. Its promising in-sample result did not pass
+channel-held-out checks, so production remains on the shipped decoder and threshold.
+
 ## Reliability and evidence
 
 Cache keys bind the model revision/graph, pipeline version, decoder gaps and
