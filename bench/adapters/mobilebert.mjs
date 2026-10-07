@@ -1,4 +1,5 @@
 import {mergeSegments,decodeWindows} from './common.mjs';
+import {configureNliTokenizer} from './nli-text.mjs';
 export async function initialize(spec,backend) {
  if(backend!=='wasm')throw Object.assign(new Error('Transformers 2 baseline selects WASM only'),{status:'unsupported_backend'});
  const {pipeline,env}=await import('../browser/vendor/xenova/transformers.min.js');
@@ -7,6 +8,7 @@ export async function initialize(spec,backend) {
  env.backends.onnx.wasm.numThreads=1;env.backends.onnx.wasm.proxy=false;
  env.backends.onnx.wasm.wasmPaths=new URL('../browser/vendor/xenova/',import.meta.url).href;
  const model=await pipeline('zero-shot-classification',spec.directory,{local_files_only:true,quantized:false,model_file_name:spec.modelFile});
+ configureNliTokenizer(model,spec.preprocessing.maxLength);
  return {backend:'wasm',async infer(f) {
   const windows=[];
   for(let i=0;i<f.cues.length;i+=spec.preprocessing.cueStride) {

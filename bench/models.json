@@ -51,7 +51,9 @@
           "self promotion",
           "ordinary content"
         ],
-        "hypothesis": "This example is {}."
+        "hypothesis": "This example is {}.",
+        "maxLength": 512,
+        "truncation": "premise-hypothesis pair bounded to graph max_position_embeddings; Transformers 2 tokenizer model_max_length override"
       },
       "decoding": {
         "threshold": 0.9,
@@ -108,7 +110,9 @@
           "self promotion",
           "ordinary content"
         ],
-        "hypothesis": "This example is {}."
+        "hypothesis": "This example is {}.",
+        "maxLength": 512,
+        "truncation": "premise-hypothesis pair bounded to graph max_position_embeddings; Transformers 2 tokenizer model_max_length override"
       },
       "decoding": {
         "threshold": 0.9,

@@ -15,7 +15,7 @@ async function walk(dir) {
 for(const file of await walk(path.join(root,'bench'))) {
  const r=spawnSync(process.execPath,['--check',file],{encoding:'utf8'});assert.equal(r.status,0,r.stderr);
 }
-for(const file of ['bench/datasets/pilot.json','bench/datasets/synthetic.json','bench/datasets/published-smoke.json'])validateManifest(await readJson(file));
+for(const file of ['bench/datasets/pilot.json','bench/datasets/synthetic.json','bench/datasets/published-smoke.json','bench/datasets/long-smoke.json'])validateManifest(await readJson(file));
 for(const name of await readdir(path.join(root,'bench/fixtures')))validateFixture(await readJson('bench/fixtures/'+name));
 const registry=await readJson('bench/models.json');
 assert.equal(new Set(registry.models.map(m=>m.id)).size,registry.models.length);
