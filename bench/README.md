@@ -104,6 +104,14 @@ node bench/caption-import.mjs --video VIDEO_ID --file /private/path/snapshot.jso
 
 The importer preserves the exact extracted snapshot bytes/hash, player identity/duration, source/type/time, original reference snapshot, stable fixture bytes/hash and all ledger attempts. The raw source is the structured public panel extraction, not a claim of capturing the HTTP response body. The modern panel supplies whole-second cue starts. Ends are inferred from the next cue start and final video duration, with same-second rows coalesced. This limits boundary resolution and differs from native timedtext durations. Legacy panel millisecond intervals are retained when supplied. Where multiple tracks exist, exact track IDs in the public transcript continuation identify the selected language/type. Ambiguous tracks and incomplete continuation panels are rejected. Each video browser is closed before the next begins, preventing accumulation of YouTube pages. Raw captions/snapshots remain ignored. Regenerate the frozen fixture lock only after acquisition completes, before any test execution.
 
+`caption-player-probe.mjs` separately diagnoses the ordinary public CC button's actual response body. It uses a fresh public browser, does not replay signed URLs or change clients, and keeps bodies private. It does not import fixtures or assume an HTTP 200 body is nonempty:
+
+```sh
+node bench/caption-player-probe.mjs --video pg7fntKLNak \
+  --chrome '/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' \
+  --memory-budget 28672 --minimum-available 4096
+```
+
 ### Ettin pipeline verification
 
 The v2 adapter now preserves per-window logits and uses pinned Flow normalization, constrained Viterbi BILOU, geometric confidence and overlap stitching. Differential tests and the source/rights pins are in [reference/ettin-parity.md](reference/ettin-parity.md). These tests do not reproduce unpublished model-card datasets.

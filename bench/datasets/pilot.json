@@ -2025,6 +2025,15 @@
       "status": "failure",
       "reason": "transcript contents: Public UI timeout at transcript contents",
       "at": "2026-10-07T19:55:09.096Z"
+    },
+    {
+      "videoId": "pg7fntKLNak",
+      "channelId": "UC9-y-6csu5WGm29I7JiwpnA",
+      "phase": "captions",
+      "method": "public-player-cc-diagnostic",
+      "status": "failure",
+      "reason": "Normal public CC button requested English ASR JSON3; HTTP 200, zero response bytes",
+      "at": "2026-10-07T20:02:46.412Z"
     }
   ],
   "channelCount": 18,

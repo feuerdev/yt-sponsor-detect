@@ -2,9 +2,8 @@
 // Diagnostic only: normal public CC UI; no alternate client, auth or URL replay.
 import {launchChrome} from './chrome.mjs';
 import {requireHeadroom,resourcePolicy} from './resources.mjs';
-import {writeFile} from 'node:fs/promises';
 import path from 'node:path';
-import {args,root,readJson} from './lib.mjs';
+import {args,root,readJson,save} from './lib.mjs';
 const options=args(),manifest=await readJson(options.manifest??'bench/datasets/pilot.json'),videoId=options.video,expected=manifest.videos.find(v=>v.videoId===videoId),policy=resourcePolicy(options),pending=new Map(),responses=[];let browser;
 if(!expected||!options.chrome)throw new Error('Frozen --video and installed --chrome required');
 await requireHeadroom(policy);
@@ -20,5 +19,5 @@ try {
  const player=await browser.eval(`(()=>{const p=window.ytInitialPlayerResponse;return {videoId:p?.videoDetails?.videoId,channelId:p?.videoDetails?.channelId,durationSeconds:Number(p?.videoDetails?.lengthSeconds),captionTracks:(p?.captions?.playerCaptionsTracklistRenderer?.captionTracks??[]).map(t=>({vssId:t.vssId,languageCode:t.languageCode,kind:t.kind}))}})()`);
  if(player.videoId!==expected.videoId||player.channelId!==expected.channelId)throw new Error('Public player identity mismatch');
  console.log('Native response metadata',responses.map(({body,...metadata})=>({...metadata,bytes:body?.length})),player);
- await writeFile(path.join(root,'bench/local/acquisition-debug',videoId+'.native.json'),JSON.stringify({source:'YouTube public caption player',acquiredAt:new Date().toISOString(),player,responses},null,2));
+ await save('bench/local/acquisition-debug/'+videoId+'.native.json',{source:'YouTube public caption player',acquiredAt:new Date().toISOString(),player,responses});
 } finally{if(browser)await browser.close();}
