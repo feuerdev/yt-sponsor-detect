@@ -1,0 +1,80 @@
+{
+  "videoId": "synthetic01",
+  "channelId": "synthetic-channel",
+  "durationSeconds": 40,
+  "language": "en",
+  "cues": [
+    {
+      "start": 0,
+      "end": 2,
+      "text": "Today we will explain how an ordinary circuit works."
+    },
+    {
+      "start": 2,
+      "end": 4,
+      "text": "This video is sponsored by Example, our paid sponsor."
+    },
+    {
+      "start": 4,
+      "end": 6,
+      "text": "Thanks to our sponsor for supporting this video."
+    },
+    {
+      "start": 6,
+      "end": 8,
+      "text": "Visit Example for a discount on their software."
+    },
+    {
+      "start": 8,
+      "end": 10,
+      "text": "Now we return to the ordinary circuit explanation."
+    },
+    {
+      "start": 10,
+      "end": 12,
+      "text": "The resistor controls the current through the LED."
+    },
+    {
+      "start": 12,
+      "end": 14,
+      "text": "Like and subscribe if you enjoyed the explanation."
+    },
+    {
+      "start": 14,
+      "end": 16,
+      "text": "This is a review of the camera I bought myself."
+    },
+    {
+      "start": 16,
+      "end": 18,
+      "text": "The sensor captures light and records the image."
+    },
+    {
+      "start": 18,
+      "end": 20,
+      "text": "Thanks for watching and see you next time."
+    }
+  ],
+  "referenceSegments": [
+    {
+      "start": 2,
+      "end": 8,
+      "category": "sponsor",
+      "status": "reviewed"
+    }
+  ],
+  "reviewedNegativeIntervals": [
+    {
+      "start": 0,
+      "end": 2,
+      "status": "reviewed"
+    },
+    {
+      "start": 8,
+      "end": 40,
+      "status": "reviewed"
+    }
+  ],
+  "annotationCompleteness": "complete",
+  "reviewVersion": "synthetic-v1"
+}

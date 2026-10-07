@@ -1,0 +1,66 @@
+import {readdir,readFile,writeFile,mkdir} from 'node:fs/promises';
+import path from 'node:path';
+import {args,root,readJson,save,hash,fixtureFor} from './lib.mjs';
+import {evaluateVideo,summarize,bootstrap,quantile,pairedBootstrap} from './evaluate.mjs';
+const options=args(),manifest=await readJson(options.manifest||'bench/datasets/pilot.json'),registry=await readJson('bench/models.json');
+let gpuCapability=null;try{gpuCapability=await readJson('bench/local/gpu-probe.json');}catch(e){if(e.code!=='ENOENT')throw e;}
+const ids=options.runs?options.runs.split(','):options.run?[options.run]:await readdir(path.join(root,'bench/results'));
+const escape=value=>String(value??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const runs=[],queue=[];
+for(const id of ids) {
+ let meta;try{meta=await readJson(`bench/results/${id}/metadata.json`);}catch(e){if(options.runs||options.run)throw e;continue;}
+ const dataset=meta.manifestFile?await readJson(meta.manifestFile):meta.split==='smoke'?await readJson('bench/datasets/synthetic.json'):manifest;
+ const perVideo=[],rowsByCategory=Object.fromEntries(meta.spec.supportedCategories.map(c=>[c,[]]));
+ const predictions=[];
+ for(const v of dataset.videos.filter(v=>v.split===meta.split)) {
+  let p;try{p=await readJson(`bench/results/${id}/predictions/${v.videoId}.json`);}catch{p={videoId:v.videoId,runId:id,model:meta.spec.id,backend:null,status:'inference_failure',supportedCategories:meta.spec.supportedCategories,segments:[],reason:'Missing result'};}
+  if(meta.predictionHashes?.[v.videoId]&&meta.predictionHashes[v.videoId]!==hash(p))throw new Error('Prediction hash mismatch');
+  predictions.push(p);let f=null,raw=null,metrics={};
+  if(v.captionAvailability==='ok') {
+   f=await fixtureFor(v);
+   for(const category of meta.spec.supportedCategories){const row=evaluateVideo(f,p,category);rowsByCategory[category].push(row);metrics[category]=row;}
+   try{const cached=await readJson(`bench/results/${id}/raw/${v.videoId}.json`);if(meta.rawHashes?.[v.videoId]&&meta.rawHashes[v.videoId]!==hash(cached))throw new Error('Raw cache hash mismatch');raw=cached.raw;}catch(e){if(e.code!=='ENOENT')throw e;}
+   for(const s of p.segments) {
+    const m=metrics[s.category];if(m?.predictedUnknownSeconds>0||m?.ordinaryRemovedSeconds>0)queue.push({videoId:v.videoId,runId:id,model:meta.spec.id,start:s.start,end:s.end,category:s.category,reason:m.ordinaryRemovedSeconds>0?'intersects reviewed ordinary content':'prediction includes unknown/unreviewed time',priority:m.ordinaryRemovedSeconds>0?'high':'review'});
+   }
+   for(const category of meta.spec.supportedCategories) {
+    const row=metrics[category];
+    if(row.metrics?.[.5].unmatchedReferences.length)queue.push({videoId:v.videoId,runId:id,model:meta.spec.id,category,reason:'unmatched provisional/reference spans',priority:'review'});
+    if(row.boundaries?.start.absoluteP95Seconds>3||row.boundaries?.end.absoluteP95Seconds>3)queue.push({videoId:v.videoId,runId:id,model:meta.spec.id,category,reason:'suspicious matched boundary error >3 seconds; diagnostic queue threshold',priority:'high'});
+   }
+  }else queue.push({videoId:v.videoId,runId:id,model:meta.spec.id,reason:'caption acquisition unavailable',priority:'acquisition'});
+  perVideo.push({video:v,prediction:p,metrics,fixture:f,raw});
+ }
+ const summary=Object.fromEntries(Object.entries(rowsByCategory).map(([c,rows])=>[c,{...summarize(rows),uncertainty:bootstrap(rows)}]));
+ const timeValues=predictions.filter(p=>p.status==='ok').map(p=>p.timings?.inferenceMs).filter(Number.isFinite);
+ runs.push({runId:id,metadata:meta,summary,coverage:{selected:predictions.length,statuses:predictions.reduce((a,p)=>(a[p.status]=(a[p.status]||0)+1,a),{})},performance:{coldLoadMs:meta.initialization?.coldLoadMs??null,inferenceMedianMs:quantile(timeValues,.5),inferenceP95Ms:quantile(timeValues,.95),sampleCount:timeValues.length},perVideo});
+}
+// Cross-candidate disagreements: compare identical available fixture versions.
+const byVideo=new Map();
+for(const run of runs.filter(r=>r.metadata.split!=='smoke'))for(const v of run.perVideo)if(v.fixture&&v.prediction.status==='ok') {const list=byVideo.get(v.video.videoId)||[];list.push(v);byVideo.set(v.video.videoId,list);}
+for(const [videoId,list] of byVideo)if(new Set(list.map(v=>JSON.stringify(v.prediction.segments.map(({start,end,category})=>({start,end,category}))))).size>1)queue.push({videoId,reason:'candidate interval disagreement',models:list.map(v=>v.prediction.model),priority:'high'});
+// Every selected unreviewed video is eligible for balanced review, including
+// no-detection cases; never review only one candidate's predictions.
+for(const v of manifest.videos)queue.push({videoId:v.videoId,channelId:v.channelId,stratum:v.stratum,reason:'unreviewed complete video/negative exposure and uncertain affiliate or gifted-product policy',priority:v.stratum==='challenging'?'high':'review'});
+const quantitative=runs.some(r=>r.metadata.split==='test'&&r.metadata.status==='complete'&&Object.values(r.summary).some(s=>s.scored>0));
+const pairedComparisons=[];
+const testRuns=runs.filter(r=>r.metadata.split==='test'&&r.metadata.status==='complete');
+for(let i=0;i<testRuns.length;i++)for(let j=i+1;j<testRuns.length;j++){const a=testRuns[i],b=testRuns[j];if(a.metadata.selectionHash!==b.metadata.selectionHash||hash(a.metadata.fixtureHashes)!==hash(b.metadata.fixtureHashes))continue;for(const category of a.metadata.spec.supportedCategories.filter(c=>b.metadata.spec.supportedCategories.includes(c)))pairedComparisons.push({left:a.runId,right:b.runId,category,uncertainty:pairedBootstrap(a.perVideo.map(v=>v.metrics[category]).filter(Boolean),b.perVideo.map(v=>v.metrics[category]).filter(Boolean))});}
+const recommendation=quantitative?'Review measured Pareto tradeoffs; provisional references and absent reviewed negatives prevent automatic-skipping release approval.':'No evidence-based production model winner. Pilot captions unavailable; synthetic smoke proves only runtime execution. Keep automatic skipping disabled. Next: acquire permitted full caption tracks for the frozen pilot, verify Ettin Flow preprocessing/decoder parity, run tune/frozen test on representative WASM and physical WebGPU devices, then review negatives and agree acceptance gates.';
+const report={schemaVersion:1,generatedAt:new Date().toISOString(),pilot:{selected:manifest.videos.length,channels:new Set(manifest.videos.map(v=>v.channelId)).size,strata:manifest.actualStrata,selectionHash:manifest.selectionHash,acquisition:manifest.acquisitionSummary,attemptLedger:manifest.attemptLedger},recommendation,gpuCapability,
+ limitations:['Synthetic examples are runtime smoke, not quality evidence.','Unknown regions and missing SponsorBlock submissions are not negatives.','Actual false-skips/hour unavailable without reviewed negative exposure.','Linux VPS with constrained CPU/memory is not broad Chrome compatibility evidence.','Fresh-process timings may use warm OS disk cache; reported main-thread lag is approximate.','Account PSS is not model RAM; GPU memory unavailable.','Ettin normalization/decoder reconstruction requires upstream parity review.'],runs,pairedComparisons,reviewQueue:queue};
+const out=options.output||'bench/results/report';await mkdir(path.join(root,out),{recursive:true});
+await save(`${out}/report.json`,report);await save(`${out}/review-queue.json`,queue);
+const csv=[['runId','model','precision','requestedBackend','actualBackend','split','status','selected','ok','coldLoadMs','inferenceMedianMs','peakAccountMiB','falseSkipsPerHour'],...runs.map(r=>[r.runId,r.metadata.spec.id,r.metadata.spec.precision,r.metadata.requestedBackend,r.metadata.initialization?.actualBackend,r.metadata.split,r.metadata.status,r.coverage.selected,r.coverage.statuses.ok||0,r.performance.coldLoadMs,r.performance.inferenceMedianMs,r.metadata.memory.peakAccountMiB,r.summary.sponsor?.falseSkipsPerHour??'unavailable'])];
+await writeFile(path.join(root,out,'summary.csv'),csv.map(row=>row.map(x=>'"'+String(x??'').replaceAll('"','""')+'"').join(',')).join('\n')+'\n');
+const display=n=>n==null?'unavailable':typeof n==='number'?n.toFixed(2):escape(n);
+const table=runs.map(r=>`<tr><td>${escape(r.metadata.spec.id)}<br><small>${escape(r.metadata.split)}</small></td><td>${escape(r.metadata.requestedBackend)} → ${escape(r.metadata.initialization?.actualBackend||'unavailable')}</td><td>${escape(r.metadata.status)}<br>${escape(JSON.stringify(r.coverage.statuses))}</td><td>${display(r.performance.coldLoadMs)}</td><td>${display(r.performance.inferenceMedianMs)}</td><td>${display(r.metadata.memory.peakAccountMiB)}</td></tr>`).join('');
+const videos=runs.map(r=>`<details><summary>${escape(r.runId)} · ${escape(r.metadata.status)}</summary><pre>${escape(JSON.stringify({environment:r.metadata.initialization,memory:r.metadata.memory,failure:r.metadata.failure,spec:r.metadata.spec,summary:r.summary},null,2))}</pre>${r.perVideo.map(v=>{
+ const duration=v.fixture?.durationSeconds||v.video.durationSeconds||Math.max(1,...v.prediction.segments.map(s=>s.end));
+ const rect=(s,y,color)=>`<rect x="${s.start/duration*1000}" y="${y}" width="${(s.end-s.start)/duration*1000}" height="14" fill="${color}"><title>${escape(s.category)} ${s.start.toFixed(2)}–${s.end.toFixed(2)}</title></rect>`;
+ return `<details><summary>${escape(v.video.videoId)} · ${escape(v.video.stratum)} · ${escape(v.prediction.status)}</summary><svg viewBox="0 0 1000 52" aria-label="Reference intervals above predicted intervals"><rect width="1000" height="52" fill="#24364c"/>${(v.fixture?.referenceSegments||[]).map(s=>rect(s,6,'#77d4ba')).join('')}${v.prediction.segments.map(s=>rect(s,30,'#ffc67b')).join('')}</svg><pre>${escape(JSON.stringify({prediction:v.prediction,metrics:v.metrics,provenance:v.fixture?.provenance||{acquisitionFailure:v.video.acquisitionFailure}},null,2))}</pre><details><summary>Caption cues</summary><pre>${escape(JSON.stringify(v.fixture?.cues||'Unavailable',null,2))}</pre></details><details><summary>Cached score trace (model-specific, not calibrated)</summary><pre>${escape(JSON.stringify(v.raw||'Unavailable',null,2))}</pre></details></details>`;
+ }).join('')}</details>`).join('');
+await writeFile(path.join(root,out,'index.html'),`<!doctype html><html lang="en"><meta charset="utf-8"><meta name="viewport" content="width=device-width"><title>Sponsor benchmark report</title><link rel="stylesheet" href="../../browser/style.css"><main><p class="eyebrow">EVIDENCE & COVERAGE</p><h1>Sponsor benchmark report</h1><p class="warning">${escape(recommendation)}</p><p>Frozen pilot: ${report.pilot.selected} videos · ${report.pilot.channels} channels · ${escape(JSON.stringify(report.pilot.strata))}</p><p>Available captions: ${report.pilot.acquisition?.available??'pending'}. Real-world false skips/hour: unavailable. No reviewed pilot negatives.</p><details><summary>WebGPU capability · ${escape(gpuCapability?.status||'unavailable')}</summary><pre>${escape(JSON.stringify(gpuCapability||'No capability evidence',null,2))}</pre></details><table><thead><tr><th>Candidate / split</th><th>Backend</th><th>Completion / coverage</th><th>Fresh load ms</th><th>Median inference ms</th><th>Peak account MiB</th></tr></thead><tbody>${table}</tbody></table><details><summary>Limitations and next experiment</summary><pre>${escape(JSON.stringify(report.limitations,null,2))}</pre></details>${videos}<details><summary>Balanced review queue · ${queue.length} items</summary><pre>${escape(JSON.stringify(queue,null,2))}</pre></details></main></html>`);
+const md=`# Sponsor detection benchmark evidence\n\n${recommendation}\n\n- Pilot: ${report.pilot.selected} distinct videos, ${report.pilot.channels} channels; 25 paid / 15 challenging / 10 ordinary sampling strata.\n- Acquisition: ${report.pilot.acquisition?.available??0}/${report.pilot.selected} caption fixtures available. Failures retained in pilot manifest.\n- Label quality: provisional SponsorBlock references, partial annotations; no reviewed negative hours. Actual false skips/hour and ordinary-content loss are unavailable.\n- WebGPU capability: ${gpuCapability?.status||'unavailable'}; ONNX GPU graphs untested.
+- Inference: ${runs.filter(r=>r.coverage.statuses.ok).map(r=>r.metadata.spec.id+' ('+r.metadata.split+', '+r.metadata.initialization?.actualBackend+')').join(', ')||'no successful browser runs yet'}. Synthetic smoke is not accuracy evidence.\n\n| Candidate | Split | Requested / actual backend | Run | Fresh load ms | Inference median ms | Peak account MiB |\n|---|---|---|---|---:|---:|---:|\n${runs.map(r=>'| '+[r.metadata.spec.id,r.metadata.split,r.metadata.requestedBackend+' / '+(r.metadata.initialization?.actualBackend||'unavailable'),r.metadata.status,display(r.performance.coldLoadMs),display(r.performance.inferenceMedianMs),display(r.metadata.memory.peakAccountMiB)].join(' | ')+' |').join('\n')}\n\nPer-video inspection, cached scores, failures and review queue are in index.html/report.json. See bench/README.md for pinned reproduction commands.\n`;
+await writeFile(path.join(root,out,'recommendation.md'),md);console.log('Report saved:',out);

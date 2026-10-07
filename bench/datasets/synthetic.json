@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "kind": "synthetic smoke; never quality evidence",
+  "selectionHash": "synthetic-v1",
+  "videos": [
+    {
+      "videoId": "synthetic01",
+      "channelId": "synthetic-channel",
+      "split": "smoke",
+      "captionAvailability": "ok",
+      "fixturePath": "bench/fixtures/synthetic01.json",
+      "fixtureHash": "a3b6cce44e0e47fc27032a08f4d75131e679df59d8871256f58d390424acdc55",
+      "captionType": "synthetic"
+    }
+  ]
+}

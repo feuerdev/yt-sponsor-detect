@@ -1,5 +1,7 @@
 # Historical AdBlock Extension Implementation Plan
 
+> Current direction (7 October 2026): the isolated full-track benchmark in `bench/` takes precedence over historical sentence threshold tuning and automatic-skipping plans. See `bench/README.md` and `docs/benchmark-evidence.md`. The 50-video pilot was attempted but captions and learned-model runtime evidence are blocked; automatic skipping stays disabled.
+
 This is an early design snapshot. Its milestone checkboxes record historical implementation claims, not verified end-to-end behavior. Use [the current readiness specification](docs/project-readiness.md) and [README](README.md) for actual state, test evidence and remaining gates. Model accuracy, production bundling and browser lifecycle behavior require the checks described there.
 
 This document outlines the implementation plan for a Chrome browser extension that automatically detects and skips sponsored segments in YouTube videos using a local NLP model.

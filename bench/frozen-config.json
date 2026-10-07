@@ -1,0 +1,111 @@
+{
+  "schemaVersion": 1,
+  "frozenAt": "2026-10-07T15:36:03.168Z",
+  "selectionHash": "013b92e97f22267616fe70f665b5d719f7f1ead983718fbd1147d948884f6f66",
+  "registryHash": "dc6658e33d480bb81ae994d949a2e71024b67937b624209366b6199c2dd3d334",
+  "fixtureSetHash": "5183c302994c59bfb3710450d1665e8e6a2a82676228aec06d1f86ece38c6045",
+  "models": {
+    "mobilebert-fp32/wasm": {
+      "config": {
+        "threshold": 0.9,
+        "mergeGapSeconds": 0
+      },
+      "tuneRunId": "2026-10-07T15-21-02-654Z-mobilebert-fp32-wasm-deferred",
+      "tuneInferenceKey": null,
+      "availableTuneVideos": 0,
+      "status": "unavailable",
+      "trials": []
+    },
+    "mobilebert-int8/wasm": {
+      "config": {
+        "threshold": 0.9,
+        "mergeGapSeconds": 0
+      },
+      "tuneRunId": "2026-10-07T15-21-03-862Z-mobilebert-int8-wasm-deferred",
+      "tuneInferenceKey": null,
+      "availableTuneVideos": 0,
+      "status": "unavailable",
+      "trials": []
+    },
+    "ettin-fp32/wasm": {
+      "config": {
+        "threshold": 0.7,
+        "mergeGapCharacters": 24,
+        "mergeGapSeconds": 1.5,
+        "parity": "published rules reproduced; exact Flow source/parity not yet available"
+      },
+      "tuneRunId": "2026-10-07T15-21-05-045Z-ettin-fp32-wasm-deferred",
+      "tuneInferenceKey": null,
+      "availableTuneVideos": 0,
+      "status": "unavailable",
+      "trials": []
+    },
+    "ettin-fp32/webgpu": {
+      "config": {
+        "threshold": 0.7,
+        "mergeGapCharacters": 24,
+        "mergeGapSeconds": 1.5,
+        "parity": "published rules reproduced; exact Flow source/parity not yet available"
+      },
+      "tuneRunId": "2026-10-07T15-21-06-412Z-ettin-fp32-webgpu-deferred",
+      "tuneInferenceKey": null,
+      "availableTuneVideos": 0,
+      "status": "unavailable",
+      "trials": []
+    },
+    "ettin-int8/wasm": {
+      "config": {
+        "threshold": 0.7,
+        "mergeGapCharacters": 24,
+        "mergeGapSeconds": 1.5,
+        "parity": "published rules reproduced; exact Flow source/parity not yet available"
+      },
+      "tuneRunId": "2026-10-07T15-21-07-473Z-ettin-int8-wasm-deferred",
+      "tuneInferenceKey": null,
+      "availableTuneVideos": 0,
+      "status": "unavailable",
+      "trials": []
+    },
+    "ettin-int8/webgpu": {
+      "config": {
+        "threshold": 0.7,
+        "mergeGapCharacters": 24,
+        "mergeGapSeconds": 1.5,
+        "parity": "published rules reproduced; exact Flow source/parity not yet available"
+      },
+      "tuneRunId": "2026-10-07T15-21-08-832Z-ettin-int8-webgpu-deferred",
+      "tuneInferenceKey": null,
+      "availableTuneVideos": 0,
+      "status": "unavailable",
+      "trials": []
+    },
+    "sponsorskip-base/webgpu": {
+      "config": {
+        "threshold": 0.7,
+        "thresholdLo": 0.3,
+        "mergeGapSeconds": 2,
+        "minLengthSeconds": 1,
+        "wordTailSeconds": 0.4,
+        "sourceRevision": "01e53cbe8beb02f0ce125736b88df99396793595"
+      },
+      "tuneRunId": "2026-10-07T15-21-09-980Z-sponsorskip-base-webgpu-deferred",
+      "tuneInferenceKey": null,
+      "availableTuneVideos": 0,
+      "status": "unavailable",
+      "trials": []
+    },
+    "keyword/javascript": {
+      "config": {
+        "threshold": 1,
+        "mergeGapSeconds": 0
+      },
+      "tuneRunId": "2026-10-07T15-21-11-159Z-keyword-javascript-deferred",
+      "tuneInferenceKey": null,
+      "availableTuneVideos": 0,
+      "status": "unavailable",
+      "trials": []
+    }
+  },
+  "tuningBudget": "Seven decoder operating points per learned candidate; label wording/windowing fixed before acquisition. No repeated inference for thresholds.",
+  "selectionRule": "Diagnostic: greatest recall at observed >=95% provisional segment agreement precision, with at least one match. If none qualifies or no scored videos, preserve published/default configuration and abstain from model selection. This is not a release gate."
+}

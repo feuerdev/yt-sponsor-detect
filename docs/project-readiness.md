@@ -1,5 +1,7 @@
 # Sponsor detection: measured, reversible local ML demo
 
+> Current direction (7 October 2026): the isolated full-track benchmark in `bench/` takes precedence over historical sentence threshold tuning and automatic-skipping plans. See `bench/README.md` and `docs/benchmark-evidence.md`. The 50-video pilot was attempted but captions and learned-model runtime evidence are blocked; automatic skipping stays disabled.
+
 Status: proposed implementation spec, 5 October 2026. Primary endpoint: portfolio demonstration of on-device classification, measured errors and browser lifecycle design. Commercial launch is deferred until differentiation, accuracy and licensing are established.
 
 ## Existing system and cleanup

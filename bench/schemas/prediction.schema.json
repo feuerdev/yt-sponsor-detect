@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Browser prediction",
+  "type": "object",
+  "required": [
+    "videoId",
+    "runId",
+    "model",
+    "backend",
+    "status",
+    "supportedCategories",
+    "segments"
+  ],
+  "properties": {
+    "videoId": {
+      "type": "string"
+    },
+    "runId": {
+      "type": "string",
+      "minLength": 1
+    },
+    "model": {
+      "type": "string"
+    },
+    "backend": {
+      "enum": [
+        "wasm",
+        "webgpu",
+        "javascript",
+        null
+      ]
+    },
+    "status": {
+      "enum": [
+        "ok",
+        "abstained",
+        "unsupported_backend",
+        "unsupported_category",
+        "missing_captions",
+        "initialization_failure",
+        "inference_failure",
+        "invalid_output",
+        "resource_deferred"
+      ]
+    },
+    "supportedCategories": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "sponsor",
+          "selfpromo"
+        ]
+      }
+    },
+    "segments": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "start",
+          "end",
+          "category"
+        ],
+        "properties": {
+          "start": {
+            "type": "number",
+            "minimum": 0
+          },
+          "end": {
+            "type": "number",
+            "exclusiveMinimum": 0
+          },
+          "category": {
+            "enum": [
+              "sponsor",
+              "selfpromo"
+            ]
+          },
+          "score": {
+            "type": "number",
+            "minimum": 0,
+            "maximum": 1
+          }
+        }
+      }
+    }
+  },
+  "$comment": "Runtime contract rejects non-finite values, reversed/out-of-duration spans, unsupported categories and nonempty failure outputs."
+}
