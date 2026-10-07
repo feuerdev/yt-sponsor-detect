@@ -1,5 +1,5 @@
 import {normalizeTimed,alignedTokens,decodeBilou} from './ettin-text.mjs';
-import {softmax} from './common.mjs';
+
 export async function initialize(spec,backend) {
  if(backend==='webgpu'&&(!navigator.gpu||!(await navigator.gpu.requestAdapter())))throw Object.assign(new Error('No usable WebGPU adapter'),{status:'unsupported_backend'});
  const ort=await import('../browser/vendor/ort/ort.webgpu.bundle.min.mjs');
@@ -12,15 +12,15 @@ export async function initialize(spec,backend) {
  const session=await ort.InferenceSession.create(new URL(`sponsor_detector_combined.${spec.precision}.onnx`,base).href,{executionProviders:[backend],graphOptimizationLevel:'all'});
  return {backend,async infer(f) {
   const {text,timing}=normalizeTimed(f),{ids,spans}=alignedTokens(tokenizer,text,timing);
-  const acc=Array.from(ids,()=>new Float64Array(5)),count=new Uint32Array(ids.length),body=766,step=638;
+  const windows=[],body=spec.preprocessing.maxLength-2,step=body-spec.preprocessing.overlapTokens;
   for(let start=0;start<ids.length;start+=step) {
    const end=Math.min(ids.length,start+body),sequence=[config.cls_token_id,...ids.slice(start,end),config.sep_token_id];
    const input=new BigInt64Array(sequence.map(BigInt)),mask=new BigInt64Array(sequence.length).fill(1n);
    const out=await session.run({input_ids:new ort.Tensor('int64',input,[1,sequence.length]),attention_mask:new ort.Tensor('int64',mask,[1,sequence.length])});
    const logits=out.logits;if(logits.dims.at(-1)!==5||logits.dims.at(-2)!==sequence.length)throw new Error('Invalid Ettin logits shape');
-   for(let i=start;i<end;i++){const values=softmax(logits.data.subarray((i-start+1)*5,(i-start+2)*5));values.forEach((v,c)=>acc[i][c]+=v);count[i]++;}
+   windows.push({tokens:spans.slice(start,end),logits:Array.from({length:end-start},(_,i)=>Array.from(logits.data.subarray((i+1)*5,(i+2)*5)))});
    for(const tensor of Object.values(out))tensor.dispose?.();if(end===ids.length)break;
   }
-  return {kind:'ettin-bilou',tokens:spans,probabilities:acc.map((row,i)=>Array.from(row,v=>v/count[i])),normalizedCharacters:text.length,parity:'experimental reconstruction; exact Flow decoder/normalization parity UNVERIFIED'};
+  return {kind:'ettin-bilou-windows-v2',windows,normalizedCharacters:Array.from(text).length,parity:'pinned Flow pure pipeline differential verification; zero-duration proposals omitted; complex NFC offsets rejected'};
  },decode:decodeBilou,dispose:()=>session.release()};
 }

@@ -169,13 +169,15 @@
           "I-SPONSOR",
           "L-SPONSOR",
           "U-SPONSOR"
-        ]
+        ],
+        "implementation": "flow-pure-v2; cue normalization followed by tokenizer NFC; Python-codepoint offsets"
       },
       "decoding": {
         "threshold": 0.7,
         "mergeGapCharacters": 24,
         "mergeGapSeconds": 1.5,
-        "parity": "published rules reproduced; exact Flow source/parity not yet available"
+        "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+        "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
       }
     },
     {
@@ -232,13 +234,15 @@
           "I-SPONSOR",
           "L-SPONSOR",
           "U-SPONSOR"
-        ]
+        ],
+        "implementation": "flow-pure-v2; cue normalization followed by tokenizer NFC; Python-codepoint offsets"
       },
       "decoding": {
         "threshold": 0.7,
         "mergeGapCharacters": 24,
         "mergeGapSeconds": 1.5,
-        "parity": "published rules reproduced; exact Flow source/parity not yet available"
+        "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+        "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
       }
     },
     {

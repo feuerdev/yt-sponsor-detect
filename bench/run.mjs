@@ -5,11 +5,13 @@ import os from 'node:os';
 import path from 'node:path';
 import {args,root,readJson,save,hash,fixtureFor} from './lib.mjs';
 import {validateManifest,validateFixture} from './contracts.mjs';
-import {resources,requireHeadroom} from './resources.mjs';
+import {resources,requireHeadroom,resourcePolicy,assertHeadroom} from './resources.mjs';
 import {verifyAssets} from '../scripts/model-assets.mjs';
 import {createServer,staticResponse} from './serve.mjs';
 import {launchChrome} from './chrome.mjs';
-const exec=promisify(execFile),options=args();
+const exec=promisify(execFile),options=args();const policy=resourcePolicy(options);
+function hasHeadroom(sample){try{assertHeadroom(sample,policy);return true;}catch{return false;}}
+
 const registry=await readJson('bench/models.json'),spec=registry.models.find(m=>m.id===(options.model||'mobilebert-int8'));
 if(!spec)throw new Error('Unknown model');
 const backend=options.backend||spec.backends[0],split=options.split||'smoke';
@@ -27,7 +29,7 @@ if(split==='test'&&!frozen?.models?.[`${spec.id}/${backend}`])throw new Error('C
 const runId=options['run-id']||new Date().toISOString().replace(/[:.]/g,'-')+'-'+spec.id+'-'+backend;
 if(!/^[A-Za-z0-9_-]+$/.test(runId))throw new Error('Unsafe run ID');
 const directory=path.join(root,'bench/results',runId);await mkdir(path.dirname(directory),{recursive:true});await mkdir(directory,{recursive:false});
-const initial=await requireHeadroom(Number(options['memory-budget']||700));
+const initial=await requireHeadroom(policy);
 const setup=await readJson('bench/local/setup.json');
 const commit=execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'}).trim();
 const sourceDiff=execFileSync('git',['diff','--binary','HEAD'],{cwd:root,encoding:'utf8'});
@@ -36,7 +38,7 @@ const untrackedHashes=[];for(const file of sourceFiles)untrackedHashes.push([fil
 const meta={schemaVersion:1,runId,startedAt:new Date().toISOString(),split,spec,config,manifestFile:options.manifest||(split==='smoke'?'bench/datasets/synthetic.json':'bench/datasets/pilot.json'),requestedBackend:backend,registryHash:hash(registry),selectionHash:manifest.selectionHash||null,manifestHash:hash(manifest),configHash:hash(config),
  inferenceKey:hash({spec,backend,fixtures:videos.map(v=>[v.videoId,v.fixtureHash]),runtime:setup.runtime,sourceDiffHash:hash(sourceDiff),untrackedHashes}),runtime:setup.runtime,repositoryCommit:commit,sourceDiffHash:hash(sourceDiff),untrackedSourceHashes:untrackedHashes,
  fixtureHashes:videos.map(v=>[v.videoId,v.fixtureHash||null]),host:{platform:os.platform(),arch:os.arch(),cpus:os.cpus().map(c=>c.model),totalMemoryBytes:os.totalmem()},
- memory:{before:initial,peakAccountMiB:initial.accountMiB,minimumAvailableMiB:initial.availableMiB,method:initial.method,scope:initial.scope,gpuMemory:null},
+ memory:{policy,before:initial,peakAccountMiB:initial.accountMiB,minimumAvailableMiB:initial.availableMiB,method:initial.method,scope:initial.scope,gpuMemory:null},
  timingMethod:'Browser performance.now; fresh browser process per candidate; OS file cache unspecified. Inference sequential. Warm repeat only when explicitly selected; screenshots/orchestration excluded.',status:'running'};
 await save(`bench/results/${runId}/metadata.json`,meta);
 // An unsupported provider can be probed without downloading/loading its graph.
@@ -69,14 +71,14 @@ try {
  const address=`http://127.0.0.1:${server.address().port}`;
  console.log('Run',runId,address);
  if(options.chrome) {
-  direct=await launchChrome({executable:options.chrome,profileParent:path.join(root,'bench/local'),url:address+'/bench/browser/index.html',cpuOnly:backend!=='webgpu'&&options['browser-gpu-policy']!=='default',singleProcess:!!options['single-process'],onSample:async()=>{const r=await resources();meta.memory.peakAccountMiB=Math.max(meta.memory.peakAccountMiB,r.accountMiB);meta.memory.minimumAvailableMiB=Math.min(meta.memory.minimumAvailableMiB,r.availableMiB);if(r.accountMiB>Number(options['memory-budget']||700)||r.availableMiB<768){fatal='resource_deferred: conservative browser guard';throw new Error(fatal);}}});
+  direct=await launchChrome({executable:options.chrome,profileParent:path.join(root,'bench/local'),url:address+'/bench/browser/index.html',cpuOnly:backend!=='webgpu'&&options['browser-gpu-policy']!=='default',singleProcess:!!options['single-process'],onSample:async()=>{const r=await resources();meta.memory.peakAccountMiB=Math.max(meta.memory.peakAccountMiB,r.accountMiB);meta.memory.minimumAvailableMiB=Math.min(meta.memory.minimumAvailableMiB,r.availableMiB);if(!hasHeadroom(r)){fatal='resource_deferred: conservative browser guard';throw new Error(fatal);}}});
   meta.browserLaunch={controller:'minimal CDP',flags:direct.flags,version:direct.version};await direct.eval('window.startBenchmark()');
  }else {await agentBrowser('open',address+'/bench/browser/index.html');await agentBrowser('eval','window.startBenchmark()');}
  const deadline=Date.now()+Number(options['timeout-seconds']||600)*1000;
  while(!done&&!fatal) {
   await new Promise(r=>setTimeout(r,500));const r=await resources();
   meta.memory.peakAccountMiB=Math.max(meta.memory.peakAccountMiB,r.accountMiB);meta.memory.minimumAvailableMiB=Math.min(meta.memory.minimumAvailableMiB,r.availableMiB);
-  if(r.accountMiB>Number(options['memory-budget']||700)||r.availableMiB<768){fatal='resource_deferred: browser closed at conservative resource margin';break;}
+  if(!hasHeadroom(r)){fatal='resource_deferred: browser closed at conservative resource margin';break;}
   if(Date.now()>deadline){fatal='timeout: workload not completed';break;}
  }
  if(!fatal){if(direct)await writeFile(path.join(directory,'runner.png'),await direct.screenshot());else await agentBrowser('screenshot',path.join(directory,'runner.png'));}
