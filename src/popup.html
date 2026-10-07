@@ -51,17 +51,19 @@
     <h3>Sponsor Skipper</h3>
     <div class="container">
       <input type="checkbox" id="enabled-checkbox" />
-      <label for="enabled-checkbox">Enable Sponsor Skipping</label>
+      <label for="enabled-checkbox">Enable sponsor suggestions</label>
     </div>
 
-    <h4>Blocked Categories</h4>
+    <p>Suggestions require a click and can be wrong. Undo restores your previous playback position.</p>
+    <p>After changing categories or clearing suggestions, reload the video to analyze its captions again.</p>
+    <h4>Suggested Categories</h4>
     <div id="labels-list">
       <!-- Label items will be dynamically inserted here -->
     </div>
     <button id="add-label-btn">+ Add Category</button>
 
     <div class="container setting">
-      <button id="clear-segments-btn">Clear & Re-analyze Current Video</button>
+      <button id="clear-segments-btn">Clear Current Video Suggestions</button>
     </div>
 
     <script src="popup.js" type="module"></script>

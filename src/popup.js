@@ -101,8 +101,9 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     // Load saved settings and update the UI
-    chrome.storage.sync.get({ isEnabled: true, labels: null }, (data) => {
+    chrome.storage.sync.get({ isEnabled: true, autoSkip: false, labels: null }, (data) => {
         settings.isEnabled = data.isEnabled;
+        settings.autoSkip = false; // Ignore legacy opt-in until independent reliability gates pass.
         if (data.labels === null) {
             settings.labels = defaultLabels;
         } else {
@@ -119,6 +120,7 @@ document.addEventListener('DOMContentLoaded', () => {
         saveSettings();
     });
     
+
     clearButton.addEventListener('click', () => {
         clearSegmentsInActiveTab();
     });

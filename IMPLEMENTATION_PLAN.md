@@ -1,4 +1,6 @@
-# AdBlock Extension: Implementation Plan
+# Historical AdBlock Extension Implementation Plan
+
+This is an early design snapshot. Its milestone checkboxes record historical implementation claims, not verified end-to-end behavior. Use [the current readiness specification](docs/project-readiness.md) and [README](README.md) for actual state, test evidence and remaining gates. Model accuracy, production bundling and browser lifecycle behavior require the checks described there.
 
 This document outlines the implementation plan for a Chrome browser extension that automatically detects and skips sponsored segments in YouTube videos using a local NLP model.
 
@@ -110,27 +112,27 @@ The extension will consist of three main components:
 
 ## 4. Milestones
 
-1.  **M1: Foundation (1 day) - Completed**
+1.  **M1: Foundation (1 day) - historical implementation claim**
     -   [x] Set up `manifest.json` and file structure.
     -   [x] Implement caption interception in `background.js` and log parsed captions to the console.
 
-2.  **M2: Content Script & Communication (2 days) - Completed**
+2.  **M2: Content Script & Communication (2 days) - historical implementation claim**
     -   [x] Inject `content.js` into YouTube pages.
     -   [x] Establish message passing between `background.js` and `content.js`.
     -   [x] Implement the caption buffering logic in `content.js`.
     -   [x] Implement chapter extraction and logging.
 
-3.  **M3: Model Integration & Basic Detection (3 days) - Completed**
+3.  **M3: Model Integration & Basic Detection (3 days) - historical implementation claim**
     -   [x] Integrate `Transformers.js` into the background script.
     -   [x] Load a pre-trained classification model.
     -   [x] Set up the pipeline to classify buffered caption text sent from the content script.
-    -   **Note**: For rapid prototyping, `Transformers.js` is currently loaded from a CDN. For production, this should be bundled with the extension.
+    -   **Current source** imports Transformers.js from the package and configures local model loading. Real model files are absent from a fresh checkout; follow the README setup and artifact limitations.
 
-4.  **M4: End-to-End Skipping (2 days) - Completed**
+4.  **M4: End-to-End Skipping (2 days) - historical implementation claim**
     -   [x] Implement the video skipping logic in `content.js` based on the model's output.
     -   [x] Refine the detection threshold and buffer size for better accuracy.
 
-5.  **M5: UI & Refinements (2 days) - Completed**
+5.  **M5: UI & Refinements (2 days) - historical implementation claim**
     -   [x] Create a simple UI overlay to notify the user of a skip.
     -   [x] Add an options page to enable/disable the feature.
     -   [x] Test thoroughly and handle edge cases (live streams, videos without captions).

@@ -1,15 +1,17 @@
 {
-  "name": "adblock",
+  "name": "yt-sponsor-detect",
   "version": "0.1.0",
-  "description": "Automatically skips sponsored segments in YouTube videos.",
+  "description": "Experimental local classification of YouTube sponsor captions",
   "main": "src/background.js",
   "type": "module",
   "scripts": {
     "setup": "node scripts/download-model.js",
-    "build": "webpack --mode production",
+    "build": "npm run verify:model && webpack --mode production",
     "dev": "webpack --watch",
     "debug": "node debug.js",
-    "test": "node test_classifier.js"
+    "test": "node scripts/check.mjs && node --test --test-concurrency=1 tests/*.test.mjs",
+    "evaluate": "node test_classifier.js",
+    "verify:model": "node scripts/verify-model.mjs"
   },
   "keywords": [],
   "author": "",
