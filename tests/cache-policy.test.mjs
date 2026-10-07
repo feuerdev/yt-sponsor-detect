@@ -22,7 +22,7 @@ function fixture(saved={}, score=async()=>({sponsor:0.99})) {
                     remove:async keys=> {for(const key of [].concat(keys)) delete saved[key];}}}}});
     vm.runInContext(source,context);
     return {context,saved,messages,writes,settings,get fetches(){return fetches;},
-        request:()=>request({tabId:1,url:'https://www.youtube.com/api/timedtext?v=fixture'}),
+        request:(tabId=1,videoId='fixture')=>request({tabId,url:`https://www.youtube.com/api/timedtext?v=${videoId}`}),
         change: updates=>{Object.assign(settings,updates); changed(Object.fromEntries(Object.entries(updates).map(([k,v])=>[k,{newValue:v}])),'sync');},
         captions:value=>{events=value;},
         cache:()=>new Promise(resolve=>message({type:'GET_CACHED_SEGMENTS',videoId:'fixture'},{},resolve))};
@@ -60,9 +60,11 @@ test('repeated timedtext responses do not duplicate captions or analysis',async(
     assert.equal(f.fetches,1);assert.equal(f.writes.length,1);
 });
 test('invalid caption boundaries fail visibly without segment or completed cache',async()=>{
-    const f=fixture();f.captions([{tStartMs:-100,dDurationMs:1000,segs:[{utf8:'synthetic caption'}]}]);
-    await f.request();await settle();assert.equal(f.writes.length,0);
-    assert.equal(f.messages.at(-1).type,'ANALYSIS_ERROR');
+    for (const boundaries of [{tStartMs:-100,dDurationMs:1000}, {tStartMs:0}, {tStartMs:0,dDurationMs:0}]) {
+        const f=fixture();f.captions([{...boundaries,segs:[{utf8:'synthetic caption'}]}]);
+        await f.request();await settle();assert.equal(f.writes.length,0);
+        assert.equal(f.messages.at(-1).type,'ANALYSIS_ERROR');
+    }
 });
 
 test('a gap between detected windows never becomes a suggested skip interval', async()=>{
@@ -78,4 +80,74 @@ test('completed cache evicts oldest entries to stay bounded',async()=>{
     const f=fixture(saved);await f.request();await settle();
     assert.equal(Object.keys(saved).length,30);assert.equal(saved['sponsor-cache:old0'],undefined);
     assert.ok(saved['sponsor-cache:fixture']);
+});
+
+test('whitespace-only JSON3 separators do not invalidate speech captions',async()=>{
+    for (const duration of [undefined, 0]) {
+        const f=fixture();
+        f.captions([
+            {tStartMs:0,dDurationMs:20000,id:1,wpWinPosId:1,wsWinStyleId:1},
+            ...Array.from({length:20},(_,i)=>({tStartMs:i*1000,dDurationMs:1000,
+                wWinId:1,segs:[{utf8:'synthetic speech caption'}]})),
+            {tStartMs:1000,dDurationMs:duration,wWinId:1,aAppend:1,segs:[{utf8:'\n'}]},
+        ]);
+        await f.request();await settle();
+        assert.equal(f.messages.some(m=>m.type==='ANALYSIS_ERROR'),false);
+        assert.equal((await f.cache()).segments.length,1);
+    }
+});
+
+test('the same caption request retries after a transient classifier failure',async()=>{
+    let attempts=0;
+    const f=fixture({},async()=>{
+        if (++attempts===1) throw Object.assign(new Error('transient'),{code:'model_unavailable'});
+        return {sponsor:0.99};
+    });
+    await f.request();await settle();
+    assert.equal(f.messages.at(-1).type,'ANALYSIS_ERROR');
+    assert.equal(f.writes.length,0);
+    await f.request();await settle();
+    assert.equal((await f.cache()).segments.length,1);
+    assert.equal(f.messages.at(-1).type,'ANALYSIS_FINISHED');
+    await f.request();await settle();
+    assert.equal(f.fetches,2);
+    assert.equal(f.writes.length,1);
+});
+
+test('concurrent analyses keep completed caches within the video limit',async()=>{
+    const saved=Object.fromEntries(Array.from({length:30},(_,i)=>['sponsor-cache:old'+i,{createdAt:i}]));
+    const f=fixture(saved);
+    await Promise.all([f.request(1,'first'),f.request(2,'second')]);await settle();
+    assert.equal(Object.keys(saved).length,30);
+    assert.ok(saved['sponsor-cache:first']);
+    assert.ok(saved['sponsor-cache:second']);
+    assert.equal(saved['sponsor-cache:old0'],undefined);
+    assert.equal(saved['sponsor-cache:old1'],undefined);
+});
+
+test('a failed cache write does not prevent another tab from completing',async()=>{
+    const f=fixture();
+    const save=f.context.chrome.storage.local.set;
+    let attempts=0;
+    f.context.chrome.storage.local.set=async value=>{
+        if (++attempts===1) throw new Error('storage temporarily unavailable');
+        await save(value);
+    };
+    await Promise.all([f.request(1,'first'),f.request(2,'second')]);await settle();
+    assert.equal(f.saved['sponsor-cache:first'],undefined);
+    assert.ok(f.saved['sponsor-cache:second']);
+    assert.equal(f.messages.at(-1).type,'ANALYSIS_FINISHED');
+});
+
+test('policy changes cancel cache writes waiting behind another tab',async()=>{
+    const f=fixture();
+    const get=f.context.chrome.storage.local.get;
+    let release;
+    const pending=new Promise(resolve=>{release=resolve;});
+    f.context.chrome.storage.local.get=key=>key===null?pending:get(key);
+    await Promise.all([f.request(1,'first'),f.request(2,'second')]);await settle();
+    f.change({isEnabled:false});
+    release({});await settle();
+    assert.equal(f.writes.length,0);
+    assert.equal(Object.keys(f.saved).length,0);
 });

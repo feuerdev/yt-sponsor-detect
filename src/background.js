@@ -29,7 +29,14 @@ function validSegments(segments) {
         && segment.startTime >= 0 && segment.endTime > segment.startTime
         && typeof segment.label === 'string');
 }
-async function cacheCompleted(tabId, videoId, labels, tabData) {
+let cacheWriteQueue = Promise.resolve();
+function cacheCompleted(tabId, videoId, labels, tabData) {
+    // Serialize the read/evict/write transaction across tabs.
+    const write = cacheWriteQueue.then(() => writeCompletedCache(tabId, videoId, labels, tabData));
+    cacheWriteQueue = write.catch(() => {});
+    return write;
+}
+async function writeCompletedCache(tabId, videoId, labels, tabData) {
     const key = tabData.policyKey || policyKey(labels);
     const settings = await chrome.storage.sync.get({isEnabled: true, labels: []});
     if (tabState[tabId] !== tabData || !settings.isEnabled || policyKey(settings.labels) !== key
@@ -134,6 +141,8 @@ async function processWindowQueue(tabId, videoId, labels) {
                     await chrome.tabs.sendMessage(tabId, { type: 'ANALYSIS_ERROR', videoId, payload: { code } });
                 }
             } catch { /* Closed tabs require no playback action. */ }
+            // Allow the next caption request to rebuild a failed analysis from scratch.
+            if (tabState[tabId] === tabData) delete tabState[tabId];
         }
     } finally {
         tabData.isAnalyzing = false;
@@ -242,20 +251,20 @@ chrome.webRequest.onCompleted.addListener(
     const tabId = details.tabId;
     if (!tabState[tabId] || tabState[tabId].videoId !== videoId || tabState[tabId].captionUrl !== details.url) {
         console.log(`New video detected (${videoId}) on tab ${tabId}. Resetting state.`);
-        tabState[tabId] = { 
+        tabState[tabId] = {
             videoId: videoId,
             captionUrl: details.url,
             captionsFetched: false,
             captionRequestPending: false,
-            allCaptions: [], 
-            windowScores: [], 
+            allCaptions: [],
+            windowScores: [],
             foundSegments: [],
             lastWindowStartCaptionIndex: -1,
             windowQueue: [],
             isAnalyzing: false
         };
     }
-    
+
     const tabData = tabState[tabId];
     if (tabData.captionsFetched || tabData.captionRequestPending) return;
     tabData.captionRequestPending = true;
@@ -285,18 +294,20 @@ chrome.webRequest.onCompleted.addListener(
         const data = JSON.parse(responseText);
         
         if (data && Array.isArray(data.events)) {
-            if (data.events.some(event => event.segs && (!Number.isFinite(event.tStartMs)
-                || event.tStartMs < 0 || !Number.isFinite(event.dDurationMs) || event.dDurationMs <= 0
-                || !Array.isArray(event.segs) || event.segs.some(segment => typeof segment.utf8 !== 'string'))))
+            const textEvents = data.events.filter(event => event.segs).map(event => {
+                if (!Array.isArray(event.segs) || event.segs.some(segment => typeof segment.utf8 !== 'string'))
+                    throw new Error('invalid_captions');
+                return {...event, text: event.segs.map(s => s.utf8).join('').replace(/\n/g, ' ').trim()};
+            }).filter(event => event.text);
+            // JSON3 line-break events can omit duration. Only speech needs boundaries.
+            if (textEvents.some(event => !Number.isFinite(event.tStartMs) || event.tStartMs < 0
+                || !Number.isFinite(event.dDurationMs) || event.dDurationMs <= 0))
                 throw new Error('invalid_captions');
-            const captions = data.events
-                .filter(event => event.segs)
-                .map(event => ({
+            const captions = textEvents.map(event => ({
                     start: (event.tStartMs / 1000).toFixed(3),
                     duration: (event.dDurationMs / 1000).toFixed(3),
-                    text: event.segs.map(s => s.utf8).join('').replace(/\n/g, ' ').trim()
-                }))
-                .filter(caption => caption.text && caption.text.length > 0);
+                    text: event.text
+                }));
             
             if (captions.length === 0) return;
 
