@@ -1,6 +1,6 @@
 # YouTube sponsor detection prototype
 
-> Current direction (7 October 2026): the isolated full-track benchmark in `bench/` takes precedence over historical sentence threshold tuning and automatic-skipping plans. See `bench/README.md` and `docs/benchmark-evidence.md`. The 50-video pilot was attempted but captions and learned-model runtime evidence are blocked; automatic skipping stays disabled.
+> Current direction (7 October 2026): the isolated full-track benchmark in `bench/` takes precedence over historical sentence threshold tuning and automatic-skipping plans. See `bench/README.md` and `docs/benchmark-evidence.md`. Seven learned model/backend paths now run in Chrome on the Mac, with 14/50 pilot captions and a frozen provisional test comparison. Missing captions, human-reviewed negatives and installed-extension validation remain open; automatic skipping stays disabled.
 
 A Chromium Manifest V3 extension experimenting with local MobileBERT classification of YouTube captions. It observes caption requests, scores overlapping windows, caches estimated intervals and offers manual skip suggestions for configured categories. Every manual skip has Undo. Automatic skipping is unavailable until independent reliability evidence supports it; legacy opt-in settings are ignored. The popup supports labels, thresholds, and an enable toggle.
 
