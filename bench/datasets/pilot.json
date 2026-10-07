@@ -1,11 +1,11 @@
 {
   "acquisitionSummary": {
-    "available": 0,
-    "channelsAvailable": 0,
-    "channelsSelected": 18,
-    "qualityClaims": "provisional reference agreement only",
     "selected": 50,
-    "verifiedNegativeHours": 0
+    "available": 14,
+    "channelsSelected": 18,
+    "channelsAvailable": 6,
+    "verifiedNegativeHours": 0,
+    "qualityClaims": "provisional reference agreement only"
   },
   "actualStrata": {
     "challenging": 15,
@@ -1390,6 +1390,641 @@
       "reason": "Public timedtext JSON3/SRV3/VTT all HTTP 200 empty; public get_transcript panel HTTP 400; no signed URLs/session data retained",
       "status": "failure",
       "videoId": "xfPKwJ7Qukc"
+    },
+    {
+      "videoId": "xfPKwJ7Qukc",
+      "channelId": "UC2C_jShtL725hvbm1arSV9w",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "Command failed: agent-browser --session sponsor-caption-acquisition --json find role button click --name ...more --exact\n",
+      "at": "2026-10-07T18:50:49.632Z"
+    },
+    {
+      "videoId": "xfPKwJ7Qukc",
+      "channelId": "UC2C_jShtL725hvbm1arSV9w",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "{\"success\":false,\"data\":null,\"error\":\"Wait timed out after 25000ms\"}\n",
+      "at": "2026-10-07T18:58:12.433Z"
+    },
+    {
+      "videoId": "xfPKwJ7Qukc",
+      "channelId": "UC2C_jShtL725hvbm1arSV9w",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "ok",
+      "at": "2026-10-07T18:59:22.481Z",
+      "rawSourceHash": "213649acf9d890bdb78d490f2f81149593c445da33c9883003d296ea0919b1cf",
+      "fixtureHash": "4ce10c28162fd760f8ee566fa44f1b01c47ed0f98638e27a92d173c9824920f7"
+    },
+    {
+      "videoId": "pg7fntKLNak",
+      "channelId": "UC9-y-6csu5WGm29I7JiwpnA",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "{\"success\":false,\"data\":null,\"error\":\"Wait timed out after 25000ms\"}\n",
+      "at": "2026-10-07T19:00:36.033Z"
+    },
+    {
+      "videoId": "VuliaG_-uao",
+      "channelId": "UC9RM-iSvTu1uPJb8X5yp3EQ",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "{\"success\":false,\"data\":null,\"error\":\"Wait timed out after 25000ms\"}\n",
+      "at": "2026-10-07T19:01:05.134Z"
+    },
+    {
+      "videoId": "ohqxP8EEumo",
+      "channelId": "UCBJycsmduvYEL83R_U4JriQ",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "Ambiguous transcript language/track selection",
+      "at": "2026-10-07T19:01:09.338Z"
+    },
+    {
+      "videoId": "IJSO-BL3pEU",
+      "channelId": "UCBa659QWEk1AI4Tg--mrJ2A",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "{\"success\":false,\"data\":null,\"error\":\"Wait timed out after 25000ms\"}\n",
+      "at": "2026-10-07T19:01:37.936Z"
+    },
+    {
+      "videoId": "NvkZaWLe0Sk",
+      "channelId": "UCEIwxahdLz7bap-VDs9h35A",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "Ambiguous transcript language/track selection",
+      "at": "2026-10-07T19:01:41.973Z"
+    },
+    {
+      "videoId": "JsBZOcqZerk",
+      "channelId": "UCHnyfMqiRRG1u-2MsSQLbXA",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "{\"success\":false,\"data\":null,\"error\":\"Wait timed out after 25000ms\"}\n",
+      "at": "2026-10-07T19:02:10.854Z"
+    },
+    {
+      "videoId": "5MRybPTFDnU",
+      "channelId": "UCI8iQa1hv7oV_Z8D35vVuSg",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "{\"success\":false,\"data\":null,\"error\":\"Wait timed out after 25000ms\"}\n",
+      "at": "2026-10-07T19:02:39.831Z"
+    },
+    {
+      "videoId": "Iclf_JnPkKw",
+      "channelId": "UCMOqf8ab-42UUQIdVoKwjlQ",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "{\"success\":false,\"data\":null,\"error\":\"No element found: getByRole('button', { name: '...more', exact: true }). Verify the selector, role, or name is correct and the element exists in the DOM.\"}\n",
+      "at": "2026-10-07T19:02:47.795Z"
+    },
+    {
+      "videoId": "pg7fntKLNak",
+      "channelId": "UC9-y-6csu5WGm29I7JiwpnA",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:09:20.792Z"
+    },
+    {
+      "videoId": "pg7fntKLNak",
+      "channelId": "UC9-y-6csu5WGm29I7JiwpnA",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "description: Public UI timeout at description",
+      "at": "2026-10-07T19:12:22.027Z"
+    },
+    {
+      "videoId": "pg7fntKLNak",
+      "channelId": "UC9-y-6csu5WGm29I7JiwpnA",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript button: Public UI timeout at transcript button",
+      "at": "2026-10-07T19:13:36.481Z"
+    },
+    {
+      "videoId": "pg7fntKLNak",
+      "channelId": "UC9-y-6csu5WGm29I7JiwpnA",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:15:48.319Z"
+    },
+    {
+      "videoId": "ohqxP8EEumo",
+      "channelId": "UCBJycsmduvYEL83R_U4JriQ",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "validation: Ambiguous transcript language/track selection",
+      "at": "2026-10-07T19:16:51.572Z"
+    },
+    {
+      "videoId": "ohqxP8EEumo",
+      "channelId": "UCBJycsmduvYEL83R_U4JriQ",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "validation: Ambiguous transcript language/track selection",
+      "at": "2026-10-07T19:18:47.372Z"
+    },
+    {
+      "videoId": "ohqxP8EEumo",
+      "channelId": "UCBJycsmduvYEL83R_U4JriQ",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "validation: Incomplete transcript continuation",
+      "at": "2026-10-07T19:22:52.296Z"
+    },
+    {
+      "videoId": "ohqxP8EEumo",
+      "channelId": "UCBJycsmduvYEL83R_U4JriQ",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "ok",
+      "at": "2026-10-07T19:24:19.076Z",
+      "rawSourceHash": "62204f47afdd76f30cfff470f53225bff3d2cc5a7c85ccda40a07fffc58dd5f9",
+      "fixtureHash": "301e7341fd67b995d8b407fd359e8a40075f8767018f8577f7b655437e885621"
+    },
+    {
+      "videoId": "pg7fntKLNak",
+      "channelId": "UC9-y-6csu5WGm29I7JiwpnA",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:25:51.165Z"
+    },
+    {
+      "videoId": "VuliaG_-uao",
+      "channelId": "UC9RM-iSvTu1uPJb8X5yp3EQ",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:26:26.847Z"
+    },
+    {
+      "videoId": "IJSO-BL3pEU",
+      "channelId": "UCBa659QWEk1AI4Tg--mrJ2A",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:27:02.304Z"
+    },
+    {
+      "videoId": "NvkZaWLe0Sk",
+      "channelId": "UCEIwxahdLz7bap-VDs9h35A",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "validation: Ambiguous transcript language/track selection",
+      "at": "2026-10-07T19:27:07.641Z"
+    },
+    {
+      "videoId": "JsBZOcqZerk",
+      "channelId": "UCHnyfMqiRRG1u-2MsSQLbXA",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:27:42.757Z"
+    },
+    {
+      "videoId": "5MRybPTFDnU",
+      "channelId": "UCI8iQa1hv7oV_Z8D35vVuSg",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:28:18.398Z"
+    },
+    {
+      "videoId": "Iclf_JnPkKw",
+      "channelId": "UCMOqf8ab-42UUQIdVoKwjlQ",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:28:54.478Z"
+    },
+    {
+      "videoId": "UiPJbxryrkU",
+      "channelId": "UCR1IuLEqb6UEA_zQ81kwXfg",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "validation: Ambiguous transcript language/track selection",
+      "at": "2026-10-07T19:29:00.123Z"
+    },
+    {
+      "videoId": "R2G8Xy6hiyg",
+      "channelId": "UCUHW94eEFW7hkUMVaZz4eDg",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:29:35.700Z"
+    },
+    {
+      "videoId": "y1hZ3EalPQU",
+      "channelId": "UCXuqSBlHAE6Xw-yeJA0Tunw",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "validation: Ambiguous transcript language/track selection",
+      "at": "2026-10-07T19:29:41.265Z"
+    },
+    {
+      "videoId": "_L1Rim7-IPo",
+      "channelId": "UCY1kMZp36IQSyNx_9h4mpCg",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:30:17.257Z"
+    },
+    {
+      "videoId": "Nbwv5wHQoj0",
+      "channelId": "UCYO_jab_esuFRV4b17AJtAw",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:30:52.577Z"
+    },
+    {
+      "videoId": "zgPOenXO7Vg",
+      "channelId": "UChIs72whgZI9w6d6FhwGGHA",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:31:28.224Z"
+    },
+    {
+      "videoId": "UmuMgA_RxnU",
+      "channelId": "UCoxcjq-8xIDTYp3uz647V5A",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:32:10.684Z"
+    },
+    {
+      "videoId": "0NY2gAftzJE",
+      "channelId": "UCsXVk37bltHxD1rDPwtNM8Q",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:32:46.235Z"
+    },
+    {
+      "videoId": "mmCfOazZCNQ",
+      "channelId": "UCy0tKL1T7wFoYcxCe0xjN6Q",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "ok",
+      "at": "2026-10-07T19:32:55.616Z",
+      "rawSourceHash": "99f1487076ee9534a7765aa9f7fe461ef240f4270977dd83c5111edb774873dc",
+      "fixtureHash": "d3285c8a57328a2b60ec1e82227c080f7009103774a24a1f6b10d3d6401adf2b"
+    },
+    {
+      "videoId": "t28bEMboL9Y",
+      "channelId": "UCXuqSBlHAE6Xw-yeJA0Tunw",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "ok",
+      "at": "2026-10-07T19:33:01.226Z",
+      "rawSourceHash": "c5a7ac3218f875a1a29f05e7a2b30c807e8d67403b407457719d90580d2cec16",
+      "fixtureHash": "25b23750b9640ff42dc5f6f9b36584d5c7f1721f6e18c98175f626a30d2d5413"
+    },
+    {
+      "videoId": "ijFSEb2W6_8",
+      "channelId": "UCXuqSBlHAE6Xw-yeJA0Tunw",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "ok",
+      "at": "2026-10-07T19:33:06.823Z",
+      "rawSourceHash": "178304a83b190e2d1a8dee919aeb0bd775b9c43f04cbfa8ca27558d92255381f",
+      "fixtureHash": "a23bce2b28628f0804956ef55a058e4ce54759eb7aec3126a46e857794c2bdad"
+    },
+    {
+      "videoId": "79s8O7Cipl0",
+      "channelId": "UCXuqSBlHAE6Xw-yeJA0Tunw",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:33:42.295Z"
+    },
+    {
+      "videoId": "1H20xp8Brnc",
+      "channelId": "UCXuqSBlHAE6Xw-yeJA0Tunw",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:34:18.340Z"
+    },
+    {
+      "videoId": "4YvnVJRlQQs",
+      "channelId": "UCUHW94eEFW7hkUMVaZz4eDg",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:34:53.440Z"
+    },
+    {
+      "videoId": "sYdXa_yp0fc",
+      "channelId": "UCUHW94eEFW7hkUMVaZz4eDg",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:35:31.678Z"
+    },
+    {
+      "videoId": "drrUvxtT6lU",
+      "channelId": "UCBa659QWEk1AI4Tg--mrJ2A",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:36:07.648Z"
+    },
+    {
+      "videoId": "pZtU48TjxXg",
+      "channelId": "UCBa659QWEk1AI4Tg--mrJ2A",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:36:43.322Z"
+    },
+    {
+      "videoId": "AQqVcdTH5bQ",
+      "channelId": "UCBa659QWEk1AI4Tg--mrJ2A",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:37:18.841Z"
+    },
+    {
+      "videoId": "Dr4lseoF82c",
+      "channelId": "UCBa659QWEk1AI4Tg--mrJ2A",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:37:54.113Z"
+    },
+    {
+      "videoId": "zH9bqwNShiM",
+      "channelId": "UCXuqSBlHAE6Xw-yeJA0Tunw",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "validation: Ambiguous transcript language/track selection",
+      "at": "2026-10-07T19:37:59.202Z"
+    },
+    {
+      "videoId": "3iRUwVzRDZQ",
+      "channelId": "UCBJycsmduvYEL83R_U4JriQ",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "ok",
+      "at": "2026-10-07T19:38:04.823Z",
+      "rawSourceHash": "55f198b3252751250d8240c5453f443326906f248ead2a9482efcd0cb8b61fa8",
+      "fixtureHash": "218c7c3c2215dedb109a1f79846e81878629f5db3318b1030b4ae1c39f9abc83"
+    },
+    {
+      "videoId": "rayrrXot17M",
+      "channelId": "UCBJycsmduvYEL83R_U4JriQ",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "ok",
+      "at": "2026-10-07T19:38:09.857Z",
+      "rawSourceHash": "00100421ab11873439ecca9670c5972d93239c1adaadb63233f2d50e6d930ee7",
+      "fixtureHash": "59de26dd56edfeb911a8fa8e5c792a4d2fc90f19667a0634da26daae078b3ed6"
+    },
+    {
+      "videoId": "KnUFH5GX_fI",
+      "channelId": "UCy0tKL1T7wFoYcxCe0xjN6Q",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "ok",
+      "at": "2026-10-07T19:38:15.324Z",
+      "rawSourceHash": "e93235236fd9f4e7a8f564093318611f45bb71e4f6aef30ce6b45d1e366634d6",
+      "fixtureHash": "beb7c62299a83b94e07be7a76035da292a2007a373bfcce515c4a98dc883a372"
+    },
+    {
+      "videoId": "nXdVG45wveo",
+      "channelId": "UCy0tKL1T7wFoYcxCe0xjN6Q",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "ok",
+      "at": "2026-10-07T19:38:20.949Z",
+      "rawSourceHash": "59b2c7c72ac36875b50626477f5b9e38f0f3dac6ebce0ff45493f16e45f7fd56",
+      "fixtureHash": "464c5f48ff4229f4d7e430749b0ba4be1e41c9051c1c010782f024fada1b0698"
+    },
+    {
+      "videoId": "-HzHFSxRcro",
+      "channelId": "UChIs72whgZI9w6d6FhwGGHA",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "ok",
+      "at": "2026-10-07T19:38:26.347Z",
+      "rawSourceHash": "7b7cdb6b42ad08b15d332fe8a71558f82cc02ecc64275fe5fb133707ce0cd446",
+      "fixtureHash": "f2f677b67821591d880d6d0b693592d6d02a3a9d8c6cacd06ca3c4aed13b0686"
+    },
+    {
+      "videoId": "Smwo493IAfw",
+      "channelId": "UChIs72whgZI9w6d6FhwGGHA",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:39:02.473Z"
+    },
+    {
+      "videoId": "m3NGxgb3O1Y",
+      "channelId": "UCI8iQa1hv7oV_Z8D35vVuSg",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "Controller snapshot stalled; task browser closed; recovery snapshot retained",
+      "at": "2026-10-07T19:46:02.267Z"
+    },
+    {
+      "videoId": "m3NGxgb3O1Y",
+      "channelId": "UCI8iQa1hv7oV_Z8D35vVuSg",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "ok",
+      "at": "2026-10-07T19:46:02.281Z",
+      "rawSourceHash": "015f7e9318ae997d1a0dbe4f84f76b07f6205419c7e3991b456f1bc4ea7eb347",
+      "fixtureHash": "99119ad8411e13488279ac6793c450aefb68449fc9c9dd8c28b02606aaabc2d3"
+    },
+    {
+      "videoId": "NvkZaWLe0Sk",
+      "channelId": "UCEIwxahdLz7bap-VDs9h35A",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "validation: Ambiguous transcript language/track selection",
+      "at": "2026-10-07T19:46:23.469Z"
+    },
+    {
+      "videoId": "jY1YGJxfL3E",
+      "channelId": "UCI8iQa1hv7oV_Z8D35vVuSg",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:48:57.912Z"
+    },
+    {
+      "videoId": "s8tMVS2O9gc",
+      "channelId": "UCI8iQa1hv7oV_Z8D35vVuSg",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:49:33.644Z"
+    },
+    {
+      "videoId": "iGZsPFJuxc0",
+      "channelId": "UCR1IuLEqb6UEA_zQ81kwXfg",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:50:09.200Z"
+    },
+    {
+      "videoId": "HSRmfNDk87s",
+      "channelId": "UC2C_jShtL725hvbm1arSV9w",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:50:44.666Z"
+    },
+    {
+      "videoId": "58SrtQNt4YE",
+      "channelId": "UC2C_jShtL725hvbm1arSV9w",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:51:20.460Z"
+    },
+    {
+      "videoId": "n1KgxqEQn0A",
+      "channelId": "UC2C_jShtL725hvbm1arSV9w",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:51:55.914Z"
+    },
+    {
+      "videoId": "ausLKMojXaY",
+      "channelId": "UCYO_jab_esuFRV4b17AJtAw",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:52:31.560Z"
+    },
+    {
+      "videoId": "e1q-TuHdc4Y",
+      "channelId": "UCBJycsmduvYEL83R_U4JriQ",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "ok",
+      "at": "2026-10-07T19:52:36.526Z",
+      "rawSourceHash": "a32a2cc93810548122b4e118b41ad64fb5a2c0a7710c113ab3a7f1c2f0f131e0",
+      "fixtureHash": "8bdce4fae042b9186c7e962c518c424636e7164582f7defeac13de8a09adbca9"
+    },
+    {
+      "videoId": "DkUuOr21v4s",
+      "channelId": "UCBJycsmduvYEL83R_U4JriQ",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "ok",
+      "at": "2026-10-07T19:52:41.836Z",
+      "rawSourceHash": "8e0ec32eb8979f297bc1a8d8d8119a5ed2536865e76f6ba9230b5893eaeba45f",
+      "fixtureHash": "accc7ecda84238d2dc0a72d2a5f2ac28135fed278d26d3d033f607732acb9524"
+    },
+    {
+      "videoId": "pOX1l1edBME",
+      "channelId": "UCBJycsmduvYEL83R_U4JriQ",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "ok",
+      "at": "2026-10-07T19:52:47.252Z",
+      "rawSourceHash": "50395497b429f34e9f9c444b9691e1755d8dca9334a59f705b1fa9158a1c5706",
+      "fixtureHash": "a660c4740558737e1ede984d4a6c04cfbf766f6f79392f465dea47196f2edb47"
+    },
+    {
+      "videoId": "IHkp5Kq72ro",
+      "channelId": "UCHnyfMqiRRG1u-2MsSQLbXA",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:53:22.639Z"
+    },
+    {
+      "videoId": "ONAuUyml0yI",
+      "channelId": "UCHnyfMqiRRG1u-2MsSQLbXA",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:53:57.989Z"
+    },
+    {
+      "videoId": "VKlulHwMxgU",
+      "channelId": "UCHnyfMqiRRG1u-2MsSQLbXA",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:54:33.423Z"
+    },
+    {
+      "videoId": "hPoJWjJ9Ao8",
+      "channelId": "UCHnyfMqiRRG1u-2MsSQLbXA",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "failure",
+      "reason": "transcript contents: Public UI timeout at transcript contents",
+      "at": "2026-10-07T19:55:09.096Z"
     }
   ],
   "channelCount": 18,
@@ -1414,10 +2049,9 @@
   "targetVideos": 50,
   "videos": [
     {
-      "acquiredAt": "2026-10-07T14:59:28.970103+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquiredAt": "2026-10-07T18:59:22.481Z",
       "campaignOverlap": "unknown until review",
-      "captionAvailability": "failure",
+      "captionAvailability": "ok",
       "channelId": "UC2C_jShtL725hvbm1arSV9w",
       "channelName": "CGP Grey",
       "contamination": "unknown training-channel overlap; published examples excluded",
@@ -1428,12 +2062,19 @@
       "referenceStatus": "no_submissions",
       "split": "tune",
       "stratum": "ordinary",
-      "title": "BREAKING NEWS! The Election's Most Difficult Decision\u2026",
-      "videoId": "xfPKwJ7Qukc"
+      "title": "BREAKING NEWS! The Election's Most Difficult Decision…",
+      "videoId": "xfPKwJ7Qukc",
+      "durationSeconds": 244,
+      "captionType": "automatic",
+      "rawSourceHash": "213649acf9d890bdb78d490f2f81149593c445da33c9883003d296ea0919b1cf",
+      "fixtureHash": "4ce10c28162fd760f8ee566fa44f1b01c47ed0f98638e27a92d173c9824920f7",
+      "fixturePath": "bench/local/fixtures/xfPKwJ7Qukc.json",
+      "captionSource": "YouTube public transcript panel",
+      "timingResolutionSeconds": 1
     },
     {
       "acquiredAt": "2026-10-07T14:59:30.355862+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UC9-y-6csu5WGm29I7JiwpnA",
@@ -1465,7 +2106,7 @@
     },
     {
       "acquiredAt": "2026-10-07T14:59:31.915186+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UC9RM-iSvTu1uPJb8X5yp3EQ",
@@ -1509,10 +2150,9 @@
       "videoId": "VuliaG_-uao"
     },
     {
-      "acquiredAt": "2026-10-07T14:59:33.339211+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquiredAt": "2026-10-07T19:24:19.076Z",
       "campaignOverlap": "unknown until review",
-      "captionAvailability": "failure",
+      "captionAvailability": "ok",
       "channelId": "UCBJycsmduvYEL83R_U4JriQ",
       "channelName": "Marques Brownlee",
       "contamination": "unknown training-channel overlap; published examples excluded",
@@ -1551,11 +2191,18 @@
       "split": "test",
       "stratum": "paid",
       "title": "iPhone 18 Pro Review: All About that Chip",
-      "videoId": "ohqxP8EEumo"
+      "videoId": "ohqxP8EEumo",
+      "durationSeconds": 995,
+      "captionType": "manual",
+      "rawSourceHash": "62204f47afdd76f30cfff470f53225bff3d2cc5a7c85ccda40a07fffc58dd5f9",
+      "fixtureHash": "301e7341fd67b995d8b407fd359e8a40075f8767018f8577f7b655437e885621",
+      "fixturePath": "bench/local/fixtures/ohqxP8EEumo.json",
+      "captionSource": "YouTube public transcript panel",
+      "timingResolutionSeconds": 1
     },
     {
       "acquiredAt": "2026-10-07T14:59:34.467112+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCBa659QWEk1AI4Tg--mrJ2A",
@@ -1600,7 +2247,7 @@
     },
     {
       "acquiredAt": "2026-10-07T14:59:37.288726+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "validation: Ambiguous transcript language/track selection",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCEIwxahdLz7bap-VDs9h35A",
@@ -1632,7 +2279,7 @@
     },
     {
       "acquiredAt": "2026-10-07T14:59:38.291955+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCHnyfMqiRRG1u-2MsSQLbXA",
@@ -1677,7 +2324,7 @@
     },
     {
       "acquiredAt": "2026-10-07T14:59:39.359452+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCI8iQa1hv7oV_Z8D35vVuSg",
@@ -1722,7 +2369,7 @@
     },
     {
       "acquiredAt": "2026-10-07T14:59:50.355820+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCMOqf8ab-42UUQIdVoKwjlQ",
@@ -1793,7 +2440,7 @@
     },
     {
       "acquiredAt": "2026-10-07T14:59:51.460437+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "validation: Ambiguous transcript language/track selection",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCR1IuLEqb6UEA_zQ81kwXfg",
@@ -1838,7 +2485,7 @@
     },
     {
       "acquiredAt": "2026-10-07T14:59:52.368472+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCUHW94eEFW7hkUMVaZz4eDg",
@@ -1870,7 +2517,7 @@
     },
     {
       "acquiredAt": "2026-10-07T14:59:54.777480+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "validation: Ambiguous transcript language/track selection",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCXuqSBlHAE6Xw-yeJA0Tunw",
@@ -1988,12 +2635,12 @@
       "referenceStatus": "ok",
       "split": "tune",
       "stratum": "paid",
-      "title": "I Found these Computers in a Ditch\u2026",
+      "title": "I Found these Computers in a Ditch…",
       "videoId": "y1hZ3EalPQU"
     },
     {
       "acquiredAt": "2026-10-07T14:59:55.980998+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCY1kMZp36IQSyNx_9h4mpCg",
@@ -2038,7 +2685,7 @@
     },
     {
       "acquiredAt": "2026-10-07T14:59:56.882756+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCYO_jab_esuFRV4b17AJtAw",
@@ -2083,7 +2730,7 @@
     },
     {
       "acquiredAt": "2026-10-07T14:59:58.172681+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UChIs72whgZI9w6d6FhwGGHA",
@@ -2115,7 +2762,7 @@
     },
     {
       "acquiredAt": "2026-10-07T14:59:59.842620+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCoxcjq-8xIDTYp3uz647V5A",
@@ -2133,7 +2780,7 @@
     },
     {
       "acquiredAt": "2026-10-07T15:00:00.670334+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCsXVk37bltHxD1rDPwtNM8Q",
@@ -2177,10 +2824,9 @@
       "videoId": "0NY2gAftzJE"
     },
     {
-      "acquiredAt": "2026-10-07T15:00:01.584818+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquiredAt": "2026-10-07T19:32:55.616Z",
       "campaignOverlap": "unknown until review",
-      "captionAvailability": "failure",
+      "captionAvailability": "ok",
       "channelId": "UCy0tKL1T7wFoYcxCe0xjN6Q",
       "channelName": "Technology Connections",
       "contamination": "unknown training-channel overlap; published examples excluded",
@@ -2192,13 +2838,19 @@
       "split": "test",
       "stratum": "ordinary",
       "title": "Oil pressure is the only thing keeping an engine alive",
-      "videoId": "mmCfOazZCNQ"
+      "videoId": "mmCfOazZCNQ",
+      "durationSeconds": 3285,
+      "captionType": "manual",
+      "rawSourceHash": "99f1487076ee9534a7765aa9f7fe461ef240f4270977dd83c5111edb774873dc",
+      "fixtureHash": "d3285c8a57328a2b60ec1e82227c080f7009103774a24a1f6b10d3d6401adf2b",
+      "fixturePath": "bench/local/fixtures/mmCfOazZCNQ.json",
+      "captionSource": "YouTube public transcript panel",
+      "timingResolutionSeconds": 1
     },
     {
-      "acquiredAt": "2026-10-07T15:00:02.881463+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquiredAt": "2026-10-07T19:33:01.226Z",
       "campaignOverlap": "unknown until review",
-      "captionAvailability": "failure",
+      "captionAvailability": "ok",
       "channelId": "UCXuqSBlHAE6Xw-yeJA0Tunw",
       "channelName": "Linus Tech Tips",
       "contamination": "unknown training-channel overlap; published examples excluded",
@@ -2263,13 +2915,19 @@
       "split": "tune",
       "stratum": "paid",
       "title": "The All COSTCO Gaming Setup",
-      "videoId": "t28bEMboL9Y"
+      "videoId": "t28bEMboL9Y",
+      "durationSeconds": 1538,
+      "captionType": "automatic",
+      "rawSourceHash": "c5a7ac3218f875a1a29f05e7a2b30c807e8d67403b407457719d90580d2cec16",
+      "fixtureHash": "25b23750b9640ff42dc5f6f9b36584d5c7f1721f6e18c98175f626a30d2d5413",
+      "fixturePath": "bench/local/fixtures/t28bEMboL9Y.json",
+      "captionSource": "YouTube public transcript panel",
+      "timingResolutionSeconds": 1
     },
     {
-      "acquiredAt": "2026-10-07T15:00:03.687329+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquiredAt": "2026-10-07T19:33:06.823Z",
       "campaignOverlap": "unknown until review",
-      "captionAvailability": "failure",
+      "captionAvailability": "ok",
       "channelId": "UCXuqSBlHAE6Xw-yeJA0Tunw",
       "channelName": "Linus Tech Tips",
       "contamination": "unknown training-channel overlap; published examples excluded",
@@ -2307,12 +2965,19 @@
       "referenceStatus": "ok",
       "split": "tune",
       "stratum": "paid",
-      "title": "I\u2019ve Wanted This Robot for 10 Years",
-      "videoId": "ijFSEb2W6_8"
+      "title": "I’ve Wanted This Robot for 10 Years",
+      "videoId": "ijFSEb2W6_8",
+      "durationSeconds": 832,
+      "captionType": "automatic",
+      "rawSourceHash": "178304a83b190e2d1a8dee919aeb0bd775b9c43f04cbfa8ca27558d92255381f",
+      "fixtureHash": "a23bce2b28628f0804956ef55a058e4ce54759eb7aec3126a46e857794c2bdad",
+      "fixturePath": "bench/local/fixtures/ijFSEb2W6_8.json",
+      "captionSource": "YouTube public transcript panel",
+      "timingResolutionSeconds": 1
     },
     {
       "acquiredAt": "2026-10-07T15:00:04.942190+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCXuqSBlHAE6Xw-yeJA0Tunw",
@@ -2383,7 +3048,7 @@
     },
     {
       "acquiredAt": "2026-10-07T15:00:06.075194+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCXuqSBlHAE6Xw-yeJA0Tunw",
@@ -2454,7 +3119,7 @@
     },
     {
       "acquiredAt": "2026-10-07T15:00:07.243653+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCUHW94eEFW7hkUMVaZz4eDg",
@@ -2486,7 +3151,7 @@
     },
     {
       "acquiredAt": "2026-10-07T15:00:08.267732+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCUHW94eEFW7hkUMVaZz4eDg",
@@ -2518,7 +3183,7 @@
     },
     {
       "acquiredAt": "2026-10-07T15:00:09.477506+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCBa659QWEk1AI4Tg--mrJ2A",
@@ -2563,7 +3228,7 @@
     },
     {
       "acquiredAt": "2026-10-07T15:00:10.458983+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCBa659QWEk1AI4Tg--mrJ2A",
@@ -2608,7 +3273,7 @@
     },
     {
       "acquiredAt": "2026-10-07T15:00:11.439700+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCBa659QWEk1AI4Tg--mrJ2A",
@@ -2653,7 +3318,7 @@
     },
     {
       "acquiredAt": "2026-10-07T15:00:12.340986+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCBa659QWEk1AI4Tg--mrJ2A",
@@ -2711,7 +3376,7 @@
     },
     {
       "acquiredAt": "2026-10-07T15:00:13.471413+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "validation: Ambiguous transcript language/track selection",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCXuqSBlHAE6Xw-yeJA0Tunw",
@@ -2728,10 +3393,9 @@
       "videoId": "zH9bqwNShiM"
     },
     {
-      "acquiredAt": "2026-10-07T15:00:14.444275+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquiredAt": "2026-10-07T19:38:04.823Z",
       "campaignOverlap": "unknown until review",
-      "captionAvailability": "failure",
+      "captionAvailability": "ok",
       "channelId": "UCBJycsmduvYEL83R_U4JriQ",
       "channelName": "Marques Brownlee",
       "contamination": "unknown training-channel overlap; published examples excluded",
@@ -2757,13 +3421,19 @@
       "split": "test",
       "stratum": "challenging",
       "title": "Xiaomi 18 Fold: How Does This Happen?",
-      "videoId": "3iRUwVzRDZQ"
+      "videoId": "3iRUwVzRDZQ",
+      "durationSeconds": 647,
+      "captionType": "manual",
+      "rawSourceHash": "55f198b3252751250d8240c5453f443326906f248ead2a9482efcd0cb8b61fa8",
+      "fixtureHash": "218c7c3c2215dedb109a1f79846e81878629f5db3318b1030b4ae1c39f9abc83",
+      "fixturePath": "bench/local/fixtures/3iRUwVzRDZQ.json",
+      "captionSource": "YouTube public transcript panel",
+      "timingResolutionSeconds": 1
     },
     {
-      "acquiredAt": "2026-10-07T15:00:15.679345+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquiredAt": "2026-10-07T19:38:09.857Z",
       "campaignOverlap": "unknown until review",
-      "captionAvailability": "failure",
+      "captionAvailability": "ok",
       "channelId": "UCBJycsmduvYEL83R_U4JriQ",
       "channelName": "Marques Brownlee",
       "contamination": "unknown training-channel overlap; published examples excluded",
@@ -2775,13 +3445,19 @@
       "split": "test",
       "stratum": "challenging",
       "title": "Nothing Headphone 1 Pro: They Copied the Wrong Thing!",
-      "videoId": "rayrrXot17M"
+      "videoId": "rayrrXot17M",
+      "durationSeconds": 860,
+      "captionType": "manual",
+      "rawSourceHash": "00100421ab11873439ecca9670c5972d93239c1adaadb63233f2d50e6d930ee7",
+      "fixtureHash": "59de26dd56edfeb911a8fa8e5c792a4d2fc90f19667a0634da26daae078b3ed6",
+      "fixturePath": "bench/local/fixtures/rayrrXot17M.json",
+      "captionSource": "YouTube public transcript panel",
+      "timingResolutionSeconds": 1
     },
     {
-      "acquiredAt": "2026-10-07T15:00:16.540259+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquiredAt": "2026-10-07T19:38:15.324Z",
       "campaignOverlap": "unknown until review",
-      "captionAvailability": "failure",
+      "captionAvailability": "ok",
       "channelId": "UCy0tKL1T7wFoYcxCe0xjN6Q",
       "channelName": "Technology Connections",
       "contamination": "unknown training-channel overlap; published examples excluded",
@@ -2807,13 +3483,19 @@
       "split": "test",
       "stratum": "challenging",
       "title": "Nobody understands the point of hybrid cars",
-      "videoId": "KnUFH5GX_fI"
+      "videoId": "KnUFH5GX_fI",
+      "durationSeconds": 3351,
+      "captionType": "manual",
+      "rawSourceHash": "e93235236fd9f4e7a8f564093318611f45bb71e4f6aef30ce6b45d1e366634d6",
+      "fixtureHash": "beb7c62299a83b94e07be7a76035da292a2007a373bfcce515c4a98dc883a372",
+      "fixturePath": "bench/local/fixtures/KnUFH5GX_fI.json",
+      "captionSource": "YouTube public transcript panel",
+      "timingResolutionSeconds": 1
     },
     {
-      "acquiredAt": "2026-10-07T15:00:17.740815+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquiredAt": "2026-10-07T19:38:20.949Z",
       "campaignOverlap": "unknown until review",
-      "captionAvailability": "failure",
+      "captionAvailability": "ok",
       "channelId": "UCy0tKL1T7wFoYcxCe0xjN6Q",
       "channelName": "Technology Connections",
       "contamination": "unknown training-channel overlap; published examples excluded",
@@ -2839,13 +3521,19 @@
       "split": "test",
       "stratum": "challenging",
       "title": "The disappearing and unappreciated art of audible alerts",
-      "videoId": "nXdVG45wveo"
+      "videoId": "nXdVG45wveo",
+      "durationSeconds": 1451,
+      "captionType": "manual",
+      "rawSourceHash": "59b2c7c72ac36875b50626477f5b9e38f0f3dac6ebce0ff45493f16e45f7fd56",
+      "fixtureHash": "464c5f48ff4229f4d7e430749b0ba4be1e41c9051c1c010782f024fada1b0698",
+      "fixturePath": "bench/local/fixtures/nXdVG45wveo.json",
+      "captionSource": "YouTube public transcript panel",
+      "timingResolutionSeconds": 1
     },
     {
-      "acquiredAt": "2026-10-07T15:00:18.688626+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquiredAt": "2026-10-07T19:38:26.347Z",
       "campaignOverlap": "unknown until review",
-      "captionAvailability": "failure",
+      "captionAvailability": "ok",
       "channelId": "UChIs72whgZI9w6d6FhwGGHA",
       "channelName": "Gamers Nexus",
       "contamination": "unknown training-channel overlap; published examples excluded",
@@ -2871,11 +3559,18 @@
       "split": "tune",
       "stratum": "challenging",
       "title": "WTF is Going On? | The \"AI Constitution\" & Regulation",
-      "videoId": "-HzHFSxRcro"
+      "videoId": "-HzHFSxRcro",
+      "durationSeconds": 1764,
+      "captionType": "automatic",
+      "rawSourceHash": "7b7cdb6b42ad08b15d332fe8a71558f82cc02ecc64275fe5fb133707ce0cd446",
+      "fixtureHash": "f2f677b67821591d880d6d0b693592d6d02a3a9d8c6cacd06ca3c4aed13b0686",
+      "fixturePath": "bench/local/fixtures/-HzHFSxRcro.json",
+      "captionSource": "YouTube public transcript panel",
+      "timingResolutionSeconds": 1
     },
     {
       "acquiredAt": "2026-10-07T15:00:19.590305+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UChIs72whgZI9w6d6FhwGGHA",
@@ -2915,14 +3610,13 @@
       "referenceStatus": "ok",
       "split": "tune",
       "stratum": "challenging",
-      "title": "Microsoft\u2019s Terrifying New Patent | LG-Style ACR for Games & Software",
+      "title": "Microsoft’s Terrifying New Patent | LG-Style ACR for Games & Software",
       "videoId": "Smwo493IAfw"
     },
     {
-      "acquiredAt": "2026-10-07T15:00:20.859812+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquiredAt": "2026-10-07T19:46:02.281Z",
       "campaignOverlap": "unknown until review",
-      "captionAvailability": "failure",
+      "captionAvailability": "ok",
       "channelId": "UCI8iQa1hv7oV_Z8D35vVuSg",
       "channelName": "Hardware Unboxed",
       "contamination": "unknown training-channel overlap; published examples excluded",
@@ -2934,11 +3628,18 @@
       "split": "tune",
       "stratum": "challenging",
       "title": "We Built the Gaming PCs You Should Actually Buy",
-      "videoId": "m3NGxgb3O1Y"
+      "videoId": "m3NGxgb3O1Y",
+      "durationSeconds": 13000,
+      "captionType": "automatic",
+      "rawSourceHash": "015f7e9318ae997d1a0dbe4f84f76b07f6205419c7e3991b456f1bc4ea7eb347",
+      "fixtureHash": "99119ad8411e13488279ac6793c450aefb68449fc9c9dd8c28b02606aaabc2d3",
+      "fixturePath": "bench/local/fixtures/m3NGxgb3O1Y.json",
+      "captionSource": "YouTube public transcript panel",
+      "timingResolutionSeconds": 1
     },
     {
       "acquiredAt": "2026-10-07T15:00:21.638678+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCI8iQa1hv7oV_Z8D35vVuSg",
@@ -2970,7 +3671,7 @@
     },
     {
       "acquiredAt": "2026-10-07T15:00:22.644681+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCI8iQa1hv7oV_Z8D35vVuSg",
@@ -3002,7 +3703,7 @@
     },
     {
       "acquiredAt": "2026-10-07T15:00:23.575956+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCR1IuLEqb6UEA_zQ81kwXfg",
@@ -3034,7 +3735,7 @@
     },
     {
       "acquiredAt": "2026-10-07T15:00:26.039736+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UC2C_jShtL725hvbm1arSV9w",
@@ -3066,7 +3767,7 @@
     },
     {
       "acquiredAt": "2026-10-07T15:00:27.162522+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UC2C_jShtL725hvbm1arSV9w",
@@ -3098,7 +3799,7 @@
     },
     {
       "acquiredAt": "2026-10-07T15:00:28.080765+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UC2C_jShtL725hvbm1arSV9w",
@@ -3130,7 +3831,7 @@
     },
     {
       "acquiredAt": "2026-10-07T15:00:29.440548+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCYO_jab_esuFRV4b17AJtAw",
@@ -3147,10 +3848,9 @@
       "videoId": "ausLKMojXaY"
     },
     {
-      "acquiredAt": "2026-10-07T15:00:30.642949+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquiredAt": "2026-10-07T19:52:36.526Z",
       "campaignOverlap": "unknown until review",
-      "captionAvailability": "failure",
+      "captionAvailability": "ok",
       "channelId": "UCBJycsmduvYEL83R_U4JriQ",
       "channelName": "Marques Brownlee",
       "contamination": "unknown training-channel overlap; published examples excluded",
@@ -3162,13 +3862,19 @@
       "split": "test",
       "stratum": "ordinary",
       "title": "Dear YouTube!",
-      "videoId": "e1q-TuHdc4Y"
+      "videoId": "e1q-TuHdc4Y",
+      "durationSeconds": 743,
+      "captionType": "manual",
+      "rawSourceHash": "a32a2cc93810548122b4e118b41ad64fb5a2c0a7710c113ab3a7f1c2f0f131e0",
+      "fixtureHash": "8bdce4fae042b9186c7e962c518c424636e7164582f7defeac13de8a09adbca9",
+      "fixturePath": "bench/local/fixtures/e1q-TuHdc4Y.json",
+      "captionSource": "YouTube public transcript panel",
+      "timingResolutionSeconds": 1
     },
     {
-      "acquiredAt": "2026-10-07T15:00:31.684652+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquiredAt": "2026-10-07T19:52:41.836Z",
       "campaignOverlap": "unknown until review",
-      "captionAvailability": "failure",
+      "captionAvailability": "ok",
       "channelId": "UCBJycsmduvYEL83R_U4JriQ",
       "channelName": "Marques Brownlee",
       "contamination": "unknown training-channel overlap; published examples excluded",
@@ -3180,13 +3886,19 @@
       "split": "test",
       "stratum": "ordinary",
       "title": "Xiaomi 18 Pro Max: They've Done It Again!",
-      "videoId": "DkUuOr21v4s"
+      "videoId": "DkUuOr21v4s",
+      "durationSeconds": 715,
+      "captionType": "manual",
+      "rawSourceHash": "8e0ec32eb8979f297bc1a8d8d8119a5ed2536865e76f6ba9230b5893eaeba45f",
+      "fixtureHash": "accc7ecda84238d2dc0a72d2a5f2ac28135fed278d26d3d033f607732acb9524",
+      "fixturePath": "bench/local/fixtures/DkUuOr21v4s.json",
+      "captionSource": "YouTube public transcript panel",
+      "timingResolutionSeconds": 1
     },
     {
-      "acquiredAt": "2026-10-07T15:00:32.572894+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquiredAt": "2026-10-07T19:52:47.252Z",
       "campaignOverlap": "unknown until review",
-      "captionAvailability": "failure",
+      "captionAvailability": "ok",
       "channelId": "UCBJycsmduvYEL83R_U4JriQ",
       "channelName": "Marques Brownlee",
       "contamination": "unknown training-channel overlap; published examples excluded",
@@ -3198,11 +3910,18 @@
       "split": "test",
       "stratum": "ordinary",
       "title": "The Apple Watch Has a Problem",
-      "videoId": "pOX1l1edBME"
+      "videoId": "pOX1l1edBME",
+      "durationSeconds": 906,
+      "captionType": "manual",
+      "rawSourceHash": "50395497b429f34e9f9c444b9691e1755d8dca9334a59f705b1fa9158a1c5706",
+      "fixtureHash": "a660c4740558737e1ede984d4a6c04cfbf766f6f79392f465dea47196f2edb47",
+      "fixturePath": "bench/local/fixtures/pOX1l1edBME.json",
+      "captionSource": "YouTube public transcript panel",
+      "timingResolutionSeconds": 1
     },
     {
       "acquiredAt": "2026-10-07T15:00:33.570476+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCHnyfMqiRRG1u-2MsSQLbXA",
@@ -3220,7 +3939,7 @@
     },
     {
       "acquiredAt": "2026-10-07T15:00:34.844278+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCHnyfMqiRRG1u-2MsSQLbXA",
@@ -3238,7 +3957,7 @@
     },
     {
       "acquiredAt": "2026-10-07T15:00:35.940900+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCHnyfMqiRRG1u-2MsSQLbXA",
@@ -3256,7 +3975,7 @@
     },
     {
       "acquiredAt": "2026-10-07T15:00:46.889244+00:00",
-      "acquisitionFailure": "ValueError:empty_caption_response",
+      "acquisitionFailure": "transcript contents: Public UI timeout at transcript contents",
       "campaignOverlap": "unknown until review",
       "captionAvailability": "failure",
       "channelId": "UCHnyfMqiRRG1u-2MsSQLbXA",

@@ -9,7 +9,7 @@ export function chromeFlags({profile,cpuOnly=false,singleProcess=false,platform=
  if(cpuOnly)flags.push('--disable-gpu','--disable-software-rasterizer');
  return flags;
 }
-export async function launchChrome({executable,profileParent,url,cpuOnly=false,singleProcess=false,readyExpression='window.benchmarkReady===true',onSample,commandTimeoutMs=15000}) {
+export async function launchChrome({executable,profileParent,url,cpuOnly=false,singleProcess=false,readyExpression='window.benchmarkReady===true',onSample,onEvent,commandTimeoutMs=15000}) {
  const profile=await mkdtemp(path.join(profileParent,'chrome-'));
  const flags=chromeFlags({profile,cpuOnly,singleProcess});
  const child=spawn(executable,flags,{stdio:['ignore','ignore','pipe']});
@@ -34,7 +34,7 @@ export async function launchChrome({executable,profileParent,url,cpuOnly=false,s
   });
   ws=new WebSocket(endpoint);
   await new Promise((resolve,reject)=>{ws.addEventListener('open',resolve,{once:true});ws.addEventListener('error',reject,{once:true});});
-  ws.addEventListener('message',event=>{const m=JSON.parse(event.data);if(m.id&&pending.has(m.id)){const p=pending.get(m.id);pending.delete(m.id);clearTimeout(p.timer);m.error?p.reject(new Error(m.error.message)):p.resolve(m.result);}});
+  ws.addEventListener('message',event=>{const m=JSON.parse(event.data);if(m.id&&pending.has(m.id)){const p=pending.get(m.id);pending.delete(m.id);clearTimeout(p.timer);m.error?p.reject(new Error(m.error.message)):p.resolve(m.result);}else if(m.method&&m.sessionId===sessionId)onEvent?.(m);});
   ws.addEventListener('close',()=>{for(const {reject,timer} of pending.values()){clearTimeout(timer);reject(new Error('CDP connection closed'));}pending.clear();});
   const {targetId}=await call('Target.createTarget',{url:'about:blank'});
   ({sessionId}=await call('Target.attachToTarget',{targetId,flatten:true}));
@@ -44,6 +44,6 @@ export async function launchChrome({executable,profileParent,url,cpuOnly=false,s
    if(r.exceptionDetails)throw new Error(r.exceptionDetails.text+': '+r.exceptionDetails.exception?.description);return r.result.value;
   };
   for(let i=0;i<100;i++){if(await evalScript(readyExpression))break;if(i===99)throw new Error('Runner module not ready');await new Promise(r=>setTimeout(r,100));}
-  return {flags,version:await call('Browser.getVersion'),eval:evalScript,clickAt:async(x,y)=>{if(!Number.isFinite(x)||!Number.isFinite(y))throw new Error('Invalid click coordinates');await call('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button:'left',clickCount:1},sessionId);await call('Input.dispatchMouseEvent',{type:'mouseReleased',x,y,button:'left',clickCount:1},sessionId);},screenshot:async()=>Buffer.from((await call('Page.captureScreenshot',{format:'png'},sessionId)).data,'base64'),close};
+  return {flags,version:await call('Browser.getVersion'),command:(method,params)=>call(method,params,sessionId),eval:evalScript,clickAt:async(x,y)=>{if(!Number.isFinite(x)||!Number.isFinite(y))throw new Error('Invalid click coordinates');await call('Input.dispatchMouseEvent',{type:'mousePressed',x,y,button:'left',clickCount:1},sessionId);await call('Input.dispatchMouseEvent',{type:'mouseReleased',x,y,button:'left',clickCount:1},sessionId);},screenshot:async()=>Buffer.from((await call('Page.captureScreenshot',{format:'png'},sessionId)).data,'base64'),close};
  }catch(e){await close();throw e;}
 }
