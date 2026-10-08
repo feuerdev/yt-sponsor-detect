@@ -137,3 +137,11 @@ Actual public playback worked on the first regular-Chrome source. Our unreleased
 extension was not installed there, so this supplies no live Skip/Undo proof.
 All task-owned source tabs, local collector and isolated verifier profiles closed.
 [Caption-free recovery evidence](ettin-evidence/fresh-channel-recovery.json).
+
+A further documented browser-export diagnostic on the fixed Fireship ID
+`No-JPdFvYWU` returned a file whose header said `Language: en`, but its text
+was German. Native Chrome language detection, with model inference disabled,
+confirmed reliable German at 100%. The export was excluded. Source headers and
+selected type metadata never override actual language verification. This adds
+no English fixture and exposes no validation prediction.
+[Caption-free mismatch evidence](ettin-evidence/export-language-mismatch.json).

@@ -1,0 +1,31 @@
+{
+  "schemaVersion": 1,
+  "videoId": "No-JPdFvYWU",
+  "method": "Documented browser public transcript export",
+  "exportClaimedLanguage": "en",
+  "rawExportHash": "bcdefb9dd59be5de10dbb9e0b90818aa377aaefc2b41f9b4eabd35e489bca2fe",
+  "actualNativeLanguage": {
+    "isReliable": true,
+    "languages": [
+      {
+        "language": "de",
+        "percentage": 100
+      }
+    ]
+  },
+  "decision": "Excluded from English acquisition; export label does not override actual language verification",
+  "modelInference": false,
+  "observedAt": "2026-10-08T13:48:55.859Z",
+  "policy": {
+    "maximumAccountMiB": 28672,
+    "minimumAvailableMiB": 4096
+  },
+  "resource": {
+    "availableMiB": 11680.34375,
+    "accountMiB": 24516.171875,
+    "processes": 673,
+    "method": "RSS sum (ps KiB); vm_stat native pages",
+    "scope": "same-UID process RSS including unrelated apps and shared-page duplication; host availability proxy = free + inactive + speculative pages, not guaranteed allocatable memory; purgeable pages not added twice",
+    "platform": "darwin"
+  }
+}
