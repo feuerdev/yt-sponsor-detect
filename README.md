@@ -12,8 +12,11 @@ suggestions. Self-promotion and custom categories are unsupported. The popup
 controls enable, paid-sponsor suggestions and minimum confidence. Legacy
 zero-shot labels migrate to a sponsor-only policy; automatic opt-ins are ignored.
 
-Suggestions can be wrong or miss sponsors. Caption acquisition still depends on
-YouTube/player requests. Inference uses bundled local assets; setup and YouTube
+Suggestions can be wrong or miss sponsors. When YouTube caption requests fail, open the public transcript panel, clear any
+transcript search and click **Analyze open transcript** in the popup. The fallback
+verifies English with Chrome language detection and reads the open panel only.
+Modern panel timestamps are approximate. Sparse, partial, ambiguous, live and
+non-English transcripts can remain unavailable. Inference uses bundled local assets; setup and YouTube
 need network access. No caption upload or remote model loading is implemented.
 A formal privacy/network review and independent accuracy evidence remain release
 gates. The project is UNLICENSED pending an owner decision; model weights and
@@ -44,7 +47,8 @@ selects WASM. The idle worker releases its model after 60 seconds.
 
 Load `dist/` using `chrome://extensions` → Developer mode → Load unpacked in a
 disposable profile. Model files and generated `dist/` remain ignored. Reload a
-video after changing detection settings or clearing suggestions.
+video after changing detection settings or clearing suggestions, or analyze its
+open transcript from the popup.
 
 ## Checks and experiments
 

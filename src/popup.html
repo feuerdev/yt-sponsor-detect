@@ -46,7 +46,7 @@
       #add-label-btn {
         margin-top: 10px;
       }
-      #clear-segments-btn {
+      #clear-segments-btn, #analyze-transcript-btn {
         width: 100%;
       }
     </style>
@@ -59,7 +59,11 @@
     </div>
 
     <p>Suggestions require a click and can be wrong. Undo restores your previous playback position.</p>
-    <p>After changing detection settings or clearing suggestions, reload the video to analyze its captions again.</p>
+    <p>If caption detection is unavailable, open YouTube's transcript panel, clear any transcript search, then analyze it here. English transcripts only; panel timing is approximate.</p>
+    <div class="container">
+      <button id="analyze-transcript-btn" disabled>Analyze open transcript</button>
+    </div>
+    <p id="transcript-status" role="status" aria-live="polite"></p>
     <h4>Paid sponsorships</h4>
     <p>This model detects paid sponsorships. Self-promotion and custom categories are unavailable.</p>
     <div class="container">

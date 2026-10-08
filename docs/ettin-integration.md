@@ -11,7 +11,9 @@ Before this switch, MobileBERT classified arbitrary label hypotheses on windows 
 It marked an entire positive window and coalesced overlapping windows. Tracks
 shorter than 20 cues and a final partial window could be omitted.
 
-Only explicitly English caption requests are analyzed; other or unidentified languages report unavailable.
+English caption requests are analyzed automatically. The on-demand public-panel
+fallback requires reliable English content detection. Other or unidentified
+languages report unavailable.
 Ettin analyzes every nonempty, valid speech cue in the acquired transcript. It
 normalizes text, maps tokens to cue times, processes 766 content tokens plus two
 special tokens with 128-token overlap, including the final partial window, and
@@ -35,6 +37,56 @@ Tokenizers 0.1.3 are bundled locally. No CDN imports, remote model loading or
 caption upload. Concurrent jobs are serialized; the idle worker terminates after
 60 seconds, releasing its model. A 180-second request timeout terminates a stuck
 worker and reports unavailable. No inference executes in setup or Node tests.
+
+## Public transcript fallback
+
+If a caption URL is empty, open YouTube's complete public transcript panel and
+clear its search field. Click **Analyze open transcript** in the extension popup.
+The popup acts on the current video tab. It does not open a panel, fetch a private
+endpoint or seek playback. A bounded self-contained MAIN-world function reads
+the visible panel and verifies the URL/current player video ID and finite duration.
+Missing, hidden, ambiguous, continued, searched or live panels are unavailable.
+Chrome's [i18n.detectLanguage](https://developer.chrome.com/docs/extensions/reference/api/i18n#method-detectLanguage)
+must report reliable English at >=90%, without another language at >=10%.
+This verifies language, not whether a passage is a sponsor.
+
+Modern panel rows use whole-second starts, merge same-second text, and infer ends
+from the next cue or video duration. Legacy panel startMs/endMs are retained.
+A track starting after 60 seconds or ending more than 120 seconds before the
+video ends is rejected. This conservative completeness guard also rejects some
+sparse tracks or long silent endings. Exact selected track ID is unknown and
+recorded as null. The cache records source/language/timing provenance. Native
+caption-request timings remain a separate acquisition source.
+
+Navigation, closing the tab, disabling detection or changing policy invalidates
+an in-flight panel request. An older caption response cannot overwrite it.
+Only the extension popup can invoke this action. Captions follow the existing
+local classifier/offscreen/cache path at the shipped 0.8 threshold.
+
+19 new regressions passed for public-panel validation, English rejection, popup
+feedback, sender checks and request races. The full suite passed **130/130** with
+zero skips and actual Chrome environment guards. The real model production build
+passed, with the existing asset-size warnings.
+
+An actual installed Chrome 155 extension analyzed the public Steve Mould video
+[NvkZaWLe0Sk](https://www.youtube.com/watch?v=NvkZaWLe0Sk). This is an already-used
+development video, not fresh holdout evidence. No page/network response was
+intercepted or replaced. The default 0.8 threshold produced one suggestion at
+718.355–785.641 seconds using native Apple WebGPU (non-fallback adapter). Paused
+playback stayed at 0 seconds. The actual popup displayed the suggestion count
+and approximate-timing notice. The captured extension request scope had no
+external HTTP requests or runtime exceptions. This is not a formal privacy audit.
+
+YouTube media playback itself reported 'Something went wrong' in the isolated
+profile, with readyState 0. Therefore this run proves public transcript
+acquisition, inference and cache/UI delivery, but **does not prove public-video
+Skip/Undo**. The earlier installed synthetic GPU/CPU playback evidence below
+remains separate. Fixed resource guards were respected: peak same-UID RSS
+25,208 MiB, below 28,672 MiB, with a 4,096 MiB available-memory proxy floor.
+The task-owned browser/profile was closed and removed.
+
+- [Public transcript result and source hashes](ettin-evidence/ettin-live-transcript.json).
+- [Actual extension popup](ettin-evidence/ettin-live-transcript-popup.png).
 
 ## Rights and attribution
 

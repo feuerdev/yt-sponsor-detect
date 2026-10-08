@@ -1,3 +1,4 @@
+import {captureOpenTranscript,panelCaptions} from './transcript-panel.js';
 import { classifyCaptions } from './classifier.js';
 import { sponsorLabels } from './sponsor-policy.js';
 import { validateSegments } from './caption-contract.js';
@@ -42,7 +43,7 @@ async function writeCompletedCache(tabId, videoId, labels, tabData) {
         await chrome.storage.local.remove(others.slice(0, others.length - CACHE_MAX_ENTRIES + 1).map(([name]) => name));
     if (tabState[tabId] !== tabData) return;
     await chrome.storage.local.set({[CACHE_PREFIX + videoId]: {
-        policyKey: key, complete: true, createdAt: Date.now(), backend: tabData.backend || null, model: MODEL_SPEC.revision, segments: tabData.foundSegments.map(segment => ({...segment}))
+        policyKey: key, complete: true, createdAt: Date.now(), backend: tabData.backend || null, model: MODEL_SPEC.revision, captionProvenance: tabData.captionProvenance || null, segments: tabData.foundSegments.map(segment => ({...segment}))
     }});
 }
 chrome.storage.onChanged?.addListener((changes, area) => {
@@ -140,6 +141,8 @@ chrome.webRequest.onCompleted.addListener(
 
     // Capture state before the first await: older responses must not revive a tab.
     const tabId = details.tabId;
+    // A user-selected public panel owns this request; late caption URLs must not replace it.
+    if(tabState[tabId]?.videoId===videoId && tabState[tabId]?.captionUrl==='public-transcript-panel')return;
     if (!tabState[tabId] || tabState[tabId].videoId !== videoId || tabState[tabId].captionUrl !== details.url) {
         console.log(`New video detected (${videoId}) on tab ${tabId}. Resetting state.`);
         tabState[tabId] = {
@@ -227,7 +230,64 @@ chrome.webRequest.onCompleted.addListener(
   { urls: ["*://*.youtube.com/*"] }
 );
 
+function watchVideoId(tab) {
+    try {
+        const url=new URL(tab?.url);
+        const id=url.searchParams.get('v');
+        return url.protocol==='https:' && url.hostname==='www.youtube.com' && url.pathname==='/watch'
+            && /^[a-zA-Z0-9_-]{11}$/.test(id || '') ? id : null;
+    }catch{return null;}
+}
+async function analyzeOpenTranscript() {
+    const generation=policyGeneration;
+    let tab,videoId,state;
+    const cancelled=()=>generation!==policyGeneration || tabState[tab.id]!==state;
+    try {
+        [tab]=await chrome.tabs.query({active:true,currentWindow:true});videoId=watchVideoId(tab);
+        if(!videoId || !Number.isInteger(tab.id))return {ok:false,code:'not_youtube_video'};
+        const settings=await chrome.storage.sync.get({isEnabled:true,labels:[]});
+        if(generation!==policyGeneration)return {ok:false,code:'cancelled'};
+        const labels=sponsorLabels(settings.labels);
+        if(!settings.isEnabled || !labels?.[0]?.blocked)return {ok:false,code:'disabled'};
+        if(watchVideoId(await chrome.tabs.get(tab.id))!==videoId)return {ok:false,code:'cancelled'};
+        if(tabState[tab.id]?.videoId===videoId && (tabState[tab.id].isAnalyzing
+            || tabState[tab.id].captionUrl==='public-transcript-panel'&&tabState[tab.id].captionRequestPending))return {ok:false,code:'analysis_in_progress'};
+        state={videoId,captionUrl:'public-transcript-panel',captionRequestPending:true,captionsFetched:false,
+            allCaptions:[],foundSegments:[],isAnalyzing:false,policyKey:policyKey(settings.labels)};
+        tabState[tab.id]=state;
+        const results=await chrome.scripting.executeScript({target:{tabId:tab.id,frameIds:[0]},world:'MAIN',func:captureOpenTranscript,args:[videoId]});
+        if(cancelled())return {ok:false,code:'cancelled'};
+        const snapshot=results?.find(result=>result.frameId===0)?.result;
+        if(!snapshot)throw Error('captions_unavailable');
+        const language=await chrome.i18n.detectLanguage(snapshot.rows.map(row=>row.text).join(' '));
+        const currentVideoId=watchVideoId(await chrome.tabs.get(tab.id));
+        if(cancelled() || currentVideoId!==videoId)return {ok:false,code:'cancelled'};
+        const parsed=panelCaptions(snapshot,videoId,language);
+        state.allCaptions=parsed.captions;state.captionProvenance=parsed.provenance;
+        state.captionRequestPending=false;state.captionsFetched=true;
+        await chrome.tabs.sendMessage(tab.id,{type:'CLEAR_SEGMENTS',videoId}).catch(()=>{});
+        if(cancelled())return {ok:false,code:'cancelled'};
+        await processCaptions(tab.id,videoId,settings.labels);
+        return cancelled()?{ok:false,code:'analysis_failed'}:{ok:true,captionProvenance:state.captionProvenance,segments:state.foundSegments.length};
+    }catch(error) {
+        const code=error?.message==='unsupported_language'?'unsupported_language':'captions_unavailable';
+        if(state && !cancelled()) {
+            delete tabState[tab.id];
+            await chrome.storage.local.remove(CACHE_PREFIX+videoId).catch(()=>{});
+            await chrome.tabs.sendMessage(tab.id,{type:'ANALYSIS_ERROR',videoId,payload:{code}}).catch(()=>{});
+        }
+        return {ok:false,code};
+    }finally{if(state)state.captionRequestPending=false;}
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if(request.type==='ANALYZE_OPEN_TRANSCRIPT') {
+        if(sender.id!==chrome.runtime.id || sender.url!==chrome.runtime.getURL('popup.html')) {
+            sendResponse({ok:false,code:'invalid_request'});return false;
+        }
+        analyzeOpenTranscript().then(sendResponse);return true;
+    }
+
     if (request.type === 'GET_CACHED_SEGMENTS') {
         const videoId = request.videoId;
         (async () => {
@@ -280,8 +340,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         return false;
     }
 });
-
-// Listen for messages from content scripts - REMOVED as it's no longer needed.
 
 // Clean up buffer when a tab is closed
 chrome.tabs.onRemoved.addListener((tabId) => {
