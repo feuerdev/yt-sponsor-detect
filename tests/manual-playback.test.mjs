@@ -12,9 +12,10 @@ function fixture(settings = { isEnabled: true }) {
         setAttribute(key, value) { this[key] = value; }
         addEventListener(type, handler) { this.events[type] = handler; }
         removeEventListener(type, handler) { if (this.events[type] === handler) delete this.events[type]; }
-        click() { this.events.click?.({ currentTarget: this }); }
+        click(clientX = 120) { this.events.click?.({ currentTarget: this, clientX }); }
     }
-    const player = new Element('player'), video = new Element('video');
+    const player = new Element('player'), video = new Element('video'), bar = new Element('bar');
+    Object.assign(bar, {clientWidth:1200, getBoundingClientRect:()=>({left:100,width:1200})}); player.appendChild(bar);
     Object.assign(video, { readyState: 1, duration: 120, currentTime: 1.5, src: 'first' });
     const all = () => { const result = []; const visit = node => { result.push(node); node.children.forEach(visit); }; visit(player); return result; };
     let changed, message;
@@ -23,7 +24,7 @@ function fixture(settings = { isEnabled: true }) {
         window: { location: { search: '?v=first' } }, MutationObserver: class { observe() {} },
         document: { body: {}, createElement: tag => new Element(tag),
             getElementById: id => all().find(node => node.id === id) || null,
-            querySelector: selector => selector === 'video' ? video : selector === '#movie_player' ? player : null,
+            querySelector: selector => selector === 'video' ? video : selector === '#movie_player' ? player : selector === '.ytp-progress-bar' ? bar : null,
             querySelectorAll: () => [],
         },
         chrome: { storage: { sync: { get: async () => settings }, onChanged: { addListener(fn) { changed = fn; } } },
@@ -31,7 +32,7 @@ function fixture(settings = { isEnabled: true }) {
         },
     });
     vm.runInContext(source, context);
-    return { context, video, all, change: updates => changed(updates, 'sync'), message,
+    return { context, video, bar, all, change: updates => changed(updates, 'sync'), message,
         run: code => vm.runInContext(code, context),
         add: () => vm.runInContext("addSponsoredSegment({startTime:1,endTime:4,label:'synthetic sponsor'})", context),
         check: () => vm.runInContext('checkForSponsorBlock()', context),
@@ -86,4 +87,16 @@ test('label changes invalidate retained suggestions and obsolete cache callbacks
     skip.click();
     assert.equal(f.video.currentTime, 1.5);
     f.check(); assert.equal(f.button('Skip suggestion'), undefined);
+});
+
+test('seeking into a sponsor interval keeps the manual suggestion, while explicit Undo still opts out', async () => {
+    const f = fixture(); await ready(f);
+    f.video.currentTime = 2; f.bar.click(120); f.check();
+    assert.equal(f.video.currentTime, 2);
+    const skip = f.button('Skip suggestion'); assert.ok(skip, 'Native timeline seek must not cancel a manual suggestion');
+    skip.click(); assert.equal(f.video.currentTime, 4);
+    f.button('Undo').click(); assert.equal(f.video.currentTime, 2);
+    f.bar.click(120); f.check();
+    assert.equal(f.button('Skip suggestion'), undefined, 'Explicit Undo remains an opt-out');
+    assert.equal(f.video.currentTime, 2);
 });

@@ -68,6 +68,11 @@ try{
  execFileSync('agent-browser',['--session','ettin-extension','screenshot',out+'/ettin-extension-'+mode+'.png'],{stdio:'inherit'});
  for(let i=0;i<50;i++){if(await evalAt(pageSid,"!document.querySelector('video').seeking && Math.abs(document.querySelector('video').currentTime-1.5)<.01"))break;await new Promise(r=>setTimeout(r,50));}
  const beforeSkip=await evalAt(pageSid,"document.querySelector('video').currentTime");
+ const barClick=await evalAt(pageSid,"(()=>{const b=document.querySelector('.ytp-progress-bar'),r=b.getBoundingClientRect(),v=document.querySelector('video');return {x:r.x+r.width*v.currentTime/v.duration,y:r.y+r.height/2};})()");
+ await c.call('Input.dispatchMouseEvent',{type:'mousePressed',...barClick,button:'left',clickCount:1},pageSid);
+ await c.call('Input.dispatchMouseEvent',{type:'mouseReleased',...barClick,button:'left',clickCount:1},pageSid);
+ record.syntheticProgressBarClick={time:await evalAt(pageSid,"document.querySelector('video').currentTime"),manualSuggestionPresent:await evalAt(pageSid,"!!document.querySelector('#sponsor-skip-suggestion button')")};
+ if(!record.syntheticProgressBarClick.manualSuggestionPresent||Math.abs(record.syntheticProgressBarClick.time-beforeSkip)>.01)throw Error('Timeline click cancelled manual suggestion or moved playback');
  execFileSync('agent-browser',['--session','ettin-extension','click','#sponsor-skip-suggestion button'],{stdio:'inherit'});
  for(let i=0;i<50;i++){if(await evalAt(pageSid,"!document.querySelector('video').seeking && document.querySelector('video').currentTime>1.5"))break;await new Promise(r=>setTimeout(r,50));}
  const afterSkip=await evalAt(pageSid,"document.querySelector('video').currentTime");

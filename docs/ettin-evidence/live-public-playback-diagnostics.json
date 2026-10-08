@@ -1,0 +1,323 @@
+{
+  "scope": "Unsuccessful public installed-extension playback checks on development sources. Not independent quality evidence. Media URLs/query tokens and captions omitted.",
+  "attempts": [
+    {
+      "schemaVersion": 1,
+      "startedAt": "2026-10-08T14:30:21.576Z",
+      "finishedAt": "2026-10-08T14:32:19.522Z",
+      "videoId": "NvkZaWLe0Sk",
+      "scope": "Installed real MV3 extension, already-exposed development video, headed public YouTube. No response interception or substituted captions/media. Not independent accuracy evidence.",
+      "policy": {
+        "maximumAccountMiB": 28672,
+        "minimumAvailableMiB": 4096
+      },
+      "peakAccountMiB": 26287.921875,
+      "responseInterception": false,
+      "freshValidationExposure": false,
+      "threshold": 0.8,
+      "stage": "manual-playback",
+      "publicTranscript": {
+        "rows": 101,
+        "durationSeconds": 802,
+        "panelHash": "d0038c0dd9b54db38c4be2029709ab144625fa461e87c37a1e9865c69dc26c24"
+      },
+      "popup": {
+        "status": "1 sponsor suggestion found. Timing from the transcript panel is approximate. Review each suggestion before skipping."
+      },
+      "cache": {
+        "backend": "webgpu",
+        "captionProvenance": {
+          "captionSource": "public-transcript-panel",
+          "captionTrackId": null,
+          "endBoundaryMethod": "next cue start; final cue ends at video duration",
+          "language": "en",
+          "languageVerification": "Chrome i18n.detectLanguage; reliable English >=90 percent",
+          "timingResolutionSeconds": 1
+        },
+        "complete": true,
+        "createdAt": 1791469831945,
+        "model": "d4939256c49e92d158429a55fcf39477d003dd58",
+        "policyKey": "[3,\"d4939256c49e92d158429a55fcf39477d003dd58\",\"5006c192c9ba17c9283d7366307cccc9d80d67bab4301c1749e8f737a8b6d40f\",\"ettin-flow-v2-int8-768-128-ort1.29-tokenizers0.1.3\",24,1.5,[{\"name\":\"sponsor\",\"threshold\":0.8,\"blocked\":true}]]",
+        "segments": [
+          {
+            "endTime": 785.641,
+            "label": "sponsor",
+            "startTime": 718.355
+          }
+        ]
+      },
+      "contentPlayback": {
+        "videoId": "NvkZaWLe0Sk",
+        "currentTime": 0.113853,
+        "paused": false,
+        "readyState": 4,
+        "durationSeconds": 802.101,
+        "playerDuration": 802.101,
+        "isAd": false,
+        "mediaError": null,
+        "playerError": null
+      },
+      "setupSeek": {
+        "method": "Real YouTube progress-bar input",
+        "targetSeconds": 721.355
+      },
+      "lastSeekState": {
+        "videoId": "NvkZaWLe0Sk",
+        "currentTime": 0,
+        "paused": true,
+        "readyState": 0,
+        "durationSeconds": null,
+        "playerDuration": 802.101,
+        "isAd": false,
+        "mediaError": null,
+        "playerError": "Something went wrong. Refresh or try again later. Learn more"
+      },
+      "mediaResponses": [
+        {
+          "domain": "googlevideo.com",
+          "path": "/generate_204",
+          "status": 204
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 200
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 200
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/generate_204",
+          "status": 204
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 200
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 200
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 200
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 200
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 200
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 200
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 200
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 200
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 200
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 200
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 200
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 200
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 200
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 200
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 200
+        }
+      ],
+      "mediaFailures": [],
+      "finalPublicState": {
+        "url": "https://www.youtube.com/watch?v=NvkZaWLe0Sk",
+        "paused": true,
+        "readyState": 0,
+        "durationSeconds": null,
+        "currentTime": 0,
+        "playerError": "Something went wrong. Refresh or try again later. Learn more",
+        "visiblePanels": [
+          {
+            "rows": 101,
+            "searchActive": false
+          }
+        ]
+      },
+      "status": "failed",
+      "error": "Public runtime condition timed out at manual-playback",
+      "cleanup": "Task-owned browser and profile closed"
+    },
+    {
+      "schemaVersion": 1,
+      "startedAt": "2026-10-08T14:46:06.820Z",
+      "finishedAt": "2026-10-08T14:46:18.310Z",
+      "videoId": "Tuxgh8SrzbQ",
+      "scope": "Installed real MV3 extension, already-exposed development video, headed public YouTube. No response interception or substituted captions/media. Not independent accuracy evidence.",
+      "policy": {
+        "maximumAccountMiB": 28672,
+        "minimumAvailableMiB": 4096
+      },
+      "peakAccountMiB": 26490.765625,
+      "responseInterception": false,
+      "freshValidationExposure": false,
+      "threshold": 0.8,
+      "stage": "extension-classification",
+      "publicTranscript": {
+        "rows": 103,
+        "durationSeconds": 751,
+        "panelHash": "4a52dd1e19c417d4a53e7c92414b1cee6ed89b89b9eeac67d243447c21180b47"
+      },
+      "popup": {
+        "status": "Sponsor analysis unavailable. Try again; playback is unchanged."
+      },
+      "cache": null,
+      "mediaResponses": [
+        {
+          "domain": "googlevideo.com",
+          "path": "/generate_204",
+          "status": 204
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 200
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 200
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/generate_204",
+          "status": 204
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 200
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 200
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 403
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 403
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 403
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 403
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 403
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "status": 403
+        }
+      ],
+      "mediaFailures": [
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "error": "net::ERR_ABORTED"
+        },
+        {
+          "domain": "googlevideo.com",
+          "path": "/videoplayback",
+          "error": "net::ERR_ABORTED"
+        }
+      ],
+      "finalPublicState": {
+        "url": "https://www.youtube.com/",
+        "paused": true,
+        "readyState": 0,
+        "durationSeconds": null,
+        "currentTime": 0,
+        "playerError": null,
+        "visiblePanels": []
+      },
+      "status": "failed",
+      "error": "No real sponsor suggestion for manual playback proof",
+      "cleanup": "Task-owned browser and profile closed"
+    }
+  ]
+}

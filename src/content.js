@@ -322,39 +322,10 @@ function checkForSponsorBlock() {
     document.getElementById('sponsor-skip-suggestion')?.remove();
 }
 
-function handleProgressBarClick(event) {
-    const video = document.querySelector('video');
-    const progressBar = event.currentTarget;
-    if (!video || !video.duration || !progressBar) return;
-
-    const rect = progressBar.getBoundingClientRect();
-    const clickX = event.clientX - rect.left;
-    const clickedTime = (clickX / progressBar.clientWidth) * video.duration;
-
-    for (const segment of sponsoredSegments) {
-        if (clickedTime >= segment.startTime && clickedTime <= segment.endTime) {
-            if (segment.skipDisabled) {
-                return; 
-            }
-            console.log(`User clicked segment. Disabling suggestion for [${formatTime(segment.startTime)} - ${formatTime(segment.endTime)}]`);
-            segment.skipDisabled = true;
-
-            const highlightId = `sponsored-highlight-${segment.startTime}-${segment.endTime}`;
-            const highlight = document.getElementById(highlightId);
-            if (highlight) {
-                highlight.style.backgroundColor = 'rgba(128, 128, 128, 0.6)'; 
-                highlight.title = 'Skipping disabled for this segment.';
-            }
-            break;
-        }
-    }
-}
-
 let videoElement = null;
 let lastVideoSrc = null;
 let lastVideoId = null;
 let videoGeneration = 0;
-let progressBarWithListener = null;
 
 function initializeVideoListener() {
     const video = document.querySelector('video');
@@ -370,11 +341,6 @@ function initializeVideoListener() {
             if (videoElement) {
                 videoElement.removeEventListener('timeupdate', checkForSponsorBlock);
             }
-            if (progressBarWithListener) {
-                progressBarWithListener.removeEventListener('click', handleProgressBarClick);
-                progressBarWithListener = null;
-            }
-
             sponsoredSegments.length = 0;
             clearPlaybackControls();
             document.getElementById('sponsor-analysis-error')?.remove();
@@ -403,15 +369,6 @@ function initializeVideoListener() {
             console.log("Attached listener to new video element.");
         }
 
-        const progressBar = document.querySelector('.ytp-progress-bar');
-        if (progressBar !== progressBarWithListener) {
-            if (progressBarWithListener) {
-                progressBarWithListener.removeEventListener('click', handleProgressBarClick);
-            }
-            progressBarWithListener = progressBar;
-            if (progressBar) progressBar.addEventListener('click', handleProgressBarClick);
-        }
-
     } else if (videoElement) {
         console.log('Video element removed.');
         lastVideoSrc = null;
@@ -425,10 +382,6 @@ function initializeVideoListener() {
         if (videoElement) {
             videoElement.removeEventListener('timeupdate', checkForSponsorBlock);
             videoElement = null;
-        }
-        if (progressBarWithListener) {
-            progressBarWithListener.removeEventListener('click', handleProgressBarClick);
-            progressBarWithListener = null;
         }
     }
 }

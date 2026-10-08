@@ -65,11 +65,11 @@ test('removing an empty-source video releases listeners and segments', () => {
     assert.equal(f.segments(), 0);
 });
 
-test('replacing or removing the progress bar releases its old click listener', () => {
+test('native progress bar replacement never installs a suggestion-cancelling click listener', () => {
     const f = fixture(), old = f.bar;
     f.bar = element(); f.refresh();
     assert.equal(old.listeners.has('click'), false);
-    assert.equal(f.bar.listeners.has('click'), true);
+    assert.equal(f.bar.listeners.has('click'), false);
     const replacement = f.bar;
     f.bar = null; f.refresh();
     assert.equal(replacement.listeners.has('click'), false);

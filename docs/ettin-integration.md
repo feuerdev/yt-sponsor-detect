@@ -198,3 +198,36 @@ The GPU check requires a native Apple adapter. No software-GPU enable flag is
 used. CPU explicitly disables GPU and software rasterization. Both keep the
 same fixed Mac resource guards. The checked-in reusable script was also run
 successfully on CPU after extracting it from the original smoke harness.
+
+## Timeline seeking regression and current verification
+
+The old progress-bar click listener opted out of a suggested interval whenever
+the user sought into it. That behaviour belonged to automatic skipping and
+prevented the current manual Skip from working. Native timeline input now keeps
+the manual suggestion available. Explicit Undo still opts out of that interval.
+The regression was reproduced before removing the listener.
+
+The current suite passes 172/172 tests with no skips. The verified real-model
+build passes with two asset-size warnings. The rebuilt installed GPU and CPU
+smokes both click the synthetic timeline at 1.5 seconds, retain the suggestion,
+skip to 8 seconds and Undo back to 1.5 seconds. These are engineering checks on
+synthetic media at the diagnostic 0.7 setting, not detection accuracy evidence.
+The production threshold remains 0.8.
+
+Fresh headed Chrome checks used actual public YouTube media and transcripts,
+without response interception or copied authentication. On the exposed Steve
+Mould development source, the installed extension classified 101 public rows at
+0.8 on WebGPU and produced 718.355–785.641 seconds. Actual content playback
+initially reached readyState 4 at duration 802.101 seconds. Native YouTube
+timeline input then led to a YouTube player error and no ready content, so
+manual Skip/Undo was not reached. Captured media responses were HTTP 200.
+This does not establish the cause of the player error.
+
+A fresh ElectroBOOM development-source attempt read 103 public rows, then
+reported analysis unavailable and ended at the YouTube home page. Media
+responses included HTTP 403, but navigation and its cause are unresolved.
+Neither failed attempt establishes live public Skip/Undo. Both remain separate
+from the successful synthetic installed checks. No fresh validation predictions
+were produced and no registered fixture was replaced.
+
+[Caption-free failed public runtime records](ettin-evidence/live-public-playback-diagnostics.json).
