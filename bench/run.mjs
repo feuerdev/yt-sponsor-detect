@@ -29,7 +29,7 @@ const config=frozen?.models?.[`${spec.id}/${backend}`]?.config||spec.decoding;
 if(split==='test'&&!frozen?.models?.[`${spec.id}/${backend}`])throw new Error('Candidate missing from frozen configuration');
 const runId=options['run-id']||new Date().toISOString().replace(/[:.]/g,'-')+'-'+spec.id+'-'+backend;
 if(!/^[A-Za-z0-9_-]+$/.test(runId))throw new Error('Unsafe run ID');
-if(split==='test')await lockTestExposure({file:testLedgerPath,frozen,selectionHash:manifest.selectionHash,runId});
+if(split==='test')await lockTestExposure({file:testLedgerPath,expectedFile:manifest.reviewExposureLedgerPath,frozen,selectionHash:manifest.selectionHash,runId});
 const directory=path.join(root,'bench/results',runId);await mkdir(path.dirname(directory),{recursive:true});await mkdir(directory,{recursive:false});
 const initial=await requireHeadroom(policy);
 const setup=await readJson('bench/local/setup.json');

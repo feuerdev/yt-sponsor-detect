@@ -1,9 +1,11 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-import {hash,readJson,save} from './lib.mjs';
-export async function lockTestExposure({file='bench/local/test-ledger.json',frozen,selectionHash,runId,at=new Date().toISOString()}) {
+import path from 'node:path';
+import {root,hash,readJson,save} from './lib.mjs';
+export async function lockTestExposure({file='bench/local/test-ledger.json',expectedFile,frozen,selectionHash,runId,at=new Date().toISOString()}) {
  if(typeof runId!=='string'||!/^[A-Za-z0-9_-]+$/.test(runId))throw Error('Invalid test run identity');
  if(!frozen||typeof selectionHash!=='string'||!selectionHash||frozen.selectionHash!==selectionHash)throw Error('Frozen selection identity mismatch');
  if(typeof file!=='string'||!file||!Number.isFinite(Date.parse(at)))throw Error('Invalid exposure ledger provenance');
+ if(expectedFile!==undefined&&(typeof expectedFile!=='string'||!expectedFile||path.resolve(root,file)!==path.resolve(root,expectedFile)))throw Error('Reviewed snapshot requires its bound exposure ledger');
  let ledger;try{ledger=await readJson(file);}catch(e){if(e.code!=='ENOENT')throw e;}
  if(ledger&&(ledger.frozenHash!==hash(frozen)||ledger.selectionHash!==selectionHash))throw Error('Locked test already evaluated with a different config or selection; create a fresh holdout');
  if(ledger&&(!Number.isFinite(Date.parse(ledger.firstTestAt))||ledger.attempts!==undefined&&!Array.isArray(ledger.attempts)))throw Error('Corrupt existing exposure history');

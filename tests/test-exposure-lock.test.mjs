@@ -25,3 +25,11 @@ test('legacy history and extra provenance survive compatible attempts',async t=>
 test('invalid or reused run identities cannot append a misleading new exposure',async t=>{
  const file=path.join(await temporary(t),'fresh.json');await assert.rejects(lock(file,''),/run/i);await lock(file);const before=await readFile(file,'utf8');await assert.rejects(lock(file),/duplicate|already/i);assert.equal(await readFile(file,'utf8'),before);
 });
+test('a reviewed snapshot binds its exposure ledger so a different filename cannot reset test history',async t=>{
+ const dir=await temporary(t),bound=path.join(dir,'bound.json'),other=path.join(dir,'other.json');
+ await lock(bound);const before=await readFile(bound,'utf8');
+ await assert.rejects(lockTestExposure({file:other,expectedFile:bound,runId:'different-ledger',frozen,selectionHash:'new-selection'}),/bound|ledger/i);
+ await assert.rejects(readFile(other),{code:'ENOENT'});assert.equal(await readFile(bound,'utf8'),before);
+ await lockTestExposure({file:path.join(dir,'sub','..','bound.json'),expectedFile:bound,runId:'bound-cpu',frozen,selectionHash:'new-selection',at:'2026-10-08T14:00:00Z'});
+ assert.deepEqual(JSON.parse(await readFile(bound)).attempts.map(a=>a.runId),['gpu-run','bound-cpu']);
+});

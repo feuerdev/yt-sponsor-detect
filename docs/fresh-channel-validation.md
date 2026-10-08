@@ -145,3 +145,15 @@ confirmed reliable German at 100%. The export was excluded. Source headers and
 selected type metadata never override actual language verification. This adds
 no English fixture and exposes no validation prediction.
 [Caption-free mismatch evidence](ettin-evidence/export-language-mismatch.json).
+
+## Checked human reference import
+
+A [review workflow](human-reference-review.md) now has an explicit fresh-only
+import command. It validates a common human reference version/policy, original
+fixture hashes, reviewer attestation and blind source review. Pending packets,
+changed sources, incomplete selected populations, ordinary/promotion conflicts,
+invalid complete coverage, campaign leakage and existing exposure history reject
+import. New reviewed fixtures preserve original captions and provisional references.
+They bind one exposure ledger path, which the runner enforces before test inference.
+No real human labels have been created. The actual pending packet rejected safely
+without creating a dataset. The complete regression suite passed 171/171 tests.
