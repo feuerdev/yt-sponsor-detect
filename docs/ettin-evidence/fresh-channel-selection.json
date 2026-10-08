@@ -1,0 +1,277 @@
+{
+  "schemaVersion": 1,
+  "createdAt": "2026-10-08T12:38:57.884465+00:00",
+  "frozenAt": "2026-10-08T12:38:57.884485+00:00",
+  "selectionHash": "3016fee3f5c0c6ea3405127f3ca66ea261df148d8e6032cdb32c004d93688eb0",
+  "registeredPlanHash": "21c40b64bc81d0d30d9559ceebc3372f5269569231aa9d1e5e00976814a435b9",
+  "splitMethod": "SHA256 ordered channel IDs: first three tune, remaining three test. Exact allocation fixed here.",
+  "samplingMethod": "Three newest public RSS entries per channel, ordered by publishedAt descending then videoId. Exclude original benchmark/smoke/canary IDs and all original channels. No replacement based on transcript availability, label count or model result. Exclusions and feed failures retained. All durations eligible.",
+  "originalPilotSelectionHash": "013b92e97f22267616fe70f665b5d719f7f1ead983718fbd1147d948884f6f66",
+  "targetVideos": 18,
+  "targetChannels": 6,
+  "status": "Selected before caption availability or model predictions; no test exposure",
+  "upstreamTrainingOverlap": "unknown",
+  "reviewedNegativeExposure": "none",
+  "videos": [
+    {
+      "videoId": "RpslsMqPFWA",
+      "channelId": "UCj1VqrHhDte54oLgPG4xpuQ",
+      "channelName": "Stuff Made Here",
+      "title": "I made an apple peel itself",
+      "publishedAt": "2026-08-05T22:30:42+00:00",
+      "split": "test",
+      "paidCrowdReferences": 1,
+      "selfPromoCrowdReferences": 0,
+      "source": "https://www.youtube.com/watch?v=RpslsMqPFWA"
+    },
+    {
+      "videoId": "2OfjZ3ORJfc",
+      "channelId": "UCj1VqrHhDte54oLgPG4xpuQ",
+      "channelName": "Stuff Made Here",
+      "title": "Robot golf vs holes that keep getting harder",
+      "publishedAt": "2026-04-15T20:01:57+00:00",
+      "split": "test",
+      "paidCrowdReferences": 1,
+      "selfPromoCrowdReferences": 0,
+      "source": "https://www.youtube.com/watch?v=2OfjZ3ORJfc"
+    },
+    {
+      "videoId": "JQB8aNKyeao",
+      "channelId": "UCj1VqrHhDte54oLgPG4xpuQ",
+      "channelName": "Stuff Made Here",
+      "title": "Making an autocorrect mini golf club (part 1)",
+      "publishedAt": "2026-01-01T04:51:16+00:00",
+      "split": "test",
+      "paidCrowdReferences": 2,
+      "selfPromoCrowdReferences": 0,
+      "source": "https://www.youtube.com/watch?v=JQB8aNKyeao"
+    },
+    {
+      "videoId": "4VnCJdYImb8",
+      "channelId": "UCUQo7nzH1sXVpzL92VesANw",
+      "channelName": "DIY Perks",
+      "title": "Building a NEW kind of invisible PC",
+      "publishedAt": "2026-09-29T11:30:24+00:00",
+      "split": "tune",
+      "paidCrowdReferences": 1,
+      "selfPromoCrowdReferences": 0,
+      "source": "https://www.youtube.com/watch?v=4VnCJdYImb8"
+    },
+    {
+      "videoId": "7FStfdGjAwc",
+      "channelId": "UCUQo7nzH1sXVpzL92VesANw",
+      "channelName": "DIY Perks",
+      "title": "A new way to build a PC in 2026!",
+      "publishedAt": "2026-07-17T12:00:19+00:00",
+      "split": "tune",
+      "paidCrowdReferences": 3,
+      "selfPromoCrowdReferences": 0,
+      "source": "https://www.youtube.com/watch?v=7FStfdGjAwc"
+    },
+    {
+      "videoId": "rqCt61ZbU10",
+      "channelId": "UCUQo7nzH1sXVpzL92VesANw",
+      "channelName": "DIY Perks",
+      "title": "Building an LED SUPERNOVA!",
+      "publishedAt": "2026-02-28T12:15:13+00:00",
+      "split": "tune",
+      "paidCrowdReferences": 1,
+      "selfPromoCrowdReferences": 0,
+      "source": "https://www.youtube.com/watch?v=rqCt61ZbU10"
+    },
+    {
+      "videoId": "Tuxgh8SrzbQ",
+      "channelId": "UCJ0-OtVpF0wOKEqT2Z1HEtA",
+      "channelName": "ElectroBOOM",
+      "title": "Rage-Fixing the Power Washer",
+      "publishedAt": "2026-09-21T16:04:44+00:00",
+      "split": "tune",
+      "paidCrowdReferences": 1,
+      "selfPromoCrowdReferences": 0,
+      "source": "https://www.youtube.com/watch?v=Tuxgh8SrzbQ"
+    },
+    {
+      "videoId": "DWAMwfM2DrM",
+      "channelId": "UCJ0-OtVpF0wOKEqT2Z1HEtA",
+      "channelName": "ElectroBOOM",
+      "title": "Electricity Can Pass Through Glass #experiment #science #electrical #funny",
+      "publishedAt": "2026-09-05T17:47:30+00:00",
+      "split": "tune",
+      "paidCrowdReferences": 0,
+      "selfPromoCrowdReferences": 0,
+      "source": "https://www.youtube.com/watch?v=DWAMwfM2DrM"
+    },
+    {
+      "videoId": "-TvOCDbhCWk",
+      "channelId": "UCJ0-OtVpF0wOKEqT2Z1HEtA",
+      "channelName": "ElectroBOOM",
+      "title": "Plasma Globe Can Be a Fire Hazard #experiment #technology #science #funny",
+      "publishedAt": "2026-09-01T16:05:09+00:00",
+      "split": "tune",
+      "paidCrowdReferences": 0,
+      "selfPromoCrowdReferences": 0,
+      "source": "https://www.youtube.com/watch?v=-TvOCDbhCWk"
+    },
+    {
+      "videoId": "WrCjAAl9okA",
+      "channelId": "UCsBjURrPoezykLs9EqgamOA",
+      "channelName": "Fireship",
+      "title": "A $6.3 billion open-weight model just got embarrassed by the French...",
+      "publishedAt": "2026-10-07T20:24:27+00:00",
+      "split": "test",
+      "paidCrowdReferences": 2,
+      "selfPromoCrowdReferences": 0,
+      "source": "https://www.youtube.com/watch?v=WrCjAAl9okA"
+    },
+    {
+      "videoId": "_5p1_TNSWqQ",
+      "channelId": "UCsBjURrPoezykLs9EqgamOA",
+      "channelName": "Fireship",
+      "title": "PewDiePie is setting AI free... and OpenAI is furious",
+      "publishedAt": "2026-10-05T20:34:44+00:00",
+      "split": "test",
+      "paidCrowdReferences": 1,
+      "selfPromoCrowdReferences": 0,
+      "source": "https://www.youtube.com/watch?v=_5p1_TNSWqQ"
+    },
+    {
+      "videoId": "No-JPdFvYWU",
+      "channelId": "UCsBjURrPoezykLs9EqgamOA",
+      "channelName": "Fireship",
+      "title": "The one OpenAI announcement that can actually make you money...",
+      "publishedAt": "2026-10-01T19:34:14+00:00",
+      "split": "test",
+      "paidCrowdReferences": 1,
+      "selfPromoCrowdReferences": 0,
+      "source": "https://www.youtube.com/watch?v=No-JPdFvYWU"
+    },
+    {
+      "videoId": "5OcnO7U0VeA",
+      "channelId": "UCFhXFikryT4aFcLkLw2LBLA",
+      "channelName": "NileRed",
+      "title": "Making nasty soap",
+      "publishedAt": "2026-08-19T16:34:22+00:00",
+      "split": "tune",
+      "paidCrowdReferences": 0,
+      "selfPromoCrowdReferences": 0,
+      "source": "https://www.youtube.com/watch?v=5OcnO7U0VeA"
+    },
+    {
+      "videoId": "K56LuXCQ0ik",
+      "channelId": "UCFhXFikryT4aFcLkLw2LBLA",
+      "channelName": "NileRed",
+      "title": "Making color changing mercury",
+      "publishedAt": "2026-08-10T17:11:42+00:00",
+      "split": "tune",
+      "paidCrowdReferences": 0,
+      "selfPromoCrowdReferences": 0,
+      "source": "https://www.youtube.com/watch?v=K56LuXCQ0ik"
+    },
+    {
+      "videoId": "ID-K64Jk6JM",
+      "channelId": "UCFhXFikryT4aFcLkLw2LBLA",
+      "channelName": "NileRed",
+      "title": "Turning air into alcohol",
+      "publishedAt": "2026-08-05T18:28:30+00:00",
+      "split": "tune",
+      "paidCrowdReferences": 2,
+      "selfPromoCrowdReferences": 2,
+      "source": "https://www.youtube.com/watch?v=ID-K64Jk6JM"
+    },
+    {
+      "videoId": "4ievxm-8P7E",
+      "channelId": "UC2rzsm1Qi6N1X-wuOg_p0Ng",
+      "channelName": "Project Farm",
+      "title": "This Torque Adapter Makes Torque Wrenches Obsolete!",
+      "publishedAt": "2026-10-04T16:50:07+00:00",
+      "split": "test",
+      "paidCrowdReferences": 0,
+      "selfPromoCrowdReferences": 1,
+      "source": "https://www.youtube.com/watch?v=4ievxm-8P7E"
+    },
+    {
+      "videoId": "rk5a6DLCgcQ",
+      "channelId": "UC2rzsm1Qi6N1X-wuOg_p0Ng",
+      "channelName": "Project Farm",
+      "title": "These Ratchet Straps Make Regular Ratchet Straps Obsolete!",
+      "publishedAt": "2026-09-27T16:50:34+00:00",
+      "split": "test",
+      "paidCrowdReferences": 0,
+      "selfPromoCrowdReferences": 0,
+      "source": "https://www.youtube.com/watch?v=rk5a6DLCgcQ"
+    },
+    {
+      "videoId": "xTFbdQ5J39c",
+      "channelId": "UC2rzsm1Qi6N1X-wuOg_p0Ng",
+      "channelName": "Project Farm",
+      "title": "Please Avoid This Car Interior Cleaner!",
+      "publishedAt": "2026-09-20T16:50:34+00:00",
+      "split": "test",
+      "paidCrowdReferences": 0,
+      "selfPromoCrowdReferences": 0,
+      "source": "https://www.youtube.com/watch?v=xTFbdQ5J39c"
+    }
+  ],
+  "discoveryLedger": [
+    {
+      "channelId": "UCj1VqrHhDte54oLgPG4xpuQ",
+      "name": "Stuff Made Here",
+      "at": "2026-10-08T12:38:57.206680+00:00",
+      "phase": "feed",
+      "status": "ok",
+      "rawHash": "3e906763e977515b2fed12f556b4aa46f80f96849c11d91090b9b3fe90a5734e",
+      "availableEntries": 15,
+      "selected": 3
+    },
+    {
+      "channelId": "UCUQo7nzH1sXVpzL92VesANw",
+      "name": "DIY Perks",
+      "at": "2026-10-08T12:38:57.338821+00:00",
+      "phase": "feed",
+      "status": "ok",
+      "rawHash": "4c77cc22912f25e84415b99eb05103ef9915bdb9b728a48e4ee1150c8c7cac5d",
+      "availableEntries": 15,
+      "selected": 3
+    },
+    {
+      "channelId": "UCJ0-OtVpF0wOKEqT2Z1HEtA",
+      "name": "ElectroBOOM",
+      "at": "2026-10-08T12:38:57.455175+00:00",
+      "phase": "feed",
+      "status": "ok",
+      "rawHash": "060e006110ac5dc2576947dfb6a6eb7ec268033345e16e1894ad115fca4d2199",
+      "availableEntries": 15,
+      "selected": 3
+    },
+    {
+      "channelId": "UCsBjURrPoezykLs9EqgamOA",
+      "name": "Fireship",
+      "at": "2026-10-08T12:38:57.557561+00:00",
+      "phase": "feed",
+      "status": "ok",
+      "rawHash": "2d19afc11f0f46653321c68c1a5d2429d49ff42959f7f3996e780572c2f65b67",
+      "availableEntries": 15,
+      "selected": 3
+    },
+    {
+      "channelId": "UCFhXFikryT4aFcLkLw2LBLA",
+      "name": "NileRed",
+      "at": "2026-10-08T12:38:57.662158+00:00",
+      "phase": "feed",
+      "status": "ok",
+      "rawHash": "4792162c2f6176a675b4830d4d6eb77816f1cc542e8529190741ffbea6bf9fb6",
+      "availableEntries": 15,
+      "selected": 3
+    },
+    {
+      "channelId": "UC2rzsm1Qi6N1X-wuOg_p0Ng",
+      "name": "Project Farm",
+      "at": "2026-10-08T12:38:57.759633+00:00",
+      "phase": "feed",
+      "status": "ok",
+      "rawHash": "d14d24db3b5a3413986ab944f62fd01172edc3be29702e37b48afb8045d27c1a",
+      "availableEntries": 15,
+      "selected": 3
+    }
+  ]
+}
