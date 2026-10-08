@@ -5,16 +5,22 @@
     "minimumAvailableMiB": 4096
   },
   "before": {
-    "availableMiB": 11192.640625,
-    "accountMiB": 24454.390625,
-    "processes": 654,
+    "availableMiB": 12026,
+    "accountMiB": 22744.546875,
+    "processes": 650,
     "method": "RSS sum (ps KiB); vm_stat native pages",
     "scope": "same-UID process RSS including unrelated apps and shared-page duplication; host availability proxy = free + inactive + speculative pages, not guaranteed allocatable memory; purgeable pages not added twice",
     "platform": "darwin"
   },
-  "peakAccountMiB": 26072.015625,
-  "startedAt": "2026-10-08T14:41:41.761Z",
+  "peakAccountMiB": 25167.375,
+  "startedAt": "2026-10-08T17:03:35.852Z",
   "scope": "Installed production MV3 bundle, real model; synthetic English caption/player fixture. Network responses fulfilled only in this fresh browser. No public YouTube or held-out quality claim.",
+  "sourceHashes": {
+    "contentSource": "ff64cb3700d258d31fe9273c486e3875ae7ca42d5cf3a234fc1bf7e0328aa199",
+    "contentBundle": "d92c3eb21ea70d5a049d5db4ee0dc6e3179e2f15031ff399a699e0836bfd002f",
+    "backgroundBundle": "602faece7ad72c235f36ed9525290b158be574d7e7f6a03ac8b0b3facb1f6c88",
+    "smokeScript": "f72f53df7aafd9fc15b0cb92e402e9df3a746573a0e15b9318a0ecf084bb39a2"
+  },
   "nativeFlags": [
     "--headless=new",
     "--no-first-run",
@@ -27,14 +33,14 @@
     "--enable-automation",
     "--enable-unsafe-extension-debugging",
     "--window-size=1280,900",
-    "--user-data-dir=/Users/jannik/Documents/DEV/feuerdev/yt-sponsor-detect/bench/local/extension-NDAHnE"
+    "--user-data-dir=/Users/jannik/Documents/DEV/feuerdev/yt-sponsor-detect/bench/local/extension-5p9CZZ"
   ],
   "extensionId": "knelgoknoihejeaeoagiigdkplllddcb",
   "defaultThresholdResult": {
     "backend": "webgpu",
     "captionProvenance": null,
     "complete": true,
-    "createdAt": 1791470504561,
+    "createdAt": 1791479017924,
     "model": "d4939256c49e92d158429a55fcf39477d003dd58",
     "policyKey": "[3,\"d4939256c49e92d158429a55fcf39477d003dd58\",\"5006c192c9ba17c9283d7366307cccc9d80d67bab4301c1749e8f737a8b6d40f\",\"ettin-flow-v2-int8-768-128-ort1.29-tokenizers0.1.3\",24,1.5,[{\"name\":\"sponsor\",\"threshold\":0.8,\"blocked\":true}]]",
     "segments": []
@@ -49,7 +55,7 @@
     "backend": "webgpu",
     "captionProvenance": null,
     "complete": true,
-    "createdAt": 1791470505072,
+    "createdAt": 1791479018648,
     "model": "d4939256c49e92d158429a55fcf39477d003dd58",
     "policyKey": "[3,\"d4939256c49e92d158429a55fcf39477d003dd58\",\"5006c192c9ba17c9283d7366307cccc9d80d67bab4301c1749e8f737a8b6d40f\",\"ettin-flow-v2-int8-768-128-ort1.29-tokenizers0.1.3\",24,1.5,[{\"name\":\"sponsor\",\"threshold\":0.7,\"blocked\":true}]]",
     "segments": [
@@ -81,7 +87,7 @@
       "--enable-automation",
       "--enable-unsafe-extension-debugging",
       "--window-size=1280,900",
-      "--user-data-dir=/Users/jannik/Documents/DEV/feuerdev/yt-sponsor-detect/bench/local/extension-NDAHnE",
+      "--user-data-dir=/Users/jannik/Documents/DEV/feuerdev/yt-sponsor-detect/bench/local/extension-5p9CZZ",
       "--noerrdialogs",
       "--flag-switches-begin",
       "--flag-switches-end"
@@ -90,6 +96,17 @@
   "network": {
     "requestCount": 13,
     "externalModelRequests": []
+  },
+  "syntheticAdClock": {
+    "duringAd": {
+      "time": 1.5,
+      "suggestionPresent": false,
+      "highlights": 0
+    },
+    "resumedContent": {
+      "time": 1.5,
+      "suggestionPresent": true
+    }
   },
   "syntheticProgressBarClick": {
     "time": 1.5,

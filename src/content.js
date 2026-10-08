@@ -171,12 +171,17 @@ function clearPlaybackControls() {
     document.getElementById('sponsor-undo-notice')?.remove();
 }
 
+function contentPlaybackAvailable(video) {
+    return video?.readyState >= 1 && Number.isFinite(video.duration) && video.duration > 0
+        && !video.error && !document.querySelector('#movie_player')?.classList?.contains('ad-showing');
+}
+
 function playbackIdentity(video) {
     return { video, generation: videoGeneration, src: video.src,
         videoId: new URLSearchParams(window.location.search).get('v') };
 }
 function isCurrentPlayback(identity) {
-    return isEnabled && identity.video === document.querySelector('video')
+    return isEnabled && contentPlaybackAvailable(identity.video) && identity.video === document.querySelector('video')
         && identity.generation === videoGeneration && identity.src === identity.video.src
         && identity.videoId === new URLSearchParams(window.location.search).get('v');
 }
@@ -225,8 +230,7 @@ function showSkipNotification(video, segment, previousTime) {
 }
 
 function performSkip(video, segment) {
-    if (!isEnabled || segment.skipDisabled || !sponsoredSegments.includes(segment)
-        || !Number.isFinite(video.duration) || video.duration <= 0
+    if (!isEnabled || !contentPlaybackAvailable(video) || segment.skipDisabled || !sponsoredSegments.includes(segment)
         || !Number.isFinite(video.currentTime) || video.currentTime < segment.startTime
         || video.currentTime >= segment.endTime - 0.1) return;
     const destination = Math.min(segment.endTime, video.duration);
@@ -266,7 +270,8 @@ function updateProgressBarHighlights() {
     const progressBar = document.querySelector('.ytp-progress-bar');
     const video = document.querySelector('video');
 
-    if (!progressBar || !video || !video.duration) {
+    if (!progressBar || !contentPlaybackAvailable(video)) {
+        clearProgressBarHighlights();
         return;
     }
 
@@ -311,7 +316,11 @@ function clearProgressBarHighlights() {
 function checkForSponsorBlock() {
     if (!isEnabled) return;
     const video = document.querySelector('video');
-    if (!video || video.readyState < 1 || !Number.isFinite(video.duration) || video.duration <= 0) return;
+    if (!contentPlaybackAvailable(video)) {
+        clearPlaybackControls();
+        clearProgressBarHighlights();
+        return;
+    }
     updateProgressBarHighlights();
     for (const segment of sponsoredSegments) {
         if (!segment.skipDisabled && video.currentTime >= segment.startTime && video.currentTime < segment.endTime - 0.1) {

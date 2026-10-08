@@ -6,10 +6,12 @@ import {nativeChrome}from'./native-chrome.mjs';
 import {resources,requireHeadroom,assertHeadroom}from'../../bench/resources.mjs';
 import {fileURLToPath}from'node:url';
 import {resolve}from'node:path';
+import {hash}from'../../bench/lib.mjs';
 const repo=fileURLToPath(new URL('../../',import.meta.url)),out=resolve(process.env.ETTIN_SMOKE_OUTPUT||repo+'/bench/local/extension-evidence'),mode=process.argv[2]||'gpu';
 if(!['gpu','cpu'].includes(mode))throw Error('Expected gpu or cpu mode');
 await mkdir(out,{recursive:true});
 const policy={maximumAccountMiB:28672,minimumAvailableMiB:4096},before=await requireHeadroom(policy),record={mode,policy,before,peakAccountMiB:before.accountMiB,startedAt:new Date().toISOString(),scope:'Installed production MV3 bundle, real model; synthetic English caption/player fixture. Network responses fulfilled only in this fresh browser. No public YouTube or held-out quality claim.'};
+record.sourceHashes={contentSource:hash(await readFile(repo+'/src/content.js')),contentBundle:hash(await readFile(repo+'/dist/content.js')),backgroundBundle:hash(await readFile(repo+'/dist/background.js')),smokeScript:hash(await readFile(fileURLToPath(import.meta.url)))};
 const f=JSON.parse(await readFile(repo+'/bench/fixtures/synthetic01.json'));
 const json3=JSON.stringify({events:f.cues.map(c=>({tStartMs:c.start*1000,dDurationMs:(c.end-c.start)*1000,segs:[{utf8:c.text}]}))});
 const mp4=await readFile(process.env.ETTIN_SMOKE_MEDIA||repo+'/bench/local/ettin-fixture.mp4');
@@ -67,6 +69,11 @@ try{
  await evalAt(pageSid,"document.querySelector('video').pause();document.querySelector('video').currentTime=1.5;document.querySelector('video').dispatchEvent(new Event('timeupdate'));document.querySelector('#result').textContent="+JSON.stringify('PASS: '+cache.backend+' graph inference; '+cache.segments.length+' paid-sponsor suggestions; full local MV3 messaging/cache flow.'));
  execFileSync('agent-browser',['--session','ettin-extension','screenshot',out+'/ettin-extension-'+mode+'.png'],{stdio:'inherit'});
  for(let i=0;i<50;i++){if(await evalAt(pageSid,"!document.querySelector('video').seeking && Math.abs(document.querySelector('video').currentTime-1.5)<.01"))break;await new Promise(r=>setTimeout(r,50));}
+ const adClock=await evalAt(pageSid,"(()=>{const p=document.querySelector('#movie_player'),v=document.querySelector('video');p.classList.add('ad-showing');v.dispatchEvent(new Event('timeupdate'));return {time:v.currentTime,suggestionPresent:!!document.querySelector('#sponsor-skip-suggestion button'),highlights:document.querySelectorAll('.sponsored-segment-highlight').length};})()");
+ if(adClock.suggestionPresent||adClock.highlights||Math.abs(adClock.time-1.5)>.01)throw Error('Synthetic platform-ad clock retained content controls');
+ const resumed=await evalAt(pageSid,"(()=>{const p=document.querySelector('#movie_player'),v=document.querySelector('video');p.classList.remove('ad-showing');v.dispatchEvent(new Event('timeupdate'));return {time:v.currentTime,suggestionPresent:!!document.querySelector('#sponsor-skip-suggestion button')};})()");
+ record.syntheticAdClock={duringAd:adClock,resumedContent:resumed};
+ if(!resumed.suggestionPresent||Math.abs(resumed.time-1.5)>.01)throw Error('Synthetic content suggestion did not resume after platform ad');
  const beforeSkip=await evalAt(pageSid,"document.querySelector('video').currentTime");
  const barClick=await evalAt(pageSid,"(()=>{const b=document.querySelector('.ytp-progress-bar'),r=b.getBoundingClientRect(),v=document.querySelector('video');return {x:r.x+r.width*v.currentTime/v.duration,y:r.y+r.height/2};})()");
  await c.call('Input.dispatchMouseEvent',{type:'mousePressed',...barClick,button:'left',clickCount:1},pageSid);

@@ -231,3 +231,41 @@ from the successful synthetic installed checks. No fresh validation predictions
 were produced and no registered fixture was replaced.
 
 [Caption-free failed public runtime records](ettin-evidence/live-public-playback-diagnostics.json).
+
+## Platform-ad clocks and independent public playback control
+
+Public diagnostics exposed a different clock during preroll/midroll ads. A
+content sponsor interval can overlap that platform ad's time even though it
+belongs to the actual video. The content script now suppresses sponsor controls
+and highlights while the player has `ad-showing`, or media metadata/duration is
+unavailable or the media reports an error. Retained Skip/Undo handlers reject
+those states before seeking or opting out. Suggestions return on usable content
+playback. This changes manual controls, not model inference or operating points.
+
+Six regressions failed before the fix, including both retained buttons. The full
+current suite passes 178/178 with no skips. The real-weight build passes with two
+asset-size warnings. Rebuilt installed native Apple WebGPU and explicit
+GPU-disabled WASM smokes both suppress controls during a simulated platform ad,
+restore them when content resumes, retain the suggestion after timeline input,
+and pass manual Skip 1.5 → 8 seconds and Undo to 1.5 seconds. Result files include
+SHA-256 for the actual content source, content/background bundles and smoke
+script. These checks use synthetic captions/media and a simulated ad marker,
+with diagnostic confidence 0.7. Production remains 0.8 and manual only.
+
+A separate fresh headed native Chrome control loaded no task extension or
+model. The launch disabled extensions and the recorded extension target list
+was empty. Agent-browser dismissed the visible cookie dialog, let the natural
+preroll finish and confirmed actual content at duration 802.101, readyState 4.
+Native YouTube timeline input sought toward 721.355 seconds. The source then
+reported the same player error as the installed public attempt, with readyState
+0, no finite media duration and captured HTTP 403/ERR_ABORTED media responses.
+This proves that this player error can occur without our extension. It does not
+establish the exact cause of the earlier installed errors or prove live public
+Skip/Undo. Captions, media query strings and authentication are absent from the
+export. No response interception, model inference or fresh holdout exposure
+occurred in this control. Earlier failed driver/consent/component-guard attempts
+remain private and do not support the control conclusion. All owned browsers
+and profiles were closed after each run.
+
+- [No-extension control metadata](ettin-evidence/public-no-extension-control.json).
+- [Actual source player error](ettin-evidence/public-no-extension-seek.png).

@@ -14,7 +14,9 @@ function fixture(settings = { isEnabled: true }) {
         removeEventListener(type, handler) { if (this.events[type] === handler) delete this.events[type]; }
         click(clientX = 120) { this.events.click?.({ currentTarget: this, clientX }); }
     }
+    const adClasses = new Set();
     const player = new Element('player'), video = new Element('video'), bar = new Element('bar');
+    player.classList = {contains: name => adClasses.has(name)};
     Object.assign(bar, {clientWidth:1200, getBoundingClientRect:()=>({left:100,width:1200})}); player.appendChild(bar);
     Object.assign(video, { readyState: 1, duration: 120, currentTime: 1.5, src: 'first' });
     const all = () => { const result = []; const visit = node => { result.push(node); node.children.forEach(visit); }; visit(player); return result; };
@@ -25,14 +27,14 @@ function fixture(settings = { isEnabled: true }) {
         document: { body: {}, createElement: tag => new Element(tag),
             getElementById: id => all().find(node => node.id === id) || null,
             querySelector: selector => selector === 'video' ? video : selector === '#movie_player' ? player : selector === '.ytp-progress-bar' ? bar : null,
-            querySelectorAll: () => [],
+            querySelectorAll: selector => selector === '.sponsored-segment-highlight' ? all().filter(node => node.className === 'sponsored-segment-highlight') : [],
         },
         chrome: { storage: { sync: { get: async () => settings }, onChanged: { addListener(fn) { changed = fn; } } },
             runtime: { onMessage: { addListener(fn) { message = fn; } }, sendMessage(request, callback) { callback?.({ segments: [] }); } },
         },
     });
     vm.runInContext(source, context);
-    return { context, video, bar, all, change: updates => changed(updates, 'sync'), message,
+    return { context, video, bar, all, ad: on => on ? adClasses.add('ad-showing') : adClasses.delete('ad-showing'), change: updates => changed(updates, 'sync'), message,
         run: code => vm.runInContext(code, context),
         add: () => vm.runInContext("addSponsoredSegment({startTime:1,endTime:4,label:'synthetic sponsor'})", context),
         check: () => vm.runInContext('checkForSponsorBlock()', context),
@@ -99,4 +101,44 @@ test('seeking into a sponsor interval keeps the manual suggestion, while explici
     f.bar.click(120); f.check();
     assert.equal(f.button('Skip suggestion'), undefined, 'Explicit Undo remains an opt-out');
     assert.equal(f.video.currentTime, 2);
+});
+
+
+test('platform-ad time never becomes a content sponsor suggestion', async () => {
+    const f = fixture(); f.ad(true); await ready(f);
+    assert.equal(f.video.currentTime, 1.5);
+    assert.equal(f.button('Skip suggestion'), undefined);
+    assert.equal(f.all().filter(node => node.className === 'sponsored-segment-highlight').length, 0);
+    f.ad(false); f.check();
+    assert.ok(f.button('Skip suggestion'), 'Content suggestion resumes after the platform ad');
+});
+
+test('a retained content Skip cannot seek a platform ad in the reused media element', async () => {
+    const f = fixture(); await ready(f); const skip = f.button('Skip suggestion');
+    f.ad(true); skip.click();
+    assert.equal(f.video.currentTime, 1.5);
+    f.check(); assert.equal(f.button('Skip suggestion'), undefined);
+    f.ad(false); f.check(); assert.ok(f.button('Skip suggestion'));
+});
+
+test('a retained Undo cannot seek a platform ad or mark content as opted out', async () => {
+    const f = fixture(); await ready(f); f.button('Skip suggestion').click();
+    const undo = f.button('Undo'); f.ad(true); f.video.currentTime = 2; undo.click();
+    assert.equal(f.video.currentTime, 2);
+    f.check(); assert.equal(f.button('Undo'), undefined);
+    f.ad(false); f.check(); assert.ok(f.button('Skip suggestion'));
+});
+
+for (const [name, unavailable] of [
+    ['empty media', {readyState:0}],
+    ['invalid duration', {duration:NaN}],
+    ['media error', {error:{code:2}}],
+]) test(`${name} removes controls and rejects retained Skip and Undo`, async () => {
+    const f = fixture(); await ready(f); const skip = f.button('Skip suggestion');
+    Object.assign(f.video, unavailable); skip.click();
+    assert.equal(f.video.currentTime, 1.5); f.check();
+    assert.equal(f.button('Skip suggestion'), undefined);
+    const g = fixture(); await ready(g); g.button('Skip suggestion').click();
+    const undo = g.button('Undo'); Object.assign(g.video, unavailable); undo.click();
+    assert.equal(g.video.currentTime, 4); g.check(); assert.equal(g.button('Undo'), undefined);
 });
