@@ -56,7 +56,36 @@ unchanged by this development work and matches the exported original ledger.
 Six additional failure-first ledger regressions pass, including byte-identical
 preservation of a separate original history, compatible backend attempts,
 changed config/selection rejection, corrupt JSON and duplicate run protection.
-The complete suite will be rerun after the sequential acquisition browser closes.
-A blind [human review template](https://github.com/feuerdev/yt-sponsor-detect/blob/feat/sponsor-browser-benchmark/bench/datasets/category-policy.json)
+After all sequential acquisition browsers closed, the complete suite passed
+**158/158** tests with zero skips and actual Chrome checks under the same guards.
+A blind human review template following the [category policy](../bench/datasets/category-policy.json)
 has been prepared privately for the selected videos; all reviewed intervals and
 reviewer fields remain pending. No human review or fresh accuracy is claimed.
+
+## Completed first acquisition pass
+
+The fixed eighteen-video pass completed with **3 acquired transcripts and 15
+failures**. All three successful tracks are automatic English captions from
+ElectroBOOM: one sponsor-positive full video and two short science clips. The
+nine fresh validation tracks are all unavailable. Their absence supplies no
+accuracy evidence or negative labels, and no fresh validation predictions have
+been exposed. They stay in the selection for later source recovery; they are
+not replaced by easier videos.
+
+The acquired development tracks add one provisional paid reference from a new
+channel. A separate combined development manifest contains only the original
+thirty tune IDs and the nine newly registered tune IDs: thirteen acquired tracks,
+four sponsor-positive channels and nine scorable paid references. It contains
+no test entries and is still not an independent quality evaluation.
+
+A targeted retry of the latest DIY Perks video inspected the actual public UI.
+The Transcript tab was already selected, with zero caption rows. Chrome observed
+HTTP **400** from `/youtubei/v1/get_transcript`. This corroborates the empty-panel
+transport failure; no alternate client or direct endpoint replay was attempted.
+The retry failure and original eighteen attempts remain separate preserved
+records. Raw panel data/captions, profiles and request parameters stay private.
+[Caption-free acquisition evidence](ettin-evidence/fresh-channel-acquisition.json).
+
+Peak same-UID RSS was **26,017.156 MiB** within the unchanged guard. The sequential
+task-owned browsers and profiles closed. Fresh accuracy, resolved categories,
+campaign checks and reviewed ordinary exposure remain pending.

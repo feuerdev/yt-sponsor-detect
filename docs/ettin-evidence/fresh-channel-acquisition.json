@@ -1,0 +1,255 @@
+{
+  "schemaVersion": 1,
+  "selectionHash": "3016fee3f5c0c6ea3405127f3ca66ea261df148d8e6032cdb32c004d93688eb0",
+  "registeredPlanHash": "21c40b64bc81d0d30d9559ceebc3372f5269569231aa9d1e5e00976814a435b9",
+  "scope": "Caption acquisition only, extension model detection disabled. No validation predictions or exposed test reads.",
+  "selected": 18,
+  "available": 3,
+  "failures": 15,
+  "tune": {
+    "selected": 9,
+    "available": 3,
+    "scorablePaidReferences": 1,
+    "paidPositiveChannels": 1
+  },
+  "test": {
+    "selected": 9,
+    "available": 0,
+    "testExposure": "none"
+  },
+  "resourcePolicy": {
+    "maximumAccountMiB": 28672,
+    "minimumAvailableMiB": 4096
+  },
+  "peakAccountMiB": 26017.15625,
+  "attempts": [
+    {
+      "videoId": "RpslsMqPFWA",
+      "channelId": "UCj1VqrHhDte54oLgPG4xpuQ",
+      "split": "test",
+      "startedAt": "2026-10-08T12:45:51.206Z",
+      "finishedAt": "2026-10-08T12:46:27.456Z",
+      "stage": "transcript-capture",
+      "status": "failure",
+      "peakAccountMiB": 25831.734375,
+      "error": "Public UI timeout"
+    },
+    {
+      "videoId": "2OfjZ3ORJfc",
+      "channelId": "UCj1VqrHhDte54oLgPG4xpuQ",
+      "split": "test",
+      "startedAt": "2026-10-08T12:46:27.457Z",
+      "finishedAt": "2026-10-08T12:47:03.968Z",
+      "stage": "transcript-capture",
+      "status": "failure",
+      "peakAccountMiB": 25795.828125,
+      "error": "Public UI timeout"
+    },
+    {
+      "videoId": "JQB8aNKyeao",
+      "channelId": "UCj1VqrHhDte54oLgPG4xpuQ",
+      "split": "test",
+      "startedAt": "2026-10-08T12:47:03.969Z",
+      "finishedAt": "2026-10-08T12:47:40.312Z",
+      "stage": "transcript-capture",
+      "status": "failure",
+      "peakAccountMiB": 25945.734375,
+      "error": "Public UI timeout"
+    },
+    {
+      "videoId": "4VnCJdYImb8",
+      "channelId": "UCUQo7nzH1sXVpzL92VesANw",
+      "split": "tune",
+      "startedAt": "2026-10-08T12:47:40.313Z",
+      "finishedAt": "2026-10-08T12:48:16.869Z",
+      "stage": "transcript-capture",
+      "status": "failure",
+      "peakAccountMiB": 25795.65625,
+      "error": "Public UI timeout"
+    },
+    {
+      "videoId": "7FStfdGjAwc",
+      "channelId": "UCUQo7nzH1sXVpzL92VesANw",
+      "split": "tune",
+      "startedAt": "2026-10-08T12:48:16.870Z",
+      "finishedAt": "2026-10-08T12:48:53.486Z",
+      "stage": "transcript-capture",
+      "status": "failure",
+      "peakAccountMiB": 25876.34375,
+      "error": "Public UI timeout"
+    },
+    {
+      "videoId": "rqCt61ZbU10",
+      "channelId": "UCUQo7nzH1sXVpzL92VesANw",
+      "split": "tune",
+      "startedAt": "2026-10-08T12:48:53.486Z",
+      "finishedAt": "2026-10-08T12:49:30.299Z",
+      "stage": "transcript-capture",
+      "status": "failure",
+      "peakAccountMiB": 25973.3125,
+      "error": "Public UI timeout"
+    },
+    {
+      "videoId": "Tuxgh8SrzbQ",
+      "channelId": "UCJ0-OtVpF0wOKEqT2Z1HEtA",
+      "split": "tune",
+      "startedAt": "2026-10-08T12:49:30.300Z",
+      "finishedAt": "2026-10-08T12:49:37.249Z",
+      "stage": "private-import",
+      "status": "ok",
+      "peakAccountMiB": 25614.40625,
+      "cues": 102,
+      "captionType": "automatic",
+      "scorablePaidReferences": 1,
+      "disputedReferences": 0
+    },
+    {
+      "videoId": "DWAMwfM2DrM",
+      "channelId": "UCJ0-OtVpF0wOKEqT2Z1HEtA",
+      "split": "tune",
+      "startedAt": "2026-10-08T12:49:37.249Z",
+      "finishedAt": "2026-10-08T12:49:43.770Z",
+      "stage": "private-import",
+      "status": "ok",
+      "peakAccountMiB": 25603.1875,
+      "cues": 9,
+      "captionType": "automatic",
+      "scorablePaidReferences": 0,
+      "disputedReferences": 0
+    },
+    {
+      "videoId": "-TvOCDbhCWk",
+      "channelId": "UCJ0-OtVpF0wOKEqT2Z1HEtA",
+      "split": "tune",
+      "startedAt": "2026-10-08T12:49:43.771Z",
+      "finishedAt": "2026-10-08T12:49:51.673Z",
+      "stage": "private-import",
+      "status": "ok",
+      "peakAccountMiB": 25633.0625,
+      "cues": 8,
+      "captionType": "automatic",
+      "scorablePaidReferences": 0,
+      "disputedReferences": 0
+    },
+    {
+      "videoId": "WrCjAAl9okA",
+      "channelId": "UCsBjURrPoezykLs9EqgamOA",
+      "split": "test",
+      "startedAt": "2026-10-08T12:49:51.674Z",
+      "finishedAt": "2026-10-08T12:50:28.127Z",
+      "stage": "transcript-button",
+      "status": "failure",
+      "peakAccountMiB": 25902.46875,
+      "error": "Public UI timeout"
+    },
+    {
+      "videoId": "_5p1_TNSWqQ",
+      "channelId": "UCsBjURrPoezykLs9EqgamOA",
+      "split": "test",
+      "startedAt": "2026-10-08T12:50:28.128Z",
+      "finishedAt": "2026-10-08T12:51:04.948Z",
+      "stage": "transcript-capture",
+      "status": "failure",
+      "peakAccountMiB": 25772.421875,
+      "error": "Public UI timeout"
+    },
+    {
+      "videoId": "No-JPdFvYWU",
+      "channelId": "UCsBjURrPoezykLs9EqgamOA",
+      "split": "test",
+      "startedAt": "2026-10-08T12:51:04.949Z",
+      "finishedAt": "2026-10-08T12:51:41.440Z",
+      "stage": "transcript-capture",
+      "status": "failure",
+      "peakAccountMiB": 25899.828125,
+      "error": "Public UI timeout"
+    },
+    {
+      "videoId": "5OcnO7U0VeA",
+      "channelId": "UCFhXFikryT4aFcLkLw2LBLA",
+      "split": "tune",
+      "startedAt": "2026-10-08T12:51:41.441Z",
+      "finishedAt": "2026-10-08T12:52:17.412Z",
+      "stage": "transcript-capture",
+      "status": "failure",
+      "peakAccountMiB": 25804,
+      "error": "Public UI timeout"
+    },
+    {
+      "videoId": "K56LuXCQ0ik",
+      "channelId": "UCFhXFikryT4aFcLkLw2LBLA",
+      "split": "tune",
+      "startedAt": "2026-10-08T12:52:17.413Z",
+      "finishedAt": "2026-10-08T12:52:53.661Z",
+      "stage": "transcript-capture",
+      "status": "failure",
+      "peakAccountMiB": 25957.765625,
+      "error": "Public UI timeout"
+    },
+    {
+      "videoId": "ID-K64Jk6JM",
+      "channelId": "UCFhXFikryT4aFcLkLw2LBLA",
+      "split": "tune",
+      "startedAt": "2026-10-08T12:52:53.662Z",
+      "finishedAt": "2026-10-08T12:53:30.192Z",
+      "stage": "transcript-capture",
+      "status": "failure",
+      "peakAccountMiB": 26017.15625,
+      "error": "Public UI timeout"
+    },
+    {
+      "videoId": "4ievxm-8P7E",
+      "channelId": "UC2rzsm1Qi6N1X-wuOg_p0Ng",
+      "split": "test",
+      "startedAt": "2026-10-08T12:53:30.193Z",
+      "finishedAt": "2026-10-08T12:54:06.122Z",
+      "stage": "transcript-capture",
+      "status": "failure",
+      "peakAccountMiB": 25780.96875,
+      "error": "Public UI timeout"
+    },
+    {
+      "videoId": "rk5a6DLCgcQ",
+      "channelId": "UC2rzsm1Qi6N1X-wuOg_p0Ng",
+      "split": "test",
+      "startedAt": "2026-10-08T12:54:06.123Z",
+      "finishedAt": "2026-10-08T12:54:42.262Z",
+      "stage": "transcript-capture",
+      "status": "failure",
+      "peakAccountMiB": 25916.796875,
+      "error": "Public UI timeout"
+    },
+    {
+      "videoId": "xTFbdQ5J39c",
+      "channelId": "UC2rzsm1Qi6N1X-wuOg_p0Ng",
+      "split": "test",
+      "startedAt": "2026-10-08T12:54:42.263Z",
+      "finishedAt": "2026-10-08T12:55:18.906Z",
+      "stage": "transcript-capture",
+      "status": "failure",
+      "peakAccountMiB": 25884.4375,
+      "error": "Public UI timeout"
+    }
+  ],
+  "targetedRetry": {
+    "videoId": "4VnCJdYImb8",
+    "status": "failure",
+    "stage": "transcript-capture",
+    "error": "Public UI timeout",
+    "transcriptResponses": [
+      {
+        "path": "/youtubei/v1/get_transcript",
+        "status": 400
+      }
+    ],
+    "peakAccountMiB": 25840.515625,
+    "startedAt": "2026-10-08T12:58:45.491Z",
+    "finishedAt": "2026-10-08T12:59:22.871Z"
+  },
+  "limitations": [
+    "No reviewed negative exposure",
+    "No acquired fresh validation captions",
+    "Upstream training and campaign overlap unknown",
+    "Failures retained; no replacements based on availability"
+  ]
+}
