@@ -126,5 +126,92 @@ the production algorithm. [Numeric record](ettin-evidence/overlap-study-disputed
 
 No automatic skipping or new production operating point is enabled. The next
 quality phase needs more sponsor-positive channels, resolved category disputes
-and reviewed ordinary exposure. Caption acquisition/live-extension behavior is
-a separate application requirement and remains to be verified.
+and reviewed ordinary exposure. The public-panel fallback has since passed actual installed-extension
+classification; live public-media Skip/Undo remains unverified. See
+[application evidence](ettin-integration.md).
+
+## Ten-track development sample
+
+A further public acquisition pass tried 22 remaining tuning videos, acquiring
+only two more tracks; the 20 transport/metadata failures remain recorded. A
+fresh Mark Rober retry recovered a complete English transcript with an unknown
+selected caption type. A separate, tested development converter preserves that
+unknown type instead of guessing manual/automatic. The frozen importer and
+original manifest are unchanged. All added labels remain provisional, with no
+reviewed negative intervals. The recovered tracks include a six-cue short video.
+
+The private development sample now has ten tracks across seven channels, three
+paid-positive channels, eight scorable paid references and two disputed category
+references. The same registered 21 candidates were scored against fresh real
+Chrome INT8 tune logits on WebGPU and WASM (source `06a8899`). Both runs completed
+all ten available tracks; the twenty missing tracks remain explicit.
+
+| Operating point | Paid reference matches | Agreement precision | Agreement recall | Sponsor seconds covered |
+| --- | ---: | ---: | ---: | ---: |
+| Shipped Flow / 0.8, either backend | 5/8 | 0.833 | 0.625 | 64.18% |
+| All-tune selection, Flow / 0.95 | 4/8 | 1.000 | 0.500 | 57.05% |
+| Channel-held-out selection, either backend | 4/8 | 0.800 | 0.500 | 57.05% |
+
+Promotion again fails: too few references, low out-of-fold agreement precision,
+recall regression and no coverage improvement. The expanded result is weaker
+than the original sparse sample. It does not substantiate great accuracy.
+[Caption-free numeric record](ettin-evidence/overlap-study-ten-tracks.json).
+
+The missed short sponsor introductions and integrated third-party product pitch
+are below the shipped confidence threshold. The upstream Android model card
+uses 0.7, but merely lowering our threshold adds a suggestion overlapping a
+provisional self-promotion reference and more unknown time. This finding motivates
+a separately registered, development-only self-sponsorship policy experiment;
+it does not authorize a threshold change or reclassifying uncertain references.
+The pinned model card explicitly targets external paid sponsors and treats
+self-promotion as negative. [Pinned upstream model card](https://huggingface.co/CuriousDragon/ettin-17m-sponsor-combined-android/blob/d4939256c49e92d158429a55fcf39477d003dd58/README.md).
+
+Inference peak same-UID RSS was 24,864.0 MiB on GPU and 24,788.0 MiB on CPU,
+within the unchanged 28,672/4,096 MiB guard policy. The converter and existing
+suite passed 140/140 tests with real Chrome checks and zero skips. Original
+frozen benchmark files, exposed test history and production decoder remain
+unchanged.
+
+## Explicit self-sponsorship policy experiment
+
+A separate three-point [plan](../bench/experiments/ettin-self-sponsor-v1.json)
+was committed at `fed03cc` before scoring: baseline Flow/0.8, Flow/0.8 with a
+self-sponsorship veto, and Flow/0.7 with that veto. The hypothesis was conceived
+after qualitative tuning inspection, so even channel exclusion is development
+evidence; it is not independent validation.
+
+The filter acts only after the complete transcript has reached the model. It
+rejects an affirmative first-person self-sponsored clause in complete caption
+cues wholly inside a predicted span. Quoted speech is ignored, negations and
+third-person discussion do not match, and explicit third-party attribution
+preserves mixed promotions conservatively. There are no creator/brand rules,
+position cutoffs, duration cutoffs or reference-label inputs. This narrow policy
+cannot identify every self-promotion or resolve ambiguous memberships.
+
+At 0.7 it removed one prediction overlapping 39.706 seconds of a provisional
+self-promotion reference on both backends. It did not remove any known paid
+reference match. The complete three-candidate results are retained:
+
+| Development point | Paid matches | Agreement precision | Agreement F1 | Sponsor seconds covered | Unknown predicted seconds |
+| --- | ---: | ---: | ---: | ---: | ---: |
+| Baseline / 0.8, either backend | 5/8 | 0.833 | 0.714 | 64.18% | 102.633 |
+| Veto / 0.8, either backend | 5/8 | 0.833 | 0.714 | 64.18% | 102.633 |
+| Veto / 0.7, GPU | 8/8 | 0.889 | 0.941 | 86.56% | 119.344 |
+| Veto / 0.7, CPU | 8/8 | 0.800 | 0.889 | 86.56% | 178.690 |
+| Channel-held-out selection, either backend | 5/8 | 0.833 | 0.714 | 64.18% | 102.633 |
+
+The CPU-only additional low-threshold interval concerns a product discussion;
+it is unreviewed and remains unknown. The disputed category prediction is also
+preserved. Neither is reclassified to improve the score. Conservative selection
+on excluded channels provides no improvement, with too few references and
+agreement precision below the fixed gate. Production retains Flow/0.8; this
+filter is not imported into the extension. Automatic skipping remains disabled.
+[Full caption-free policy record](ettin-evidence/self-sponsor-study.json).
+
+Six failure-first policy tests cover affirmative and split-cue declarations,
+negation, quoted/third-person speech, mixed external sponsorship, cue containment,
+input immutability and malformed inputs. The full suite passed 146/146 with zero
+skips and actual Chrome environment checks. Policy scoring reused authenticated
+v6 tune logits, never old test predictions or new Node/cloud inference. Reviewed
+negative exposure, resolved disputes and a fresh unseen-channel holdout remain
+necessary for a stronger quality claim.
