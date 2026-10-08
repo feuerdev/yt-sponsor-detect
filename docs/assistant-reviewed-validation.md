@@ -36,3 +36,7 @@ Import the private original sources with `bench/review-import.mjs --review-kind 
 Run `bench/run.mjs` with the imported manifest and frozen config, `--model ettin-int8`, backend `webgpu` or `wasm`, and split `tune` or `test`. Test runs must use the bound `--test-ledger`. Use the native Chrome path and the established Mac resource guards. Results include all selected acquisition failures. Once test exposure exists, reference import into that cohort is rejected.
 
 Sources: [sb-mirror README](https://github.com/mchangrh/sb-mirror), [official API documentation](https://wiki.sponsor.ajay.app/w/API_Docs), [VIP review and lock guidance](https://wiki.sponsor.ajay.app/w/VIP_Guide). No mirror was downloaded or used for these five-video results.
+
+## Regression validation
+
+Three new failure-first importer tests cover the explicit LLM route, transcript attestation without human impersonation, and retained source/conflict/exposure guards. The pending-human CLI rejection remains compatible. The complete repository suite passed **181/181** tests with no skips, including real Chrome controller/network checks under the same resource limits. `git diff --check` passed. This update changes benchmark import/evidence only; the application model, decoding and bundles are unchanged.

@@ -90,3 +90,7 @@ sources and three provisional validation paid references do not establish strong
 general accuracy. Broader positive coverage, uncertainty estimates, campaign
 checks and an independent fresh test remain necessary. Production still uses
 Flow/0.8 and manual controls only.
+
+## Separate assistant-review alternative
+
+The user later explicitly authorized the assistant's transcript reasoning as a separate reference source for these five videos. That is handled by `--review-kind llm`, with no human watch attestation. The original instructions above still apply to actual human audiovisual review. [Assistant labels, locked validation results and limits](assistant-reviewed-validation.md).
