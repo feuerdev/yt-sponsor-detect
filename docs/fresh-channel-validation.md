@@ -41,3 +41,22 @@ inference, using a separate exposure ledger that preserves the original ledger.
 Candidate budgets and selection rules remain those already registered. A common
 human reference version, reviewed ordinary exposure and campaign checks remain
 required for a release-quality claim.
+
+## Separate exposure lock
+
+`bench/run.mjs` now accepts `--test-ledger /absolute/path/to/fresh-ledger.json`
+for a genuinely fresh frozen cohort. Omitting it preserves the original
+`bench/local/test-ledger.json` default. An incompatible config/selection or corrupt
+existing history is rejected; the helper retains first-exposure time, previous
+attempt events and legacy provenance. A reused run ID is rejected. Events are
+recorded as **before-inference attempts**, not as completed model predictions.
+The ledger path is recorded in each test run's metadata. Original history is
+unchanged by this development work and matches the exported original ledger.
+
+Six additional failure-first ledger regressions pass, including byte-identical
+preservation of a separate original history, compatible backend attempts,
+changed config/selection rejection, corrupt JSON and duplicate run protection.
+The complete suite will be rerun after the sequential acquisition browser closes.
+A blind [human review template](https://github.com/feuerdev/yt-sponsor-detect/blob/feat/sponsor-browser-benchmark/bench/datasets/category-policy.json)
+has been prepared privately for the selected videos; all reviewed intervals and
+reviewer fields remain pending. No human review or fresh accuracy is claimed.

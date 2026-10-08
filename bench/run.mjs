@@ -5,6 +5,7 @@ import os from 'node:os';
 import path from 'node:path';
 import {args,root,readJson,save,hash,fixtureFor} from './lib.mjs';
 import {validateManifest,validateFixture} from './contracts.mjs';
+import {lockTestExposure} from './test-exposure-lock.mjs';
 import {resources,requireHeadroom,resourcePolicy,assertHeadroom} from './resources.mjs';
 import {verifyAssets} from '../scripts/model-assets.mjs';
 import {createServer,staticResponse} from './serve.mjs';
@@ -23,11 +24,12 @@ const frozen=options.config?await readJson(options.config):null;
 if(split==='test'&&!frozen)throw new Error('Test runs require frozen configuration');
 if(frozen&&frozen.fixtureSetHash!==hash(manifest.videos.map(v=>[v.videoId,v.fixtureHash||null])))throw new Error('Frozen fixture set mismatch');
 if(frozen&&(frozen.selectionHash!==manifest.selectionHash||frozen.registryHash!==hash(registry)))throw new Error('Frozen registry/split mismatch');
-if(split==='test'){const ledgerPath='bench/local/test-ledger.json';let ledger;try{ledger=await readJson(ledgerPath);}catch(e){if(e.code!=='ENOENT')throw e;}if(ledger&&ledger.frozenHash!==hash(frozen))throw new Error('Locked test already evaluated with a different config; create a fresh holdout');await save(ledgerPath,{frozenHash:hash(frozen),selectionHash:manifest.selectionHash,firstTestAt:ledger?.firstTestAt||new Date().toISOString(),policy:'Test errors must not tune this holdout'});}
+const testLedgerPath=options['test-ledger']||'bench/local/test-ledger.json';
 const config=frozen?.models?.[`${spec.id}/${backend}`]?.config||spec.decoding;
 if(split==='test'&&!frozen?.models?.[`${spec.id}/${backend}`])throw new Error('Candidate missing from frozen configuration');
 const runId=options['run-id']||new Date().toISOString().replace(/[:.]/g,'-')+'-'+spec.id+'-'+backend;
 if(!/^[A-Za-z0-9_-]+$/.test(runId))throw new Error('Unsafe run ID');
+if(split==='test')await lockTestExposure({file:testLedgerPath,frozen,selectionHash:manifest.selectionHash,runId});
 const directory=path.join(root,'bench/results',runId);await mkdir(path.dirname(directory),{recursive:true});await mkdir(directory,{recursive:false});
 const initial=await requireHeadroom(policy);
 const setup=await readJson('bench/local/setup.json');
@@ -35,7 +37,7 @@ const commit=execFileSync('git',['rev-parse','HEAD'],{cwd:root,encoding:'utf8'})
 const sourceDiff=execFileSync('git',['diff','--binary','HEAD'],{cwd:root,encoding:'utf8'});
 const sourceFiles=execFileSync('git',['ls-files','--others','--exclude-standard','bench'],{cwd:root,encoding:'utf8'}).trim().split('\n').filter(Boolean);
 const untrackedHashes=[];for(const file of sourceFiles)untrackedHashes.push([file,hash(await readFile(path.join(root,file)))]);
-const meta={schemaVersion:1,runId,startedAt:new Date().toISOString(),split,spec,config,manifestFile:options.manifest||(split==='smoke'?'bench/datasets/synthetic.json':'bench/datasets/pilot.json'),requestedBackend:backend,registryHash:hash(registry),selectionHash:manifest.selectionHash||null,manifestHash:hash(manifest),configHash:hash(config),
+const meta={schemaVersion:1,runId,testLedgerPath:split==='test'?testLedgerPath:null,startedAt:new Date().toISOString(),split,spec,config,manifestFile:options.manifest||(split==='smoke'?'bench/datasets/synthetic.json':'bench/datasets/pilot.json'),requestedBackend:backend,registryHash:hash(registry),selectionHash:manifest.selectionHash||null,manifestHash:hash(manifest),configHash:hash(config),
  inferenceKey:hash({spec,backend,fixtures:videos.map(v=>[v.videoId,v.fixtureHash]),runtime:setup.runtime,sourceDiffHash:hash(sourceDiff),untrackedHashes}),runtime:setup.runtime,repositoryCommit:commit,sourceDiffHash:hash(sourceDiff),untrackedSourceHashes:untrackedHashes,
  fixtureHashes:videos.map(v=>[v.videoId,v.fixtureHash||null]),host:{platform:os.platform(),arch:os.arch(),cpus:os.cpus().map(c=>c.model),totalMemoryBytes:os.totalmem()},
  memory:{policy,before:initial,peakAccountMiB:initial.accountMiB,minimumAvailableMiB:initial.availableMiB,method:initial.method,scope:initial.scope,gpuMemory:null},
