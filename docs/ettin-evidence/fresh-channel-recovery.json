@@ -1,0 +1,329 @@
+{
+  "schemaVersion": 1,
+  "recordedAt": "2026-10-08T13:43:02.493Z",
+  "selectionHash": "3016fee3f5c0c6ea3405127f3ca66ea261df148d8e6032cdb32c004d93688eb0",
+  "registeredPlanHash": "21c40b64bc81d0d30d9559ceebc3372f5269569231aa9d1e5e00976814a435b9",
+  "originalFirstPass": {
+    "selected": 18,
+    "available": 3,
+    "failures": 15,
+    "peakAccountMiB": 26017.15625,
+    "evidence": "fresh-channel-acquisition.json"
+  },
+  "regularChromeRecovery": {
+    "attempted": 15,
+    "acquired": 2,
+    "unavailableInObservedUI": 13,
+    "source": "Public rendered transcript DOM only",
+    "profileStateTransfer": false,
+    "externalUpload": false,
+    "modelInference": false,
+    "successes": [
+      {
+        "videoId": "RpslsMqPFWA",
+        "channelId": "UCj1VqrHhDte54oLgPG4xpuQ",
+        "split": "test",
+        "rows": 785,
+        "cues": 778,
+        "durationSeconds": 1765.741,
+        "captionType": "automatic",
+        "languageVerification": {
+          "isReliable": true,
+          "languages": [
+            {
+              "language": "en",
+              "percentage": 100
+            }
+          ]
+        },
+        "scorablePaidReferences": 1,
+        "disputedReferences": 0,
+        "rawSourceHash": "ee3277a067318d57454a1cc1c565f71995cb2dbfde3e1fa0c7017e7d1e61d8f2",
+        "fixtureHash": "9c2b12dd3ffe5683802d89e738f2b2d095e5b3cf5c791a802eb579d4c07f1865",
+        "media": {
+          "paused": true,
+          "readyState": 4
+        }
+      },
+      {
+        "videoId": "WrCjAAl9okA",
+        "channelId": "UCsBjURrPoezykLs9EqgamOA",
+        "split": "test",
+        "rows": 48,
+        "cues": 48,
+        "durationSeconds": 370,
+        "captionType": "unknown",
+        "languageVerification": {
+          "isReliable": true,
+          "languages": [
+            {
+              "language": "en",
+              "percentage": 100
+            }
+          ]
+        },
+        "scorablePaidReferences": 2,
+        "disputedReferences": 0,
+        "rawSourceHash": "2bf65f3ccf658db2160d47858134d11b589763fcc6adbdcfce7840c0c08d7b70",
+        "fixtureHash": "692890bc1ef228be2fc34c236c73a9a20636d30936f7c15a9452f7fb7cb54abe",
+        "media": {
+          "paused": false,
+          "readyState": 0
+        }
+      }
+    ],
+    "unavailableRecords": [
+      {
+        "videoId": "2OfjZ3ORJfc",
+        "channelId": "UCj1VqrHhDte54oLgPG4xpuQ",
+        "split": "test",
+        "method": "regular-Chrome-public-DOM",
+        "status": "unavailable-in-observed-UI",
+        "rows": 0,
+        "observationWindow": {
+          "first": "2026-10-08T13:35:00Z",
+          "last": "2026-10-08T13:40:45.350Z"
+        },
+        "exactPerAttemptTime": null,
+        "error": "Visible public transcript panel contained zero rows; row locator timed out",
+        "modelInference": false
+      },
+      {
+        "videoId": "JQB8aNKyeao",
+        "channelId": "UCj1VqrHhDte54oLgPG4xpuQ",
+        "split": "test",
+        "method": "regular-Chrome-public-DOM",
+        "status": "unavailable-in-observed-UI",
+        "rows": 0,
+        "observationWindow": {
+          "first": "2026-10-08T13:35:00Z",
+          "last": "2026-10-08T13:40:45.350Z"
+        },
+        "exactPerAttemptTime": null,
+        "error": "Visible public transcript panel contained zero rows; row locator timed out",
+        "modelInference": false
+      },
+      {
+        "videoId": "4VnCJdYImb8",
+        "channelId": "UCUQo7nzH1sXVpzL92VesANw",
+        "split": "tune",
+        "method": "regular-Chrome-public-DOM",
+        "status": "unavailable-in-observed-UI",
+        "rows": 0,
+        "observationWindow": {
+          "first": "2026-10-08T13:35:00Z",
+          "last": "2026-10-08T13:40:45.350Z"
+        },
+        "exactPerAttemptTime": null,
+        "error": "Visible public transcript panel contained zero rows; row locator timed out",
+        "modelInference": false
+      },
+      {
+        "videoId": "7FStfdGjAwc",
+        "channelId": "UCUQo7nzH1sXVpzL92VesANw",
+        "split": "tune",
+        "method": "regular-Chrome-public-DOM",
+        "status": "unavailable-in-observed-UI",
+        "rows": 0,
+        "observationWindow": {
+          "first": "2026-10-08T13:35:00Z",
+          "last": "2026-10-08T13:40:45.350Z"
+        },
+        "exactPerAttemptTime": null,
+        "error": "Visible public transcript panel contained zero rows; row locator timed out",
+        "modelInference": false
+      },
+      {
+        "videoId": "rqCt61ZbU10",
+        "channelId": "UCUQo7nzH1sXVpzL92VesANw",
+        "split": "tune",
+        "method": "regular-Chrome-public-DOM",
+        "status": "unavailable-in-observed-UI",
+        "rows": 0,
+        "observationWindow": {
+          "first": "2026-10-08T13:35:00Z",
+          "last": "2026-10-08T13:40:45.350Z"
+        },
+        "exactPerAttemptTime": null,
+        "error": "Visible public transcript panel contained zero rows; row locator timed out",
+        "modelInference": false
+      },
+      {
+        "videoId": "5OcnO7U0VeA",
+        "channelId": "UCFhXFikryT4aFcLkLw2LBLA",
+        "split": "tune",
+        "method": "regular-Chrome-public-DOM",
+        "status": "unavailable-in-observed-UI",
+        "rows": 0,
+        "observationWindow": {
+          "first": "2026-10-08T13:35:00Z",
+          "last": "2026-10-08T13:40:45.350Z"
+        },
+        "exactPerAttemptTime": null,
+        "error": "Visible public transcript panel contained zero rows; row locator timed out",
+        "modelInference": false
+      },
+      {
+        "videoId": "K56LuXCQ0ik",
+        "channelId": "UCFhXFikryT4aFcLkLw2LBLA",
+        "split": "tune",
+        "method": "regular-Chrome-public-DOM",
+        "status": "unavailable-in-observed-UI",
+        "rows": 0,
+        "observationWindow": {
+          "first": "2026-10-08T13:35:00Z",
+          "last": "2026-10-08T13:40:45.350Z"
+        },
+        "exactPerAttemptTime": null,
+        "error": "Visible public transcript panel contained zero rows; row locator timed out",
+        "modelInference": false
+      },
+      {
+        "videoId": "ID-K64Jk6JM",
+        "channelId": "UCFhXFikryT4aFcLkLw2LBLA",
+        "split": "tune",
+        "method": "regular-Chrome-public-DOM",
+        "status": "unavailable-in-observed-UI",
+        "rows": 0,
+        "observationWindow": {
+          "first": "2026-10-08T13:35:00Z",
+          "last": "2026-10-08T13:40:45.350Z"
+        },
+        "exactPerAttemptTime": null,
+        "error": "Visible public transcript panel contained zero rows; row locator timed out",
+        "modelInference": false
+      },
+      {
+        "videoId": "_5p1_TNSWqQ",
+        "channelId": "UCsBjURrPoezykLs9EqgamOA",
+        "split": "test",
+        "method": "regular-Chrome-public-DOM",
+        "status": "unavailable-in-observed-UI",
+        "rows": 0,
+        "observationWindow": {
+          "first": "2026-10-08T13:35:00Z",
+          "last": "2026-10-08T13:40:45.350Z"
+        },
+        "exactPerAttemptTime": null,
+        "error": "No visible Show transcript control after description expansion",
+        "modelInference": false
+      },
+      {
+        "videoId": "No-JPdFvYWU",
+        "channelId": "UCsBjURrPoezykLs9EqgamOA",
+        "split": "test",
+        "method": "regular-Chrome-public-DOM",
+        "status": "unavailable-in-observed-UI",
+        "rows": 0,
+        "observationWindow": {
+          "first": "2026-10-08T13:35:00Z",
+          "last": "2026-10-08T13:40:45.350Z"
+        },
+        "exactPerAttemptTime": null,
+        "error": "Visible public transcript panel contained zero rows; row locator timed out",
+        "modelInference": false
+      },
+      {
+        "videoId": "4ievxm-8P7E",
+        "channelId": "UC2rzsm1Qi6N1X-wuOg_p0Ng",
+        "split": "test",
+        "method": "regular-Chrome-public-DOM",
+        "status": "unavailable-in-observed-UI",
+        "rows": 0,
+        "observationWindow": {
+          "first": "2026-10-08T13:35:00Z",
+          "last": "2026-10-08T13:40:45.350Z"
+        },
+        "exactPerAttemptTime": null,
+        "error": "Visible public transcript panel contained zero rows; row locator timed out",
+        "modelInference": false
+      },
+      {
+        "videoId": "rk5a6DLCgcQ",
+        "channelId": "UC2rzsm1Qi6N1X-wuOg_p0Ng",
+        "split": "test",
+        "method": "regular-Chrome-public-DOM",
+        "status": "unavailable-in-observed-UI",
+        "rows": 0,
+        "observationWindow": {
+          "first": "2026-10-08T13:35:00Z",
+          "last": "2026-10-08T13:40:45.350Z"
+        },
+        "exactPerAttemptTime": null,
+        "error": "Visible public transcript panel contained zero rows; row locator timed out",
+        "modelInference": false
+      },
+      {
+        "videoId": "xTFbdQ5J39c",
+        "channelId": "UC2rzsm1Qi6N1X-wuOg_p0Ng",
+        "split": "test",
+        "method": "regular-Chrome-public-DOM",
+        "status": "unavailable-in-observed-UI",
+        "rows": 0,
+        "observationWindow": {
+          "first": "2026-10-08T13:35:00Z",
+          "last": "2026-10-08T13:40:45.350Z"
+        },
+        "exactPerAttemptTime": null,
+        "error": "Visible public transcript panel contained zero rows; row locator timed out",
+        "modelInference": false
+      }
+    ],
+    "languageVerificationProfiles": [
+      {
+        "policy": {
+          "maximumAccountMiB": 28672,
+          "minimumAvailableMiB": 4096
+        },
+        "peakAccountMiB": 25148.203125,
+        "completedAt": "2026-10-08T13:35:50.012Z",
+        "modelInference": false
+      },
+      {
+        "policy": {
+          "maximumAccountMiB": 28672,
+          "minimumAvailableMiB": 4096
+        },
+        "peakAccountMiB": 25853.515625,
+        "completedAt": "2026-10-08T13:40:02.595Z",
+        "modelInference": false
+      }
+    ],
+    "mismatchedExport": {
+      "videoId": "RpslsMqPFWA",
+      "builtInExportLanguage": "de-DE",
+      "visibleSelectedLanguage": "English (auto-generated)",
+      "action": "Discarded German export from English acquisition; saved actual visible English rows instead"
+    },
+    "headedIsolatedRetry": {
+      "videoId": "RpslsMqPFWA",
+      "status": "failure",
+      "publicTranscriptHTTPStatus": 400,
+      "evidence": "Private headed-probe.log"
+    },
+    "cleanup": "Task-owned regular tabs, loopback collector and isolated metadata Chrome profiles closed"
+  },
+  "current": {
+    "selected": 18,
+    "available": 5,
+    "tune": {
+      "selected": 9,
+      "available": 3
+    },
+    "test": {
+      "selected": 9,
+      "available": 2,
+      "scorablePaidReferences": 3,
+      "testExposure": "none",
+      "frozenConfiguration": null
+    }
+  },
+  "limitations": [
+    "Partial crowd references; no human-reviewed ordinary exposure",
+    "No fresh validation predictions; a fresh code/config/fixture freeze is required before inference",
+    "Source availability is limited; failed IDs remain selected without substitutions",
+    "Working regular-Chrome media is source evidence only; our extension was not installed there",
+    "Source timings are whole seconds with inferred end boundaries",
+    "Upstream training/channel/campaign overlap remains unknown"
+  ]
+}

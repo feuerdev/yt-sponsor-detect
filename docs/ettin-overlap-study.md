@@ -215,3 +215,18 @@ skips and actual Chrome environment checks. Policy scoring reused authenticated
 v6 tune logits, never old test predictions or new Node/cloud inference. Reviewed
 negative exposure, resolved disputes and a fresh unseen-channel holdout remain
 necessary for a stronger quality claim.
+
+## Thirteen-track registered development expansion
+
+The same fixed studies were repeated on a development-only snapshot containing
+thirteen acquired tracks from eight channels and nine provisional paid references.
+Shipped Flow/0.8 matched 6/9 and covered 69.9% of reference time. The overlap
+study's channel-held-out selection matched 5/9 with 64.0% coverage. The separate
+self-sponsorship filter at 0.7 matched 9/9 in-sample, but its channel-held-out
+selection returned the baseline 6/9 and 69.9% coverage. Neither passed promotion.
+Unknown suggestions remain unreviewed, and there is no ordinary-content safety
+rate. Production Flow/0.8 and manual-only controls remain unchanged.
+
+[Current results and fresh-source coverage](fresh-channel-validation.md).
+All earlier results above remain development evidence. No fresh validation
+predictions have been exposed.
