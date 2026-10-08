@@ -72,10 +72,34 @@ Failure-first regressions and the full Node suite pass (194 tests passed, three
 Chrome-controller tests skipped). The real-weight production build passes with
 the existing two asset-size warnings.
 
-The rebuilt automatic path still needs its installed test in the user's Chrome.
-Browser control explicitly blocks chrome://extensions, so the user has been
-asked to reload the existing extension there. Do not treat the earlier synthetic
-or manual-panel checks below as automatic acquisition or genuine Skip/Undo proof.
+The rebuilt extension now passed genuine public-video checks in the existing
+logged-in Chrome session after the user reloaded it. CC stayed off, no popup
+analysis was invoked, and the configured adblock settings were left unchanged.
+No page or network response was substituted.
+
+| Video | Navigation | Suggested interval (seconds) | Native seek before Skip | After Skip | After Undo |
+| --- | --- | --- | --- | --- | --- |
+| [Steve Mould](https://www.youtube.com/watch?v=NvkZaWLe0Sk) | Direct watch-page load | 718.355–785.641 | 721.876155 | 785.641 | 721.876155 |
+| [Prop Department](https://www.youtube.com/watch?v=PvTyTUkuem8) | Clicked a recommendation from YouTube home | 555.203–682 | 632.709999 | 682 | 632.709999 |
+
+Both videos played normally, acquired their transcript automatically and ended
+acquisition with the transcript panel closed. The home-to-watch check retained
+the original content-script load and exposed 302 rendered transcript rows.
+Native YouTube digit shortcuts deliberately sought into the suggested intervals
+for the control checks. Skip required a click, Undo restored the pre-skip time,
+and playback was paused during those control checks. A revisit to the first
+video returned one cached interval without reopening the transcript.
+
+These are acquisition, inference-delivery, cache and playback-control checks,
+not a new accuracy evaluation. Neither suggestion was independently annotated
+for this run. The actual inference backend and saved confidence preference were
+not inspected. The shipped default remains 0.8. The earlier synthetic checks
+remain separate evidence for controlled GPU/CPU runtime failures.
+
+[Sanitized results and tested source/build hashes](ettin-evidence/real-chrome-validation.json).
+Screenshots contain the public video player only, without account or recommendation details.
+
+![Real public-video Skip with Undo available](ettin-evidence/real-chrome-sponsor-skip.jpg)
 
 ## Earlier manual transcript fallback and validation
 
