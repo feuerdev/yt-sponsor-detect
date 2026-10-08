@@ -11,9 +11,9 @@ Before this switch, MobileBERT classified arbitrary label hypotheses on windows 
 It marked an entire positive window and coalesced overlapping windows. Tracks
 shorter than 20 cues and a final partial window could be omitted.
 
-English caption requests are analyzed automatically. The on-demand public-panel
-fallback requires reliable English content detection. Other or unidentified
-languages report unavailable.
+Watch-page loads and SPA navigation now trigger transcript acquisition without
+CC or popup actions. Native panel acquisition requires reliable English content
+detection. Other or unidentified languages report unavailable.
 Ettin analyzes every nonempty, valid speech cue in the acquired transcript. It
 normalizes text, maps tokens to cue times, processes 766 content tokens plus two
 special tokens with 128-token overlap, including the final partial window, and
@@ -42,7 +42,42 @@ caption upload. Concurrent jobs are serialized; the idle worker terminates after
 60 seconds, releasing its model. A 180-second request timeout terminates a stuck
 worker and reports unavailable. No inference executes in setup or Node tests.
 
-## Public transcript fallback
+## Automatic transcript acquisition
+
+The normal content-script cache request now starts acquisition on a miss. The
+MAIN-world extractor uses the native description transcript button independently
+of timedtext requests, polls for up to 15 seconds, and retains URL/player identity
+checks. It does not change CC or seek playback. A newly opened transcript is
+closed after capture unless the user interacts during recovery. Already-open
+transcripts and their searches remain owned by the user. Duplicate player
+rebindings reuse the current acquisition or analysis.
+
+The content script is installed on all YouTube paths so home-to-watch navigation
+works. Missing settings select the conservative sponsor-only 0.8 policy without
+requiring the popup. Invalid configured policies still remain invalid.
+
+Continued or sparse English tracks can now supply partial evidence. Coverage
+start/end is cached and shown on the video. For coarse partial tracks, the final
+cue without a known next boundary is omitted. Its words cannot be stretched over
+an unknown tail. Legacy explicit endpoints are preserved. Errors distinguish
+transcript acquisition, English eligibility and model/inference failures.
+
+Regression investigation on 2026-10-08 found genuine timedtext HTTP 200 responses
+with empty bodies in an isolated public profile. In the user's logged-in Chrome,
+NvkZaWLe0Sk played normally with CC off, and Show transcript displayed 101 visible
+rows. The previous installed extension stayed idle. These observations establish
+an acquisition gap. They do not establish a regression in Ettin inference.
+
+Failure-first regressions and the full Node suite pass (194 tests passed, three
+Chrome-controller tests skipped). The real-weight production build passes with
+the existing two asset-size warnings.
+
+The rebuilt automatic path still needs its installed test in the user's Chrome.
+Browser control explicitly blocks chrome://extensions, so the user has been
+asked to reload the existing extension there. Do not treat the earlier synthetic
+or manual-panel checks below as automatic acquisition or genuine Skip/Undo proof.
+
+## Earlier manual transcript fallback and validation
 
 If a caption URL is empty, open YouTube's complete public transcript panel and
 clear its search field. Click **Analyze open transcript** in the extension popup.

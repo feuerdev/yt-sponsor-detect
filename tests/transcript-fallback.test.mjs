@@ -56,3 +56,33 @@ test('an older empty caption response cannot clear a successful manual panel res
  const f=fixture();const old=f.captions({tabId:1,url:'https://www.youtube.com/api/timedtext?v=abcdefghijk&lang=en'});await tick();f.request();assert.equal((await f.finished())?.ok,true);
  f.fetching.resolve({ok:true,text:async()=>''});await old;assert.equal(f.state()?.captionProvenance.captionSource,'public-transcript-panel');assert.equal(f.messages.filter(m=>m.type==='ANALYSIS_ERROR').length,0);
 });
+
+test('normal watch-page cache request acquires captions without CC or popup actions',async()=>{
+ const f=fixture();
+ f.handler({type:'GET_CACHED_SEGMENTS',videoId:'abcdefghijk'},{id:'fixture',frameId:0,url:f.tab.url,tab:f.tab},()=>{});
+ for(let i=0;i<30&&!f.classifications.length;i++)await tick();
+ assert.equal(f.classifications.length,1);
+ assert.equal(f.reads[0].func,captureOpenTranscript);
+ assert.deepEqual(JSON.parse(JSON.stringify(f.reads[0].args)),['abcdefghijk',true]);
+ assert.equal(f.writes.length,1);
+});
+test('automatic caption acquisition deduplicates player rebindings',async()=>{
+ const f=fixture();f.scriptPending=deferred();
+ const sender={id:'fixture',frameId:0,url:f.tab.url,tab:f.tab};
+ f.handler({type:'GET_CACHED_SEGMENTS',videoId:'abcdefghijk'},sender,()=>{});await tick();
+ f.handler({type:'GET_CACHED_SEGMENTS',videoId:'abcdefghijk'},sender,()=>{});await tick();
+ assert.equal(f.reads.length,1);
+ f.scriptPending.resolve([{frameId:0,result:f.snapshot}]);await tick();await tick();
+ assert.equal(f.classifications.length,1);
+});
+test('foreign-page cache requests never open a transcript panel',async()=>{
+ const f=fixture();f.handler({type:'GET_CACHED_SEGMENTS',videoId:'abcdefghijk'},{id:'fixture',frameId:0,url:'https://example.com/',tab:{id:1,url:'https://example.com/'}},()=>{});
+ await tick();assert.equal(f.reads.length,0);
+});
+
+test('a content script originating on YouTube home can acquire after SPA navigation',async()=>{
+ const f=fixture();
+ f.handler({type:'GET_CACHED_SEGMENTS',videoId:'abcdefghijk'},{id:'fixture',frameId:0,url:'https://www.youtube.com/',tab:f.tab},()=>{});
+ for(let i=0;i<30&&!f.classifications.length;i++)await tick();
+ assert.equal(f.classifications.length,1);
+});

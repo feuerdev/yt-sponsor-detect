@@ -46,3 +46,7 @@ test('Ettin supports only sponsor and migrates legacy zero-shot thresholds',()=>
  assert.deepEqual(sponsorLabels([{name:'sponsor',threshold:.9,blocked:true}]),[{name:'sponsor',threshold:.9,blocked:true}]);
  assert.equal(sponsorLabels([{name:'selfpromo',threshold:.8,blocked:true}]),null);
 });
+
+test('a fresh install uses the conservative sponsor policy without opening the popup',()=>{
+ assert.deepEqual(sponsorLabels(null),[{name:'sponsor',threshold:.8,blocked:true}]);
+});

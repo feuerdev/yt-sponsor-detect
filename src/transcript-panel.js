@@ -1,8 +1,10 @@
 import {validateCaptions} from './caption-contract.js';
 
 // Serialized by chrome.scripting into MAIN. Keep this function self-contained.
-// Only reads the open public panel; never opens it, fetches, seeks or runs page text.
-export function captureOpenTranscript(videoId) {
+// Automatic acquisition uses YouTube's own transcript control without changing CC or playback.
+export function captureOpenTranscript(videoId, automatic=false) {
+    let capturedPanel=null;
+    function read() {
     try {
         const url=new URL(location.href),player=document.querySelector('#movie_player');
         if(url.protocol!=='https:' || url.hostname!=='www.youtube.com' || url.pathname!=='/watch'
@@ -13,7 +15,7 @@ export function captureOpenTranscript(videoId) {
         const candidates=[];
         for(const panel of document.querySelectorAll('ytd-engagement-panel-section-list-renderer')) {
             const rect=panel.getBoundingClientRect();
-            if(rect.width<=0 || rect.height<=0)continue;
+            if(rect.width<=0 || rect.height<=0 || panel.getAttribute?.('visibility')==='ENGAGEMENT_PANEL_VISIBILITY_HIDDEN')continue;
             const rows=[],seen=new WeakSet();let visited=0,characters=0,incomplete=false;
             function collect(value,depth=0) {
                 if(!value || typeof value!=='object')return;
@@ -34,15 +36,55 @@ export function captureOpenTranscript(videoId) {
             }
             collect(panel.data);
             if(rows.length) {
-                if(incomplete || panel.querySelector('input[type="search"], input#search')?.value?.trim())return null;
-                candidates.push({videoId,durationSeconds,rows});
+                if((incomplete&&!automatic) || panel.querySelector('input[type="search"], input#search')?.value?.trim())return null;
+                candidates.push({panel,snapshot:{videoId,durationSeconds,rows,...(incomplete?{incomplete:true}:{})}});
             }
         }
-        return candidates.length===1 ? candidates[0] : null;
+        if(candidates.length!==1)return null;
+        capturedPanel=candidates[0].panel;return candidates[0].snapshot;
     }catch{return null;}
+    }
+    if(!automatic)return read();
+    return (async()=>{
+        const sameVideo=()=>new URL(location.href).searchParams.get('v')===videoId;
+        const panels=()=>Array.from(document.querySelectorAll('ytd-engagement-panel-section-list-renderer'));
+        const visible=panel=>{const r=panel.getBoundingClientRect();return r.width>0&&r.height>0
+            && panel.getAttribute?.('visibility')!=='ENGAGEMENT_PANEL_VISIBILITY_HIDDEN';};
+        const transcriptPanel=panel=>!!panel.querySelector('ytd-transcript-renderer, transcript-view-model, transcript-segment-view-model, ytd-transcript-segment-renderer');
+        const alreadyOpen=panels().some(p=>visible(p)&&transcriptPanel(p));
+        let opened=false,interacted=false;
+        const interrupted=event=>{if(event.isTrusted)interacted=true;};
+        document.addEventListener('pointerdown',interrupted,true);
+        document.addEventListener('keydown',interrupted,true);
+        try {
+            const deadline=Date.now()+15000;
+            while(sameVideo() && Date.now()<deadline) {
+                const result=read();if(result)return result;
+                // An existing searched transcript belongs to the user. Never clear its search.
+                if(panels().some(p=>visible(p)&&p.querySelector('input[type="search"], input#search')?.value?.trim()))return null;
+                if(interacted&&!opened&&!alreadyOpen)return null;
+                if(!opened&&!alreadyOpen) {
+                    const button=document.querySelector('ytd-video-description-transcript-section-renderer button');
+                    if(button) {opened=true;button.click();continue;}
+                }
+                await new Promise(resolve=>setTimeout(resolve,200));
+            }
+            return null;
+        }finally {
+            document.removeEventListener('pointerdown',interrupted,true);
+            document.removeEventListener('keydown',interrupted,true);
+            if(opened && !interacted && sameVideo()) {
+                for(const panel of panels())if(visible(panel)) {
+                    // Scope restoration to a panel containing transcript rows, never another panel.
+                    if(panel===capturedPanel || transcriptPanel(panel))
+                        panel.querySelector('#visibility-button button')?.click();
+                }
+            }
+        }
+    })();
 }
 
-export function panelCaptions(snapshot,videoId,language) {
+export function panelCaptions(snapshot,videoId,language,{allowPartial=false}={}) {
     const unavailable=()=>{throw Error('captions_unavailable');};
     if(!snapshot || snapshot.videoId!==videoId || !Number.isFinite(snapshot.durationSeconds)
         || snapshot.durationSeconds<=0 || snapshot.durationSeconds>43200 || !Array.isArray(snapshot.rows)
@@ -60,15 +102,20 @@ export function panelCaptions(snapshot,videoId,language) {
     }
     // A visibly clipped/search result must not look like a completed full transcript.
     // Sparse tracks and long silent endings can safely remain unavailable.
-    if(rows[0].start>60 || duration-rows.at(-1).start>120)unavailable();
+    const partial=snapshot.incomplete===true || rows[0].start>60 || duration-(rows.at(-1).end??rows.at(-1).start)>120;
+    if(partial&&!allowPartial)unavailable();
+    // A final coarse cue has no defensible endpoint when the remaining track is unknown.
+    if(partial && rows.at(-1).end===undefined)rows.pop();
+    if(!rows.length)unavailable();
     const languages=language?.languages;
     if(language?.isReliable!==true || !Array.isArray(languages)
         || !languages.some(item=>item.language==='en'&&Number.isFinite(item.percentage)&&item.percentage>=90)
         || languages.some(item=>!Number.isFinite(item.percentage)||item.percentage<0||item.percentage>100
             || (item.language!=='en'&&item.language!=='und'&&item.percentage>=10)))throw Error('unsupported_language');
-    const captions=rows.map((row,i)=>({start:row.start,duration:(row.end??rows[i+1]?.start??duration)-row.start,text:row.text}));
+    const captions=rows.map((row,i)=>({start:row.start,duration:(row.end??rows[i+1]?.start??(partial?snapshot.rows.at(-1).start:duration))-row.start,text:row.text}));
     try{validateCaptions(captions);}catch{unavailable();}
     return {captions,provenance:{captionSource:'public-transcript-panel',captionTrackId:null,language:'en',
         languageVerification:'Chrome i18n.detectLanguage; reliable English >=90 percent',
-        timingResolutionSeconds:coarse?1:.001,endBoundaryMethod:coarse?'next cue start; final cue ends at video duration':'native panel startMs/endMs'}};
+        coverage:partial?'partial':'full',coverageStart:captions[0].start,coverageEnd:Math.max(...captions.map(c=>c.start+c.duration)),
+        timingResolutionSeconds:coarse?1:.001,endBoundaryMethod:coarse?(partial?'next known cue start; unknown final cue omitted':'next cue start; final cue ends at video duration'):'native panel startMs/endMs'}};
 }

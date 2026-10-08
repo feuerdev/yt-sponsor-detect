@@ -1,5 +1,6 @@
 export const DEFAULT_THRESHOLD = 0.8;
 export function sponsorLabels(labels) {
+    if(labels==null)return [{name:'sponsor',threshold:DEFAULT_THRESHOLD,blocked:true}];
     if (!Array.isArray(labels)) return null;
     const legacy = labels.find(label => label?.name === 'contains sponsored content');
     if (legacy && typeof legacy.blocked === 'boolean')

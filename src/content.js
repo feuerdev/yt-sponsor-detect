@@ -58,14 +58,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sponsoredSegments.length = 0;
     clearPlaybackControls();
     document.getElementById('sponsor-analysis-error')?.remove();
+    document.getElementById('sponsor-transcript-coverage')?.remove();
     clearProgressBarHighlights();
   } else if (request.type === "ANALYSIS_ERROR") {
     sponsoredSegments.length = 0;
     clearProgressBarHighlights();
     clearPlaybackControls();
-    showAnalysisError();
+    showAnalysisError(request.payload?.code);
   } else if (request.type === "ANALYSIS_STARTED") {
     document.getElementById('sponsor-analysis-error')?.remove();
+    showTranscriptCoverage(request.payload.captionProvenance);
     showAnalysisIndicator(request.payload.processed, request.payload.total);
   } else if (request.type === "ANALYSIS_PROGRESS") {
     updateAnalysisIndicator(request.payload.processed, request.payload.total);
@@ -186,15 +188,31 @@ function isCurrentPlayback(identity) {
         && identity.videoId === new URLSearchParams(window.location.search).get('v');
 }
 
-function showAnalysisError() {
+function showTranscriptCoverage(provenance) {
+    document.getElementById('sponsor-transcript-coverage')?.remove();
+    if(provenance?.coverage!=='partial' || !Number.isFinite(provenance.coverageStart)
+        || !Number.isFinite(provenance.coverageEnd))return;
+    const container=getNotificationContainer();if(!container)return;
+    const status=document.createElement('div');status.id='sponsor-transcript-coverage';status.setAttribute('role','status');
+    status.textContent=`Partial transcript analyzed: ${formatTime(provenance.coverageStart)}–${formatTime(provenance.coverageEnd)}. Other portions were not checked.`;
+    status.style.backgroundColor='rgba(0,0,0,0.8)';status.style.color='white';status.style.padding='8px';container.appendChild(status);
+}
+function showAnalysisError(code) {
     hideAnalysisIndicator();
+    document.getElementById('sponsor-transcript-coverage')?.remove();
     const container = getNotificationContainer();
     if (!container) return;
     document.getElementById('sponsor-analysis-error')?.remove();
     const status = document.createElement('div');
     status.id = 'sponsor-analysis-error';
     status.setAttribute('role', 'status');
-    status.textContent = 'Sponsor detection unavailable. Playback unchanged.';
+    status.textContent = ({
+        captions_unavailable:'YouTube transcript unavailable. Playback unchanged.',
+        unsupported_language:'Sponsor detection currently requires an English transcript. Playback unchanged.',
+        model_unavailable:'Sponsor model unavailable. Playback unchanged.',
+        inference_failed:'Sponsor analysis failed. Playback unchanged.',
+        invalid_output:'Sponsor analysis returned invalid results. Playback unchanged.',
+    })[code] || 'Sponsor detection unavailable. Playback unchanged.';
     status.style.backgroundColor = 'rgba(0,0,0,0.8)';
     status.style.color = 'white';
     status.style.padding = '8px';
@@ -353,6 +371,7 @@ function initializeVideoListener() {
             sponsoredSegments.length = 0;
             clearPlaybackControls();
             document.getElementById('sponsor-analysis-error')?.remove();
+            document.getElementById('sponsor-transcript-coverage')?.remove();
             clearProgressBarHighlights();
 
             if (videoId) {
@@ -365,7 +384,9 @@ function initializeVideoListener() {
                         console.error("Error getting cached segments:", chrome.runtime.lastError.message);
                         return;
                     }
+                    if(response?.cached)showTranscriptCoverage(response.captionProvenance);
                     if (response && response.segments && response.segments.length > 0) {
+                        showTranscriptCoverage(response.captionProvenance);
                         console.log(`Received ${response.segments.length} cached segments for video ${videoId}.`);
                         response.segments.forEach(addSponsoredSegment);
                         updateProgressBarHighlights();

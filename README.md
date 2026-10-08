@@ -6,18 +6,27 @@ The benchmark is provisional: 14/50 pilot captions, nine acquired test videos,
 and only one paid-sponsor holdout reference. See [integration and rights](docs/ettin-integration.md)
 and [benchmark evidence](docs/benchmark-evidence.md).
 
-The extension observes English caption requests, processes the complete transcript
-in overlapping token windows, caches estimated intervals and offers manual
-suggestions. Self-promotion and custom categories are unsupported. The popup
+The extension acquires a transcript automatically when a YouTube video loads,
+including navigation from the home page. It processes the available English
+transcript in overlapping token windows, caches estimated intervals and offers
+manual suggestions. Self-promotion and custom categories are unsupported. The popup
 controls enable, paid-sponsor suggestions and minimum confidence. Legacy
 zero-shot labels migrate to a sponsor-only policy; automatic opt-ins are ignored.
 
-Suggestions can be wrong or miss sponsors. When YouTube caption requests fail, open the public transcript panel, clear any
-transcript search and click **Analyze open transcript** in the popup. The fallback
-verifies English with Chrome language detection and reads the open panel only.
-Modern panel timestamps are approximate. Sparse, partial, ambiguous, live and
-non-English transcripts can remain unavailable. Inference uses bundled local assets; setup and YouTube
-need network access. No caption upload or remote model loading is implemented.
+Suggestions can be wrong or miss sponsors. Captions do not need to be enabled.
+On a cache miss, the extension uses YouTube's native transcript control, waits up
+to 15 seconds for its data, and closes a panel it opened if the user has not
+interacted with it. A transcript that was already open stays open. It does not
+change transcript searches, CC settings or playback. **Analyze open transcript**
+in the popup remains a manual retry option.
+
+Partial English transcripts are usable with a visible coverage notice. An
+unknown trailing cue is omitted rather than extended over missing transcript
+minutes. Modern panel timestamps are approximate. Missing, searched, ambiguous,
+live or non-English transcripts can remain unavailable, with specific transcript,
+language or model failure messages. Inference uses bundled local assets. Setup
+and YouTube need network access. No caption upload or remote model loading is
+implemented.
 A formal privacy/network review and independent accuracy evidence remain release
 gates. The project is UNLICENSED pending an owner decision; model weights and
 GPL-derived code have separate obligations before any distribution.
@@ -47,8 +56,7 @@ selects WASM. A GPU inference failure retries the full track once on CPU after
 releasing the GPU session. Invalid outputs remain failures. The idle worker
 releases its model after 60 seconds.
 
-Load `dist/` using `chrome://extensions` → Developer mode → Load unpacked in a
-disposable profile. Model files and generated `dist/` remain ignored. Reload a
+Load `dist/` using `chrome://extensions` → Developer mode → Load unpacked in your chosen Chrome profile. Model files and generated `dist/` remain ignored. Reload a
 video after changing detection settings or clearing suggestions, or analyze its
 open transcript from the popup.
 

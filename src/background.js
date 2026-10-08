@@ -32,7 +32,7 @@ function cacheCompleted(tabId, videoId, labels, tabData) {
 }
 async function writeCompletedCache(tabId, videoId, labels, tabData) {
     const key = tabData.policyKey || policyKey(labels);
-    const settings = await chrome.storage.sync.get({isEnabled: true, labels: []});
+    const settings = await chrome.storage.sync.get({isEnabled: true, labels: null});
     if (tabState[tabId] !== tabData || !settings.isEnabled || policyKey(settings.labels) !== key
         || !validSegments(tabData.foundSegments)) return;
     const cached = await chrome.storage.local.get(null);
@@ -67,7 +67,7 @@ async function processCaptions(tabId,videoId,labels) {
     tabData.isAnalyzing=true;
     let failed=false;
     const send=async(type,payload)=>{if(tabState[tabId]===tabData)await chrome.tabs.sendMessage(tabId,{type,videoId,payload}).catch(()=>{});};
-    await send('ANALYSIS_STARTED',{total:0,processed:0});
+    await send('ANALYSIS_STARTED',{total:0,processed:0,captionProvenance:tabData.captionProvenance||null});
     try {
         const result=policy[0].blocked?await classifyCaptions(tabData.allCaptions,policy[0].threshold,p=>{send('ANALYSIS_PROGRESS',p);}):{segments:[]};
         if(tabState[tabId]!==tabData)return;
@@ -170,7 +170,7 @@ chrome.webRequest.onCompleted.addListener(
 
     const { isEnabled, labels } = await chrome.storage.sync.get({ 
         isEnabled: true, 
-        labels: []
+        labels: null
     });
 
     if (generation !== policyGeneration || tabState[tabId] !== tabData || !isEnabled || !policyKey(labels)) {
@@ -238,31 +238,31 @@ function watchVideoId(tab) {
             && /^[a-zA-Z0-9_-]{11}$/.test(id || '') ? id : null;
     }catch{return null;}
 }
-async function analyzeOpenTranscript() {
+async function analyzeOpenTranscript(targetTab=null,automatic=false) {
     const generation=policyGeneration;
     let tab,videoId,state;
     const cancelled=()=>generation!==policyGeneration || tabState[tab.id]!==state;
     try {
-        [tab]=await chrome.tabs.query({active:true,currentWindow:true});videoId=watchVideoId(tab);
+        if(targetTab)tab=targetTab;else [tab]=await chrome.tabs.query({active:true,currentWindow:true});videoId=watchVideoId(tab);
         if(!videoId || !Number.isInteger(tab.id))return {ok:false,code:'not_youtube_video'};
-        const settings=await chrome.storage.sync.get({isEnabled:true,labels:[]});
+        const settings=await chrome.storage.sync.get({isEnabled:true,labels:null});
         if(generation!==policyGeneration)return {ok:false,code:'cancelled'};
         const labels=sponsorLabels(settings.labels);
         if(!settings.isEnabled || !labels?.[0]?.blocked)return {ok:false,code:'disabled'};
         if(watchVideoId(await chrome.tabs.get(tab.id))!==videoId)return {ok:false,code:'cancelled'};
         if(tabState[tab.id]?.videoId===videoId && (tabState[tab.id].isAnalyzing
-            || tabState[tab.id].captionUrl==='public-transcript-panel'&&tabState[tab.id].captionRequestPending))return {ok:false,code:'analysis_in_progress'};
+            || tabState[tab.id].captionUrl==='public-transcript-panel'&&(tabState[tab.id].captionRequestPending||automatic&&tabState[tab.id].captionsFetched)))return {ok:false,code:'analysis_in_progress'};
         state={videoId,captionUrl:'public-transcript-panel',captionRequestPending:true,captionsFetched:false,
             allCaptions:[],foundSegments:[],isAnalyzing:false,policyKey:policyKey(settings.labels)};
         tabState[tab.id]=state;
-        const results=await chrome.scripting.executeScript({target:{tabId:tab.id,frameIds:[0]},world:'MAIN',func:captureOpenTranscript,args:[videoId]});
+        const results=await chrome.scripting.executeScript({target:{tabId:tab.id,frameIds:[0]},world:'MAIN',func:captureOpenTranscript,args:automatic?[videoId,true]:[videoId]});
         if(cancelled())return {ok:false,code:'cancelled'};
         const snapshot=results?.find(result=>result.frameId===0)?.result;
         if(!snapshot)throw Error('captions_unavailable');
         const language=await chrome.i18n.detectLanguage(snapshot.rows.map(row=>row.text).join(' '));
         const currentVideoId=watchVideoId(await chrome.tabs.get(tab.id));
         if(cancelled() || currentVideoId!==videoId)return {ok:false,code:'cancelled'};
-        const parsed=panelCaptions(snapshot,videoId,language);
+        const parsed=panelCaptions(snapshot,videoId,language,{allowPartial:automatic});
         state.allCaptions=parsed.captions;state.captionProvenance=parsed.provenance;
         state.captionRequestPending=false;state.captionsFetched=true;
         await chrome.tabs.sendMessage(tab.id,{type:'CLEAR_SEGMENTS',videoId}).catch(()=>{});
@@ -296,7 +296,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 if (typeof videoId !== 'string' || !/^[a-zA-Z0-9_-]{1,100}$/.test(videoId)) {
                     sendResponse({segments: []}); return;
                 }
-                const settings = await chrome.storage.sync.get({isEnabled: true, labels: []});
+                const settings = await chrome.storage.sync.get({isEnabled: true, labels: null});
                 const key = policyKey(settings.labels);
                 const data = await chrome.storage.local.get(CACHE_PREFIX + videoId);
                 const entry = data[CACHE_PREFIX + videoId];
@@ -304,7 +304,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     && entry.policyKey === key && Number.isFinite(entry.createdAt)
                     && Date.now() >= entry.createdAt && Date.now() - entry.createdAt <= CACHE_TTL_MS
                     && validSegments(entry.segments);
-                sendResponse({ segments: valid ? entry.segments : [] });
+                sendResponse({ segments: valid ? entry.segments : [], cached:!!valid, captionProvenance:valid?entry.captionProvenance:null });
+                // A normal watch-page content script requests its cache on load and SPA navigation.
+                // Acquire independently of CC/network traffic, including valid empty-result caching.
+                if(!valid && sender.id===chrome.runtime.id && sender.frameId===0
+                    && watchVideoId(sender.tab)===videoId && new URL(sender.url).origin==='https://www.youtube.com')
+                    await analyzeOpenTranscript(sender.tab,true);
             } catch (e) {
                 console.error("Error getting cached segments:", e);
                 sendResponse({ segments: [] });

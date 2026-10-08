@@ -39,3 +39,50 @@ test('partial, unordered, oversized, invalid or mismatched transcript evidence i
  const bad=[{...snapshot(),videoId:'different'},{...snapshot(),durationSeconds:0},{...snapshot(),durationSeconds:1000}, {...snapshot(),rows:[{start:10,text:'Late.'},{start:0,text:'Earlier.'}]}, {...snapshot(),rows:[{start:0,text:'x'.repeat(2000001)}]}, {...snapshot(),rows:[{start:0,end:25,text:'Overrun.'}]}];
  for(const input of bad)assert.throws(()=>panelCaptions(input,'abcdefghijk',english),/captions_unavailable/);
 });
+
+test('partial modern transcripts do not assign the unknown tail to the final known words',()=>{
+ const input={...snapshot(),durationSeconds:1000,incomplete:true};
+ const parsed=panelCaptions(input,'abcdefghijk',english,{allowPartial:true});
+ assert.equal(parsed.provenance.coverage,'partial');
+ assert.equal(parsed.provenance.coverageStart,0);assert.equal(parsed.provenance.coverageEnd,10);
+ assert.deepEqual(parsed.captions,[{start:0,duration:10,text:'Our first English caption.'}]);
+});
+test('partial native timings preserve only the supplied portion',()=>{
+ const input={videoId:'abcdefghijk',durationSeconds:1000,rows:[{start:400,end:410,text:'A reliable English caption.'}]};
+ const parsed=panelCaptions(input,'abcdefghijk',english,{allowPartial:true});
+ assert.equal(parsed.provenance.coverage,'partial');assert.equal(parsed.provenance.coverageStart,400);assert.equal(parsed.provenance.coverageEnd,410);
+});
+
+function automaticCapture({alreadyOpen=false,search='',navigate=false,loading=false,otherPanel=false}={}) {
+ const state={open:alreadyOpen,opens:0,closes:0};
+ const player={getVideoData:()=>({video_id:'abcdefghijk'}),getDuration:()=>20};
+ const panel={data:{contents:[{transcriptSegmentViewModel:{timestamp:'0:00',simpleText:'Our first caption.'}},{transcriptSegmentViewModel:{timestamp:'0:10',simpleText:'Our final caption.'}}]},
+ getBoundingClientRect:()=>({width:state.open?400:0,height:state.open?700:0}),getAttribute:()=>state.open?'ENGAGEMENT_PANEL_VISIBILITY_EXPANDED':'ENGAGEMENT_PANEL_VISIBILITY_HIDDEN',
+ querySelector:s=>s.includes('input')?{value:search}:s.includes('ytd-transcript-renderer')?{}:s.includes('visibility-button')?{click:()=>{state.open=false;state.closes++;}}:null};
+ const readyData=panel.data;if(loading)panel.data={};
+ const location={href:'https://www.youtube.com/watch?v=abcdefghijk'};
+ const button={click:()=>{state.open=true;state.opens++;if(navigate)location.href='https://www.youtube.com/watch?v=other-video';}};
+ const handlers={};const unrelated={getBoundingClientRect:()=>({width:400,height:700}),getAttribute:()=>null,data:{},querySelector:s=>s.includes('visibility-button')?{click:()=>{state.otherClosed=true;}}:null};
+ const context=vm.createContext({URL,Date,setTimeout:fn=>{handlers.keydown?.({isTrusted:true});panel.data=readyData;fn();},location,window:{},getComputedStyle:()=>({visibility:'visible',display:'block'}),
+ document:{querySelector:s=>s==='#movie_player'?player:s.includes('transcript-section')?button:null,querySelectorAll:()=>otherPanel?[unrelated,panel]:[panel],addEventListener:(type,fn)=>{handlers[type]=fn;},removeEventListener(){}}});
+ return {state,result:vm.runInContext('('+captureOpenTranscript.toString()+')("abcdefghijk",true)',context)};
+}
+test('automatic capture opens and restores a previously closed native transcript panel',async()=>{
+ const f=automaticCapture();const result=await f.result;assert.equal(result?.rows.length,2);assert.equal(f.state.opens,1);assert.equal(f.state.closes,1);assert.equal(f.state.open,false);
+});
+test('automatic capture leaves an already-open user transcript panel open',async()=>{
+ const f=automaticCapture({alreadyOpen:true});assert.equal((await f.result)?.rows.length,2);assert.equal(f.state.opens,0);assert.equal(f.state.closes,0);assert.equal(f.state.open,true);
+});
+test('automatic recovery preserves the user transcript search rather than changing it',async()=>{
+ const f=automaticCapture({alreadyOpen:true,search:'sponsor'});assert.equal(await f.result,null);assert.equal(f.state.closes,0);assert.equal(f.state.opens,0);
+});
+test('navigation while opening a transcript prevents old-video extraction and restoration',async()=>{
+ const f=automaticCapture({navigate:true});assert.equal(await f.result,null);assert.equal(f.state.closes,0);
+});
+
+test('recovery never closes an unrelated visible engagement panel',async()=>{
+ const f=automaticCapture({otherPanel:true});assert.equal((await f.result)?.rows.length,2);assert.equal(f.state.otherClosed,undefined);
+});
+test('an already-open loading transcript remains owned by the user',async()=>{
+ const f=automaticCapture({alreadyOpen:true,loading:true});assert.equal((await f.result)?.rows.length,2);assert.equal(f.state.opens,0);assert.equal(f.state.closes,0);
+});

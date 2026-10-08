@@ -142,3 +142,22 @@ for (const [name, unavailable] of [
     const undo = g.button('Undo'); Object.assign(g.video, unavailable); undo.click();
     assert.equal(g.video.currentTime, 4); g.check(); assert.equal(g.button('Undo'), undefined);
 });
+
+test('acquisition, language and model failures explain which stage failed',async()=>{
+ const f=fixture();await Promise.resolve();
+ for(const [code,phrase] of [['captions_unavailable','transcript'],['unsupported_language','English'],['model_unavailable','model'],['inference_failed','analysis failed']]) {
+  f.message({type:'ANALYSIS_ERROR',payload:{code}});
+  assert.ok(f.all().some(node=>node.id==='sponsor-analysis-error'&&node.textContent.includes(phrase)),code);
+ }
+});
+test('partial coverage remains visible after analysis finishes',async()=>{
+ const f=fixture();await Promise.resolve();
+ f.message({type:'ANALYSIS_STARTED',payload:{processed:0,total:0,captionProvenance:{coverage:'partial',coverageStart:400,coverageEnd:410}}});
+ f.message({type:'ANALYSIS_FINISHED'});
+ assert.ok(f.all().some(node=>node.id==='sponsor-transcript-coverage'&&node.textContent.includes('06:40')&&node.textContent.includes('06:50')));
+ assert.equal(f.video.currentTime,1.5);
+});
+test('content script is present before home-to-watch SPA navigation',()=>{
+ const manifest=JSON.parse(readFileSync(new URL('../src/manifest.json',import.meta.url),'utf8'));
+ assert.ok(manifest.content_scripts[0].matches.includes('*://*.youtube.com/*'));
+});
