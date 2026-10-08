@@ -43,7 +43,9 @@ The graph is `sponsor_detector_combined.int8.onnx` at revision
 ORT 1.29.0's local GPU/CPU loaders and WASM are bundled separately, so the total
 extension is larger. An offscreen document owns a dedicated inference worker.
 Native WebGPU is preferred; unavailable GPU or GPU graph initialization failure
-selects WASM. The idle worker releases its model after 60 seconds.
+selects WASM. A GPU inference failure retries the full track once on CPU after
+releasing the GPU session. Invalid outputs remain failures. The idle worker
+releases its model after 60 seconds.
 
 Load `dist/` using `chrome://extensions` → Developer mode → Load unpacked in a
 disposable profile. Model files and generated `dist/` remain ignored. Reload a

@@ -32,7 +32,11 @@ limits, stale-tab/settings cancellation, failure/retry and manual Undo remain.
 
 Chrome 116+; the service worker creates one offscreen document (WORKERS reason),
 which owns a dedicated inference worker. Native WebGPU is preferred; GPU graph
-initialization failure or absent GPU selects WASM explicitly. ORT 1.29.0 and
+initialization failure or absent GPU selects WASM explicitly. A genuine GPU
+session.run failure now releases that graph and retries the complete track once
+on WASM. Partial GPU spans are discarded, and following jobs reuse the CPU
+session. Malformed inputs/outputs and decoder errors do not trigger this retry.
+A failed CPU retry remains unavailable. ORT 1.29.0 and
 Tokenizers 0.1.3 are bundled locally. No CDN imports, remote model loading or
 caption upload. Concurrent jobs are serialized; the idle worker terminates after
 60 seconds, releasing its model. A 180-second request timeout terminates a stuck
@@ -87,6 +91,26 @@ The task-owned browser/profile was closed and removed.
 
 - [Public transcript result and source hashes](ettin-evidence/ettin-live-transcript.json).
 - [Actual extension popup](ettin-evidence/ettin-live-transcript-popup.png).
+
+## GPU runtime recovery checks
+
+Three new failure-first regressions exercised GPU loss after one completed
+window, full-track CPU retry and subsequent CPU reuse, and a failed CPU retry.
+An existing fail-closed behavior was also checked: invalid GPU logits do not
+trigger CPU recovery. The full suite passed **134/134**, zero skips. These are
+controlled runtime failures, not an actual hardware device-loss experiment.
+
+The rebuilt real-weight MV3 extension then passed both installed native Apple
+WebGPU and GPU-disabled WASM synthetic checks. On each, manual Skip moved
+1.5 → 8 seconds and Undo restored 1.5. The 390px popup had no horizontal overflow
+and retained disabled settings during legacy migration. Both captured scopes
+reported no runtime errors or external model requests. The existing missing
+media path in one initial test invocation was corrected to the previously saved
+private synthetic fixture before the successful runs. No model/threshold tuning
+or independent accuracy claim follows from these checks.
+
+- [Recovery build GPU result](ettin-evidence/ettin-recovery-gpu.json).
+- [Recovery build CPU result](ettin-evidence/ettin-recovery-cpu.json).
 
 ## Rights and attribution
 
