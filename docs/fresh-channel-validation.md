@@ -157,3 +157,11 @@ import. New reviewed fixtures preserve original captions and provisional referen
 They bind one exposure ledger path, which the runner enforces before test inference.
 No real human labels have been created. The actual pending packet rejected safely
 without creating a dataset. The complete regression suite passed 171/171 tests.
+
+## User-authorized assistant references and first validation exposure
+
+The user subsequently accepted the assistant's own reasoning on the five acquired videos. A separate transcript-only LLM reference version was frozen before test predictions. It records no human watch attestations, retains uncertainty, all eighteen selected IDs, original captions/crowd references and source hashes. The default human-review workflow remains available.
+
+Four fixed-baseline browser runs completed on development/validation and GPU/CPU. Both validation paid reads matched at IoU 0.5. Test paid-time coverage was 92.68% on GPU and 89.25% on CPU. Fireship's suggestion overran five seconds into ordinary closing speech. The three development transcripts added one detected paid read and two ordinary shorts with no suggestions. This small assistant-reviewed sample is useful diagnostic evidence, not a release accuracy claim. No operating point was changed.
+
+The new validation cohort is now exposed under its separate frozen configuration and bound ledger. The earlier sections are historical checkpoints. The original exposed pilot ledger remains byte-identical. [Current review, interval judgments, limits and evidence](assistant-reviewed-validation.md).

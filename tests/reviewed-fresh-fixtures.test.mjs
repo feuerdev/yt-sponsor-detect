@@ -37,3 +37,17 @@ test('uncertain labels stay uncertain, unreviewed time stays unknown and partial
 test('reviewed campaign identities cannot silently cross channel splits',()=>{
  const i=input();i.review.videos[0].campaignGroup='same-campaign';i.review.videos[1].campaignGroup='same-campaign';assert.throws(()=>run(i),/campaign leakage/i);
 });
+
+function llmInput(){const i=input();i.options.reviewerKind='llm';i.review.status='llm-reviewed';i.review.reviewMethod='transcript-only';i.review.referenceSetVersion='assistant-transcript-v1';i.review.crowdReferencesVisible=true;for(const r of i.review.videos){r.llmReviewerAttestation=r.reviewerAttestation;r.reviewerAttestation=false;r.reviewMethod='transcript-only';}return i;}
+test('explicit LLM transcript review imports separately without becoming a human watch attestation',()=>{
+ const i=llmInput(),before=JSON.stringify(i.manifest),r=run(i),f=r.fixtures.get(id);
+ assert.equal(f.referenceSegments[0].source,'LLM transcript review');assert.equal(f.provenance.review.reviewerKind,'llm');assert.equal(f.provenance.review.reviewerAttestation,false);assert.equal(f.provenance.review.llmReviewerAttestation,true);assert.equal(f.provenance.review.reviewMethod,'transcript-only');assert.equal(f.provenance.review.crowdReferencesVisible,true);assert.match(f.provenance.evaluationScope,/LLM|transcript/);assert.equal(r.manifest.videos[0].referenceStatus,'llm-reviewed');assert.equal(r.manifest.referenceReviewerKind,'llm');assert.equal(JSON.stringify(i.manifest),before);
+});
+test('LLM reviews require explicit route and transcript attestation and cannot impersonate human review',()=>{
+ for(const mode of['default-route','human-claim','missing-attestation','wrong-method','invalid-kind']){const i=llmInput();if(mode==='default-route')delete i.options.reviewerKind;if(mode==='human-claim')i.review.videos[0].reviewerAttestation=true;if(mode==='missing-attestation')i.review.videos[0].llmReviewerAttestation=false;if(mode==='wrong-method')i.review.reviewMethod='watched-video';if(mode==='invalid-kind')i.options.reviewerKind='unknown';assert.throws(()=>run(i),/review|kind|attestation|transcript/i);}
+});
+test('LLM review retains exposure, missing source and ordinary interval conflict checks',()=>{
+ const a=llmInput();a.options.exposureLedger={firstTestAt:'2026-10-08T01:30:00Z'};assert.throws(()=>run(a),/exposure/);
+ const b=llmInput();b.review.videos[2].llmReviewerAttestation=true;assert.throws(()=>run(b),/unavailable/i);
+ const c=llmInput();c.review.videos[0].reviewedNegativeIntervals[0].end=6;assert.throws(()=>run(c),/conflict/);
+});

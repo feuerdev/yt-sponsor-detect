@@ -1,0 +1,123 @@
+{
+  "schemaVersion": 1,
+  "referenceSetVersion": "codex-transcript-v1",
+  "selectionHash": "3016fee3f5c0c6ea3405127f3ca66ea261df148d8e6032cdb32c004d93688eb0",
+  "sourceManifestHash": "395ecf5e447361ec27e88ad114410f76d50a8c835c67fb6b44c6ca7959de0cb3",
+  "reviewInputHash": "5877b322779c2f0603d518b2d37781007d21e0c30a00e4ff692b185279297c8f",
+  "reviewHash": "9dd138417e618534165e578da1ffb49fe4f24b2fd893fc037df1cd33d0fad7b4",
+  "reviewExposureLedgerPath": "/Users/jannik/Documents/Codex/2026-10-07/e/work/assistant-review/test-ledger.json",
+  "importedAt": "2026-10-08T18:08:56.408Z",
+  "fixtureHashes": [
+    {
+      "videoId": "RpslsMqPFWA",
+      "sourceFixtureHash": "9c2b12dd3ffe5683802d89e738f2b2d095e5b3cf5c791a802eb579d4c07f1865",
+      "fixtureHash": "5fc14742201fca86a2dcf8aae16d553835304130d39bc7dfb6871fb3cf86f240",
+      "availability": "ok"
+    },
+    {
+      "videoId": "2OfjZ3ORJfc",
+      "sourceFixtureHash": null,
+      "fixtureHash": null,
+      "availability": "failure"
+    },
+    {
+      "videoId": "JQB8aNKyeao",
+      "sourceFixtureHash": null,
+      "fixtureHash": null,
+      "availability": "failure"
+    },
+    {
+      "videoId": "4VnCJdYImb8",
+      "sourceFixtureHash": null,
+      "fixtureHash": null,
+      "availability": "failure"
+    },
+    {
+      "videoId": "7FStfdGjAwc",
+      "sourceFixtureHash": null,
+      "fixtureHash": null,
+      "availability": "failure"
+    },
+    {
+      "videoId": "rqCt61ZbU10",
+      "sourceFixtureHash": null,
+      "fixtureHash": null,
+      "availability": "failure"
+    },
+    {
+      "videoId": "Tuxgh8SrzbQ",
+      "sourceFixtureHash": "0e22e8b37e7a221f523b94dfae40c4561928cc8a10167cdd45cb69e8fbb67110",
+      "fixtureHash": "f2aeeb2efb8c7892d630d654d06da8b74a315f987489d584530ed6cf1cd3ada8",
+      "availability": "ok"
+    },
+    {
+      "videoId": "DWAMwfM2DrM",
+      "sourceFixtureHash": "4d55897f50941302c5ae2945542401ada8f89c47edea1d5bd4a4d21d11dec064",
+      "fixtureHash": "0e4135234a5bdd43b5dd216f6c30b2419259e6944870b22b17821de13163fc02",
+      "availability": "ok"
+    },
+    {
+      "videoId": "-TvOCDbhCWk",
+      "sourceFixtureHash": "06daa724672ec5c433478669fe8d6e9984e67c463d19ff8b709930f7d8208065",
+      "fixtureHash": "672972a125ec418c4886180b876a0f6a81fdcf78ded2f96aed82494b37d88fd3",
+      "availability": "ok"
+    },
+    {
+      "videoId": "WrCjAAl9okA",
+      "sourceFixtureHash": "692890bc1ef228be2fc34c236c73a9a20636d30936f7c15a9452f7fb7cb54abe",
+      "fixtureHash": "e2578edf98679356d62886575c17cc0379ae37401d4bf5afd28a49c2d29cb851",
+      "availability": "ok"
+    },
+    {
+      "videoId": "_5p1_TNSWqQ",
+      "sourceFixtureHash": null,
+      "fixtureHash": null,
+      "availability": "failure"
+    },
+    {
+      "videoId": "No-JPdFvYWU",
+      "sourceFixtureHash": null,
+      "fixtureHash": null,
+      "availability": "failure"
+    },
+    {
+      "videoId": "5OcnO7U0VeA",
+      "sourceFixtureHash": null,
+      "fixtureHash": null,
+      "availability": "failure"
+    },
+    {
+      "videoId": "K56LuXCQ0ik",
+      "sourceFixtureHash": null,
+      "fixtureHash": null,
+      "availability": "failure"
+    },
+    {
+      "videoId": "ID-K64Jk6JM",
+      "sourceFixtureHash": null,
+      "fixtureHash": null,
+      "availability": "failure"
+    },
+    {
+      "videoId": "4ievxm-8P7E",
+      "sourceFixtureHash": null,
+      "fixtureHash": null,
+      "availability": "failure"
+    },
+    {
+      "videoId": "rk5a6DLCgcQ",
+      "sourceFixtureHash": null,
+      "fixtureHash": null,
+      "availability": "failure"
+    },
+    {
+      "videoId": "xTFbdQ5J39c",
+      "sourceFixtureHash": null,
+      "fixtureHash": null,
+      "availability": "failure"
+    }
+  ],
+  "modelInference": false,
+  "reviewerKind": "llm",
+  "claims": "User-authorized assistant transcript references; not human audiovisual ground truth. Original sources and all exposure checks preserved."
+}
