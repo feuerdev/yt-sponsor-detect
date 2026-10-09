@@ -13,7 +13,7 @@ Ettin
 
 - Creator: CuriousDragon. Weights/configuration: CC BY-NC-SA 4.0. Base encoder jhu-clsp/ettin-encoder-17m: MIT.
 - Pinned release/decoder manifests are preserved here. Source checkpoint/ONNX hashes and revisions are in models.json.
-- The adapter reconstructs documented BILOU/window/merge rules. Exact Flow normalization literals, confidence aggregation and overlap decoder parity are NOT verified. Its output is experimental, not claimed as a faithful published reproduction.
+- The v2 adapter ports pinned Flow pure preprocessing/Viterbi/window-stitching behavior. GPLv3 origin, source hashes, differential evidence and explicit interval/NFC limits are recorded in ettin-parity.md. FLOW-LICENSE contains the full original license. This is not a model-card quality reproduction.
 
 Other assets
 

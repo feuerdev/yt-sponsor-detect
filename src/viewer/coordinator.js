@@ -39,7 +39,7 @@ export class SessionCoordinator {
     progress(jobId,progress) {
         for(const [tabId,session] of this.sessions)if(session.jobId===jobId&&session.status==='analyzing'
             &&Number.isFinite(progress?.processed)&&Number.isFinite(progress?.total)&&progress.processed>=0
-            &&progress.total>0&&progress.processed<=progress.total&&validSegments(progress.segments,session.duration)) {
+            &&progress.total>0&&progress.processed<=progress.total&&validSegments(progress.segments,session.coverageEnd||session.duration)&&progress.segments.every(s=>s.start>=(session.coverageStart||0))) {
             session.progress={processed:progress.processed,total:progress.total};session.segments=progress.segments;this.publish(tabId,session);
         }
     }
@@ -57,19 +57,19 @@ export class SessionCoordinator {
         if (!this.current(tabId,session)) return null;
         if (!settings.isEnabled) { session.status='disabled'; this.publish(tabId,session); return this.snapshot(session); }
         if (session.work) return session.work;
-        session.status='analyzing'; session.duration=transcript.duration; this.publish(tabId,session);
+        session.status='analyzing'; session.duration=transcript.duration;session.coverageEnd=transcript.coverage==='partial'?transcript.coverageEnd:transcript.duration;session.coverageStart=transcript.coverage==='partial'?transcript.coverageStart:0; this.publish(tabId,session);
         session.work=(async()=>{
             try {
                 const result=await this.detect(transcript,{jobId:session.jobId,onProgress:progress=>{
                     if (this.current(tabId,session)) { session.progress=progress; this.publish(tabId,session); }
                 }});
                 if (!this.current(tabId,session)) return null;
-                if (!result || !validSegments(result.segments,transcript.duration)) throw Object.assign(new Error('invalid_output'),{code:'invalid_output'});
+                if (!result || !validSegments(result.segments,session.coverageEnd)||!result.segments.every(s=>s.start>=session.coverageStart)) throw Object.assign(new Error('invalid_output'),{code:'invalid_output'});
                 session.status='ready'; session.segments=result.segments;
-                session.diagnostics={...result.diagnostics,track:transcript.track,timing:transcript.timing,language:transcript.language};
+                session.diagnostics={...result.diagnostics,track:transcript.track,timing:transcript.timing,language:transcript.language,coverage:transcript.coverage||'full',coverageStart:transcript.coverageStart,coverageEnd:transcript.coverageEnd};
                 this.publish(tabId,session);
                 // Storage failure does not turn valid detection into a playback failure.
-                await this.cache.put(session.videoId,this.modelKey,session,()=>this.current(tabId,session)).catch(()=>{});
+                if(transcript.coverage!=='partial')await this.cache.put(session.videoId,this.modelKey,session,()=>this.current(tabId,session)).catch(()=>{});
                 return this.current(tabId,session)?this.snapshot(session):null;
             } catch(error) {
                 if (!this.current(tabId,session)) return null;

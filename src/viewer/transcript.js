@@ -7,11 +7,13 @@ export function validVideoId(id) { return typeof id === 'string' && /^[A-Za-z0-9
 export function validateTranscript(value, videoId) {
     if (!value || value.videoId !== videoId || !Number.isFinite(value.duration) || value.duration <= 0
         || value.duration > 86400 || !Array.isArray(value.words) || !value.words.length || value.words.length > MAX_WORDS) return false;
+    if(value.coverage!==undefined&&(!['full','partial'].includes(value.coverage)||!Number.isFinite(value.coverageStart)||!Number.isFinite(value.coverageEnd)||value.coverageStart<0||value.coverageEnd<=value.coverageStart||value.coverageEnd>value.duration))return false;
     let previous = -1;
     for (const word of value.words) {
         if (!word || typeof word.text !== 'string' || !word.text.trim() || word.text.length > 500
             || !Number.isFinite(word.start) || !Number.isFinite(word.end) || word.start < previous
             || word.start < 0 || word.end <= word.start || word.end > value.duration + 1) return false;
+        if(value.coverage==='partial'&&(word.start<value.coverageStart-0.001||word.end>value.coverageEnd+0.001))return false;
         previous = word.start;
     }
     return value.timing === 'word' || value.timing === 'estimated';

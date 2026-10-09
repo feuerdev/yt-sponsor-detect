@@ -6,6 +6,8 @@ import {initializeSettings} from '../src/viewer/settings.js';
 import {SessionCoordinator} from '../src/viewer/coordinator.js';
 import {ResultCache} from '../src/viewer/cache.js';
 import {MODEL_SPEC} from '../src/model-spec.js';
+import {captureOpenTranscript} from '../src/transcript-panel.js';
+import {panelToTranscript} from '../src/viewer/panel.js';
 const source=readFileSync(new URL('../src/viewer-background.js',import.meta.url),'utf8').replace(/^import .*;\n/gm,'').replace('export const coordinator','const coordinator');
 const tick=async()=>{for(let i=0;i<4;i++)await new Promise(resolve=>setImmediate(resolve));};
 const transcript={videoId:'first',duration:30,timing:'word',track:'automatic',language:'en',words:[{text:'sponsor',start:1,end:2}]};
@@ -13,11 +15,11 @@ function storage(initial={}){const values={...initial};return {values,get:async 
 function fixture(){
     const f={sync:storage(),local:storage(),messages:[],contexts:[],created:0};
     const event=name=>({addListener:fn=>{f[name]=fn;}});
-    const chrome={runtime:{id:'extension',getURL:path=>'chrome-extension://extension/'+path,getContexts:async()=>f.contexts,
+    const chrome={scripting:{executeScript:async()=>f.panelPending?await f.panelPending:[{result:f.panel}]},i18n:{detectLanguage:async()=>f.languagePending?await f.languagePending:{isReliable:true,languages:[{language:'en',percentage:100}]}},runtime:{id:'extension',getURL:path=>'chrome-extension://extension/'+path,getContexts:async()=>f.contexts,
         onInstalled:event('installed'),onMessage:event('message'),sendMessage:async message=>{f.messages.push(message);if(message.type==='RUN_DETECTION')return {segments:[{start:1,end:4,category:'sponsor'}]};return {};},},
         storage:{sync:f.sync,local:f.local,onChanged:event('changed')},offscreen:{createDocument:async()=>{f.created++;if(f.create)await f.create();f.contexts=[{}];}},
-        tabs:{onRemoved:event('removed'),onUpdated:event('updated'),sendMessage:async(id,message)=>{f.messages.push({...message,tabId:id});},query:async()=>[{id:1,url:'https://www.youtube.com/watch?v=first'}]}};
-    const context=vm.createContext({chrome,initializeSettings,SessionCoordinator,ResultCache,MODEL_SPEC,URL});vm.runInContext(source,context);
+        tabs:{onRemoved:event('removed'),onUpdated:event('updated'),sendMessage:async(id,message)=>{f.messages.push({...message,tabId:id});},get:async()=>({id:1,url:f.url||'https://www.youtube.com/watch?v=first'}),query:async()=>[{id:1,url:'https://www.youtube.com/watch?v=first'}]}};
+    const context=vm.createContext({chrome,initializeSettings,SessionCoordinator,ResultCache,MODEL_SPEC,captureOpenTranscript,panelToTranscript,URL});vm.runInContext(source,context);
     f.coordinator=vm.runInContext('coordinator',context);
     f.sender={id:'extension',tab:{id:1,url:'https://www.youtube.com/watch?v=first'},url:'https://www.youtube.com/watch?v=first'};
     f.call=(message,sender=f.sender)=>new Promise(resolve=>{if(f.message(message,sender,resolve)!==true)resolve(undefined);});
@@ -53,4 +55,13 @@ test('popup pause and status route through active tab, disable prevents cached r
     assert.equal((await f.call({type:'PAUSE_VIDEO',paused:true},popup)).state.paused,true);
     await f.sync.set({isEnabled:false});f.changed({isEnabled:{newValue:false}},'sync');
     assert.equal((await f.call({type:'START_SESSION',videoId:'first',token:'b'})).state.status,'disabled');
+});
+
+test('actual viewer background retains public-panel recovery and rejects stale language results',async()=>{
+    const f=fixture();await tick();await f.call({type:'START_SESSION',videoId:'first',token:'a'});
+    f.panel={videoId:'first',durationSeconds:30,rows:[{start:0,end:30,text:'English caption'}]};
+    const recovered=await f.call({type:'CAPTURE_PANEL',token:'a'});assert.equal(recovered.transcript.track,'public-panel');
+    let release;f.languagePending=new Promise(r=>{release=r;});const pending=f.call({type:'CAPTURE_PANEL',token:'a'});await tick();
+    f.updated(1,{url:'https://www.youtube.com/watch?v=second'});release({isReliable:true,languages:[{language:'en',percentage:100}]});
+    assert.equal((await pending).error,'fetch_failed');assert.equal(f.coordinator.sessions.size,0);
 });

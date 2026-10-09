@@ -3,6 +3,8 @@ import {initializeSettings} from './viewer/settings.js';
 import {SessionCoordinator} from './viewer/coordinator.js';
 import {ResultCache} from './viewer/cache.js';
 import {MODEL_SPEC} from './model-spec.js';
+import {captureOpenTranscript} from './transcript-panel.js';
+import {panelToTranscript} from './viewer/panel.js';
 let creating;
 const jobs=new Map();
 async function ensureOffscreen() {
@@ -12,7 +14,7 @@ async function ensureOffscreen() {
 }
 export const coordinator=new SessionCoordinator({
     settings:chrome.storage.sync,cache:new ResultCache(chrome.storage.local),
-    modelKey:JSON.stringify(['viewer-v1','mobilebert-fp32',MODEL_SPEC.revision,MODEL_SPEC.files.at(-1).sha256,'80-word-window-40-word-step-0.98']),
+    modelKey:JSON.stringify(['viewer-v2',MODEL_SPEC.directory,MODEL_SPEC.revision,MODEL_SPEC.files.at(-1).sha256,MODEL_SPEC.pipelineVersion,'word-cues',MODEL_SPEC.decoding]),
     notify:(tabId,state)=>chrome.tabs.sendMessage(tabId,{type:'VIEWER_STATE',state}),
     cancel:jobId=>{if(jobs.has(jobId))jobs.get(jobId).cancelled=true;if(jobId)chrome.runtime.sendMessage({scope:'offscreen',type:'CANCEL_DETECTION',jobId}).catch(()=>{});},
     detect:async(transcript,{jobId})=>{
@@ -47,6 +49,9 @@ chrome.runtime.onMessage.addListener((message,sender,respond)=>{
         if(url.hostname!=='www.youtube.com'||url.pathname!=='/watch')return false;
         const tabId=sender.tab.id;
         if(message.type==='START_SESSION'&&message.videoId===url.searchParams.get('v'))task=coordinator.begin(tabId,message.videoId,message.token,{retry:message.retry===true});
+        else if(message.type==='CAPTURE_PANEL'){
+            capturePanel(tabId,message.token).then(respond,()=>respond({error:'fetch_failed'}));return true;
+        }
         else if(message.type==='SUBMIT_TRANSCRIPT')task=coordinator.submit(tabId,message.token,message.transcript);
         else if(message.type==='TRANSCRIPT_UNAVAILABLE')task=coordinator.unavailable(tabId,message.token,message.reason);
         else if(message.type==='PLAYER_STATUS')task=coordinator.snapshot(coordinator.sessions.get(tabId));
@@ -62,3 +67,19 @@ chrome.runtime.onMessage.addListener((message,sender,respond)=>{
     if(task===undefined)return false;
     Promise.resolve(task).then(state=>respond({state}),()=>respond({error:'unavailable'}));return true;
 });
+
+async function capturePanel(tabId,token) {
+    const session=coordinator.sessions.get(tabId);
+    if(!session||session.token!==token||session.status!=='loading')return {error:'fetch_failed'};
+    const current=()=>coordinator.current(tabId,session);
+    const [{result:snapshot}={}]=await chrome.scripting.executeScript({target:{tabId,frameIds:[0]},world:'MAIN',func:captureOpenTranscript,args:[session.videoId,true]});
+    if(!current())return {error:'fetch_failed'};
+    const tab=await chrome.tabs.get(tabId);const url=new URL(tab.url);
+    if(url.origin!=='https://www.youtube.com'||url.pathname!=='/watch'||url.searchParams.get('v')!==session.videoId)return {error:'fetch_failed'};
+    if(!snapshot||!Array.isArray(snapshot.rows)||snapshot.rows.length>10000)return {error:'fetch_failed'};
+    const text=snapshot.rows.map(r=>typeof r?.text==='string'?r.text:'').join(' ');
+    if(!text||text.length>2000000)return {error:'fetch_failed'};
+    const language=await chrome.i18n.detectLanguage(text);if(!current())return {error:'fetch_failed'};
+    try{return {transcript:panelToTranscript(snapshot,session.videoId,language)};}
+    catch(error){return {error:error.message==='unsupported_language'?'unsupported_language':'invalid_captions'};}
+}

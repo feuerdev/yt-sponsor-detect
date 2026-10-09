@@ -1,0 +1,32 @@
+{
+  "schemaVersion": 1,
+  "registeredAt": "2026-10-08T12:27:50.792818+00:00",
+  "sourceHead": "06a88994321fc27e6b0bea0dff8f7115140b8841",
+  "purpose": "Evaluate an explicit first-person self-sponsorship veto, alongside the upstream 0.7 threshold, without selecting passages before inference",
+  "scope": "Development tune only; candidate conceived after qualitative tune inspection, so channel folds are diagnostic and fresh unseen test is mandatory",
+  "candidateBudget": 3,
+  "candidates": [
+    {
+      "id": "flow/0.8",
+      "threshold": 0.8,
+      "selfSponsorVeto": false
+    },
+    {
+      "id": "flow/0.8/self-sponsor-veto",
+      "threshold": 0.8,
+      "selfSponsorVeto": true
+    },
+    {
+      "id": "flow/0.7/self-sponsor-veto",
+      "threshold": 0.7,
+      "selfSponsorVeto": true
+    }
+  ],
+  "veto": "An affirmative first-person self-sponsored clause in complete cues wholly contained in a predicted span. Quoted clauses ignored. Explicit third-party sponsorship attribution within that span preserves the suggestion. No creator, brand, timestamp, duration or reference-label rules.",
+  "mergeGapCharacters": 24,
+  "mergeGapSeconds": 1.5,
+  "inference": "Hash-verified existing browser logits only; no Node or cloud model inference",
+  "selection": "Same conservative selection and promotion gates as registered overlap study; no changing disputed or unknown labels",
+  "freshTest": "No production promotion until fresh independent evaluation and reviewed negative exposure",
+  "frozenBenchmark": "Original pilot, frozen config, adapters, evaluator and exposed test ledger remain unchanged"
+}

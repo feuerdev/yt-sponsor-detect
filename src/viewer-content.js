@@ -25,7 +25,9 @@ async function start(retry=false) {
     if(reply.error){apply({...state,status:'fetch_failed'});return;}
     apply(reply.state);
     if(reply.state?.status!=='loading')return;
-    const captions=same&&transcript?transcript:await requestTranscript(window,id,{signal});
+    let captions=same&&transcript?transcript:await requestTranscript(window,id,{signal});
+    if(captions.error&&!signal.aborted){const fallback=await send({type:'CAPTURE_PANEL',token:requestToken});if(signal.aborted||token!==requestToken)return;
+        if(fallback.transcript)captions=fallback.transcript;else if(fallback.error==='unsupported_language')captions=fallback;}
     if(signal.aborted||token!==requestToken)return;
     if(captions.error){const result=await send({type:'TRANSCRIPT_UNAVAILABLE',token:requestToken,reason:captions.error});apply(result.state);return;}
     transcript=captions;

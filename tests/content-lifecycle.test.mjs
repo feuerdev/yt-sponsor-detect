@@ -65,11 +65,11 @@ test('removing an empty-source video releases listeners and segments', () => {
     assert.equal(f.segments(), 0);
 });
 
-test('replacing or removing the progress bar releases its old click listener', () => {
+test('native progress bar replacement never installs a suggestion-cancelling click listener', () => {
     const f = fixture(), old = f.bar;
     f.bar = element(); f.refresh();
     assert.equal(old.listeners.has('click'), false);
-    assert.equal(f.bar.listeners.has('click'), true);
+    assert.equal(f.bar.listeners.has('click'), false);
     const replacement = f.bar;
     f.bar = null; f.refresh();
     assert.equal(replacement.listeners.has('click'), false);
@@ -137,4 +137,38 @@ test('an older settings read cannot undo a newer disable event', async () => {
 test('skipping waits for the initial settings read', () => {
     const f = fixture(), skip = prepareSkip(f);
     skip(); assert.equal(f.video.currentTime, 1.5);
+});
+
+
+test('changing confidence reacquires the current video and rejects the old cached result', async () => {
+    const f = fixture();
+    f.loadSettings(); await Promise.resolve(); await Promise.resolve();
+    const previous = f.requests[0];
+    f.changeSettings({ labels: { newValue: [{name:'sponsor',threshold:0.9,blocked:true}] } });
+    assert.equal(f.requests.length, 2, 'A settings change must restart detection without a video reload');
+    assert.equal(f.requests.at(-1).request.videoId, 'first');
+    previous.callback({segments:[{startTime:1,endTime:2}]});
+    assert.equal(f.segments(), 0, 'The previous policy must not restore stale suggestions');
+    f.requests.at(-1).callback({segments:[{startTime:3,endTime:4}]});
+    assert.equal(f.segments(), 1);
+    f.refresh();
+    assert.equal(f.requests.length, 2, 'A DOM observation must not start another acquisition');
+});
+
+test('re-enabling detection reacquires the current video without reloading', async () => {
+    const f = fixture(false);
+    f.loadSettings(); await Promise.resolve(); await Promise.resolve();
+    f.changeSettings({ isEnabled: { newValue: true } });
+    assert.equal(f.requests.length, 2);
+    f.requests.at(-1).callback({segments:[{startTime:3,endTime:4}]});
+    assert.equal(f.segments(), 1);
+});
+
+test('disabled and local-storage changes do not start another acquisition', async () => {
+    const f = fixture();
+    f.loadSettings(); await Promise.resolve(); await Promise.resolve();
+    f.changeSettings({ isEnabled: { newValue: false } });
+    f.changeSettings({ labels: { newValue: [{name:'sponsor',threshold:0.9,blocked:true}] } });
+    f.changeSettings({ labels: { newValue: [] } }, 'local');
+    assert.equal(f.requests.length, 1);
 });

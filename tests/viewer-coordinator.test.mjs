@@ -90,3 +90,9 @@ test('NLI comparison adapter covers short transcripts and the final tail, honori
     assert.ok(seen.at(-1).includes('w80'));assert.equal(detected.segments.at(-1).end,81);
     await assert.rejects(adapter.detect(transcript,{cancelled:()=>{throw new Error('cancelled');},onProgress:()=>{}}),/cancelled/);
 });
+
+test('partial panel analysis stays useful without a false complete-video cache',async()=>{
+    const f=fixture(async()=>({segments:[{start:1,end:2,category:'sponsor'}]}));await f.coordinator.begin(1,'first','partial');
+    const state=await f.coordinator.submit(1,'partial',{...transcript,coverage:'partial',coverageStart:1,coverageEnd:2});
+    assert.equal(state.status,'ready');assert.equal(state.diagnostics.coverage,'partial');assert.equal(f.local.values['viewer-cache:first'],undefined);
+});

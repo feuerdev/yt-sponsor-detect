@@ -1,8 +1,7 @@
 import {readdir} from 'node:fs/promises';
 import {args,readJson,save,hash,fixtureFor} from './lib.mjs';
 import {validateManifest} from './contracts.mjs';
-import {evaluateVideo,summarize,bootstrap} from './evaluate.mjs';
-import {decode} from './decode.mjs';
+import {evaluateTrial} from './tune-trial.mjs';
 const options=args();if(options.split&&options.split!=='tune')throw new Error('Tuning accepts tune split only');
 const manifest=validateManifest(await readJson(options.manifest||'bench/datasets/pilot.json')),registry=await readJson('bench/models.json');
 const runIds=options.runs?options.runs.split(','):await readdir(new URL('./results/',import.meta.url));
@@ -28,11 +27,10 @@ for(const spec of registry.models)for(const backend of spec.backends) {
   }
   available=cached.length;
   for(const config of cached.length?configs:[]) {
-   const rows=cached.map(({f,p,raw})=>evaluateVideo(f,{...p,segments:decode(raw,config)},'sponsor'));
-   trials.push({config,summary:summarize(rows),uncertainty:bootstrap(rows)});
+   trials.push({config,...evaluateTrial(cached,config)});
   }
  }
- const eligible=trials.filter(t=>t.summary.metrics[.5].precision>=.95&&t.summary.metrics[.5].matched>0).sort((a,b)=>b.summary.metrics[.5].recall-a.summary.metrics[.5].recall||b.config.threshold-a.config.threshold);
+ const eligible=trials.filter(t=>t.status==='valid'&&t.summary.metrics[.5].precision>=.95&&t.summary.metrics[.5].matched>0).sort((a,b)=>b.summary.metrics[.5].recall-a.summary.metrics[.5].recall||b.config.threshold-a.config.threshold);
  const chosen=eligible[0];frozen.models[`${spec.id}/${backend}`]={config:chosen?.config||spec.decoding,tuneRunId:meta?.runId||null,tuneInferenceKey:meta?.inferenceKey||null,availableTuneVideos:available,status:available?(chosen?'diagnostic_operating_point':'no_conservative_operating_point'):'unavailable',trials};
 }
 await save(options.output||'bench/frozen-config.json',frozen);console.log('Frozen',Object.keys(frozen.models).length,'candidate/backend configurations; available tune fixtures',manifest.videos.filter(v=>v.split==='tune'&&v.captionAvailability==='ok').length);

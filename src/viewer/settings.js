@@ -27,6 +27,7 @@ export const STATUS_TEXT = Object.freeze({
     disabled: 'Sponsor skipping is off', paused: 'Paused for this video', ad: 'Waiting for YouTube ad to finish',
 });
 export function statusText(state) {
+    if(state?.status==='ready'&&state.diagnostics?.coverage==='partial')return 'Checked available captions · Partial video coverage';
     if (state?.status === 'ready' && !state.segments?.length) return 'Checked captions: no sponsors detected';
     return STATUS_TEXT[state?.status] || 'Open a YouTube video';
 }

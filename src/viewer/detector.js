@@ -17,7 +17,7 @@ export class DetectorQueue {
             const started=this.clock();
             const cancelled=()=>{if(job.cancelled)throw Object.assign(new Error('cancelled'),{code:'cancelled'});};
             cancelled();const adapter=await this.getInstance();cancelled();const loaded=this.clock();
-            const result=await adapter.detect(transcript,{cancelled,onProgress:progress=>{cancelled();onProgress(progress);}});cancelled();
+            const result=await adapter.detect(transcript,{jobId,cancelled,onProgress:progress=>{cancelled();onProgress(progress);}});cancelled();
             if(!validSegments(result.segments,transcript.duration))throw Object.assign(new Error('invalid_output'),{code:'invalid_output'});
             return {...result,diagnostics:{...this.descriptor,...result.diagnostics,loadMs:loaded-started,inferenceMs:this.clock()-loaded}};
         }).finally(()=>this.jobs.delete(jobId));

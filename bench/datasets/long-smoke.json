@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "description": "Synthetic input exceeds MobileBERT graph token limit before truncation; runtime regression only",
+  "videos": [
+    {
+      "videoId": "longsmoke01",
+      "channelId": "synthetic-long-nli",
+      "split": "smoke",
+      "stratum": "synthetic",
+      "captionAvailability": "ok",
+      "durationSeconds": 600,
+      "fixturePath": "bench/fixtures/long-nli.json",
+      "fixtureHash": "8896d6efe7806655390c55c9357381ff9b0294e35cb867a11527849a3539049c"
+    }
+  ]
+}

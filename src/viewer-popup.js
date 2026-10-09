@@ -20,7 +20,7 @@ async function refresh() {
 }
 loadSettings(chrome.storage.sync).then(settings=>{
     enabled=settings.isEnabled;render(current);
-    for(const [id,key] of [['enabled','isEnabled'],['automatic','autoSkip'],['self-promotion','selfPromotion']]) {
+    for(const [id,key] of [['enabled','isEnabled'],['automatic','autoSkip']]) {
         $(id).checked=settings[key];$(id).disabled=false;
         $(id).addEventListener('change',async()=>{
             $(id).disabled=true;$('error').textContent='';
