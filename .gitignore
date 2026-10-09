@@ -12,3 +12,6 @@ model/
 /bench/results/
 /bench/browser/vendor/
 /bench/__pycache__/
+
+# Local documentation and testing reports (existing tracked docs remain tracked)
+/docs/

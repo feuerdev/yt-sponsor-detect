@@ -1,6 +1,6 @@
 # Sponsor detection browser benchmark
 
-An isolated English, full-caption-track benchmark. Production `src/` behavior is unchanged and automatic skipping stays disabled. See `docs/benchmark-evidence.md` for the actual attempted pilot and limitations; this harness does not authorize a release.
+An isolated English, full-caption-track benchmark for comparing models and decoding strategies. Automatic skipping is disabled in the extension. Benchmark results are local experiments, not release approval.
 
 ## Reproduce from a clean checkout
 
@@ -132,4 +132,4 @@ For a caption-free export, add `--redact-captions --standalone --output bench/re
 
 A separate `bench/review-import.mjs --review-kind llm` route imports assistant transcript judgments without asserting human audiovisual review. Omitting the flag preserves the strict human route. LLM packets must declare `status: "llm-reviewed"` and `reviewMethod: "transcript-only"`, with `llmReviewerAttestation: true` and `reviewerAttestation: false` on each acquired source. Identity, source hash, population, policy, conflict, completeness, campaign and exposure checks remain enforced. Unavailable records cannot claim either kind of review. Import requires a new output directory and an unexposed bound ledger.
 
-The user-authorized five-transcript version and fixed 0.8 GPU/CPU results are documented in [assistant-reviewed validation](../docs/assistant-reviewed-validation.md). These are LLM transcript references, not human watch attestations or population safety evidence. The generic original pilot report continues to describe its original provisional dataset.
+LLM transcript references are not human watch attestations or population safety evidence. Keep review packets, exposure ledgers and generated reports locally with the inputs that produced them.

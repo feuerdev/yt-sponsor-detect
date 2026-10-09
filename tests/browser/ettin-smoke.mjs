@@ -1,4 +1,4 @@
-// Installed extension smoke only. No Node model inference. See docs/ettin-integration.md.
+// Installed extension smoke only. No Node model inference. See licenses/NOTICE.md for component rights.
 import {readFile,writeFile,mkdir}from'node:fs/promises';
 import {execFileSync}from'node:child_process';
 import {connect}from'./cdp-client.mjs';

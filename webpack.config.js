@@ -15,6 +15,6 @@ export default {
   {from:'bench/reference/FLOW-LICENSE',to:'licenses/FLOW-GPL-3.0.txt'},
   {from:'bench/reference/ONNX-RUNTIME-LICENSE',to:'licenses/ONNX-RUNTIME-MIT.txt'},
   {from:'node_modules/@huggingface/tokenizers/LICENSE',to:'licenses/TOKENIZERS-APACHE-2.0.txt'},
-  {from:'docs/ettin-integration.md',to:'licenses/NOTICE.md'},
+  {from:'licenses/NOTICE.md',to:'licenses/NOTICE.md'},
  ]})],
 };

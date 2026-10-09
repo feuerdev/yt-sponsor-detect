@@ -1,96 +1,73 @@
-# YouTube sponsor detection prototype
+# YouTube sponsor detection
 
-The Chrome 116+ extension now uses **Ettin INT8** for paid-sponsor suggestions.
-Automatic skipping stays disabled; every Skip requires a click and has Undo.
-The benchmark is provisional: 14/50 pilot captions, nine acquired test videos,
-and only one paid-sponsor holdout reference. See [integration and rights](docs/ettin-integration.md)
-and [benchmark evidence](docs/benchmark-evidence.md).
+An experimental Chrome extension that detects paid sponsorships in YouTube
+videos using Ettin INT8, running locally in the browser. It highlights suggested
+segments and offers **Skip** and **Undo**. Automatic skipping is disabled.
 
-The extension acquires a transcript automatically when a YouTube video loads,
-including navigation from the home page. It processes the available English
-transcript in overlapping token windows, caches estimated intervals and offers
-manual suggestions. Self-promotion and custom categories are unsupported. The popup
-controls enable, paid-sponsor suggestions and minimum confidence. Legacy
-zero-shot labels migrate to a sponsor-only policy; automatic opt-ins are ignored.
+## Features
 
-Suggestions can be wrong or miss sponsors. Captions do not need to be enabled.
-On a cache miss, the extension uses YouTube's native transcript control, waits up
-to 15 seconds for its data, and closes a panel it opened if the user has not
-interacted with it. A transcript that was already open stays open. It does not
-change transcript searches, CC settings or playback. **Analyze open transcript**
-in the popup remains a manual retry option.
+- Automatically acquires available English transcripts, without enabling captions.
+- Analyzes transcripts with a bundled model, using WebGPU with a CPU/WASM fallback.
+- Shows timed sponsor suggestions and a coverage notice for partial transcripts.
+- Caches suggestions locally for up to 48 hours.
+- Lets you enable or disable suggestions and adjust minimum confidence in the popup.
 
-Partial English transcripts are usable with a visible coverage notice. An
-unknown trailing cue is omitted rather than extended over missing transcript
-minutes. Modern panel timestamps are approximate. Missing, searched, ambiguous,
-live or non-English transcripts can remain unavailable, with specific transcript,
-language or model failure messages. Inference uses bundled local assets. Setup
-and YouTube need network access. No caption upload or remote model loading is
-implemented.
-A formal privacy/network review and independent accuracy evidence remain release
-gates. The project is UNLICENSED pending an owner decision; model weights and
-GPL-derived code have separate obligations before any distribution.
+Suggestions can miss sponsors or include ordinary speech. Self-promotion, custom
+categories, live streams and non-English transcripts are unsupported. Videos
+without a usable transcript cannot be analyzed.
 
-## Build from source
+## Build and install
 
-```bash
+Use Chrome 116+ and Node.js 24.15+.
+
+```sh
 git clone https://github.com/feuerdev/yt-sponsor-detect.git
 cd yt-sponsor-detect
 npm ci
-npm test
 npm run setup
 npm run build
 ```
 
-Setup streams four exact assets from the immutable revision in `src/model-spec.js`,
-checks sizes/SHA-256, and publishes a complete directory. Damaged existing assets
-are diagnosed, not overwritten. Setup/tests do not run model inference. Build
-verifies real model assets first; never build with placeholder weights.
+Setup downloads the pinned model assets and verifies their checksums. The build
+bundles the model and runtime into `dist/`. Model assets and build output are not
+tracked in Git.
 
-The graph is `sponsor_detector_combined.int8.onnx` at revision
-`d4939256c49e92d158429a55fcf39477d003dd58`, about 32 MiB including tokenizer/config.
-ORT 1.29.0's local GPU/CPU loaders and WASM are bundled separately, so the total
-extension is larger. An offscreen document owns a dedicated inference worker.
-Native WebGPU is preferred; unavailable GPU or GPU graph initialization failure
-selects WASM. A GPU inference failure retries the full track once on CPU after
-releasing the GPU session. Invalid outputs remain failures. The idle worker
-releases its model after 60 seconds.
+1. Open `chrome://extensions` and enable **Developer mode**.
+2. Select **Load unpacked** and choose the project's `dist/` folder.
+3. Open or reload a YouTube video with an English transcript.
 
-Load `dist/` using `chrome://extensions` → Developer mode → Load unpacked in your chosen Chrome profile. Model files and generated `dist/` remain ignored. Reload a
-video after changing detection settings or clearing suggestions, or analyze its
-open transcript from the popup.
+After rebuilding, reload the extension and the video page.
 
-## Checks and experiments
+## Usage
 
-```bash
-npm test               # source/configuration, decoder and lifecycle checks; no model inference
-npm run verify:model   # verify existing production assets
-npm run build          # local extension bundle; requires verified real assets
+Detection starts automatically when a video loads. YouTube's transcript panel may
+open briefly during acquisition. Captions can stay off.
+
+During a suggested segment, click **Skip** to jump to its end. Click **Undo** to
+restore your previous playback position. Use the extension popup to change
+settings or clear the current video's suggestions.
+
+If detection is unavailable, open YouTube's transcript panel, clear its search,
+and select **Analyze open transcript** in the popup to retry. Transcript-panel
+timestamps are approximate, and partial transcripts only cover part of a video.
+
+## Development
+
+```sh
+npm test               # source, decoder and lifecycle checks
+npm run verify:model   # verify downloaded model assets
+npm run build          # build the extension with verified assets
 ```
 
-The old `evaluate`/`debug` sentence-label experiments are retired. Ettin emits
-timed token intervals and supports paid sponsorships only. Use the Chrome
-benchmark runner with the documented resource policy for real model experiments;
-see [bench/README.md](bench/README.md).
+The separate [browser benchmark](bench/README.md) compares models and decoding
+strategies. Model inference runs in Chrome, not in the Node test suite.
 
-The [guarded overlap study](docs/ettin-overlap-study.md) explores decoding improvements
-without using the exposed test set. Its promising in-sample result did not pass
-channel-held-out checks, so production remains on the shipped decoder and threshold.
+## Privacy and licensing
 
-## Reliability and evidence
+Transcript inference runs locally with bundled assets. The extension does not
+upload captions or load remote models. YouTube and the initial model download
+require network access. Settings and cached suggestions use Chrome's local storage.
 
-Cache keys bind the model revision/graph, pipeline version, decoder gaps and
-threshold/category policy. Old MobileBERT, expired, incomplete and malformed
-entries are rejected. Completed-cache read/evict/write is serialized, with 30
-videos retained for 48 hours. Disable, settings changes, navigation, closed tabs
-and player replacement invalidate obsolete results and playback controls.
-Failures clear partial suggestions and allow caption-request retries. Whitespace
-JSON3 separators are filtered before speech-boundary validation.
-
-The prior [PR #1 synthetic browser evidence](docs/review-evidence/README.md),
-[isolated browser benchmark](docs/benchmark-evidence.md) and
-[current integration evidence](docs/ettin-integration.md) describe distinct
-checks. Passing fixtures or a synthetic installed-browser smoke does not prove
-live YouTube reliability, worker suspension, general detection accuracy or safe
-automatic skipping. Common human-reviewed references/negative exposure, more
-captions, campaign/training-overlap review and numeric release gates remain open.
+The project is experimental and marked `UNLICENSED`. Ettin weights are
+CC BY-NC-SA 4.0, and the Flow-derived decoder is GPL-3.0-only. See
+[third-party notices](licenses/NOTICE.md) for attribution and component licenses.
