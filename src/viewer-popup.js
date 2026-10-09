@@ -4,7 +4,8 @@ import {formatTime} from './viewer/ui.js';
 const $=id=>document.getElementById(id);let current=null,enabled=true;
 function render(state) {
     current=state;
-    $('status').textContent=statusText(!enabled?{status:'disabled'}:state?.paused&&state.status!=='disabled'?{...state,status:'paused'}:state);
+    const label=statusText(!enabled?{status:'disabled'}:state?.paused&&state.status!=='disabled'?{...state,status:'paused'}:state);
+    if($('status').textContent!==label)$('status').textContent=label;
     $('pause').disabled=!state||!enabled;$('pause').textContent=state?.paused?'Resume skipping for this video':'Pause skipping for this video';
     $('retry').hidden=!state||!['fetch_failed','invalid_captions','model_unavailable','inference_failed','insufficient_text','no_captions'].includes(state.status);
     $('segments').replaceChildren();
