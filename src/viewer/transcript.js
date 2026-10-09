@@ -2,6 +2,7 @@
 // Adapted design: edde746/SponsorSkip src/page/transcript.ts at 01e53cbe.
 // See docs/viewer-attribution.md. Retrieval uses YouTube only; no transcript upload.
 export const MAX_WORDS = 100000;
+export const TRANSCRIPT_VERSION = 'json3-words-v2';
 const MAX_BODY = 8 * 1024 * 1024;
 export function validVideoId(id) { return typeof id === 'string' && /^[A-Za-z0-9_-]{1,100}$/.test(id); }
 export function validateTranscript(value, videoId) {
@@ -30,7 +31,14 @@ export function parseJson3(events, duration) {
             ? Math.min(duration, start + event.dDurationMs / 1000)
             : speech[i + 1]?.tStartMs / 1000;
         if (!Number.isFinite(end) || end <= start || end > duration + 1) throw new Error('invalid_captions');
-        const pieces = event.segs.filter(seg => typeof seg?.utf8 === 'string' && seg.utf8.trim());
+        let pieces = event.segs.filter(seg => typeof seg?.utf8 === 'string' && seg.utf8.trim());
+        for (const piece of pieces) if (piece.tOffsetMs !== undefined && (!Number.isFinite(piece.tOffsetMs) || piece.tOffsetMs < 0)) throw new Error('invalid_captions');
+        // Untimed runs are pieces of a caption line, not simultaneous word cues.
+        // Preserve their literal reading order before interpolating the whole line.
+        if (pieces.slice(1).some(piece => piece.tOffsetMs === undefined)) {
+            estimated = true;
+            pieces = [{utf8: event.segs.filter(piece => typeof piece?.utf8 === 'string').map(piece => piece.utf8).join(''), tOffsetMs: pieces[0]?.tOffsetMs}];
+        }
         for (let j = 0; j < pieces.length; j++) {
             const piece = pieces[j];
             if (piece.tOffsetMs !== undefined && (!Number.isFinite(piece.tOffsetMs) || piece.tOffsetMs < 0)) throw new Error('invalid_captions');

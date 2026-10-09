@@ -9,10 +9,11 @@ export class EttinAdapter {
         cancelled();
         if(!this.worker){this.worker=this.createWorker();this.worker.onerror=()=>this.reset('model_unavailable');
             this.worker.onmessage=({data})=>{
-                const pending=this.pending;if(!pending||data.id!==pending.jobId)return;
+                const pending=this.pending;if(!pending||data?.id!==pending.jobId)return;
                 if(data.progress){pending.onProgress({...data.progress,segments:[]});return;}
                 this.pending=null;this.timers.clearTimeout(pending.timer);
-                if(!data.ok||data.model!==this.revision||data.pipelineVersion!==this.pipelineVersion||!['wasm','webgpu'].includes(data.backend))pending.reject(Object.assign(Error('inference_failed'),{code:'inference_failed'}));
+                if(!data.ok){const code=['model_unavailable','inference_failed','invalid_output'].includes(data.code)?data.code:'inference_failed';pending.reject(Object.assign(Error(code),{code}));}
+                else if(data.model!==this.revision||data.pipelineVersion!==this.pipelineVersion||!['wasm','webgpu'].includes(data.backend))pending.reject(Object.assign(Error('inference_failed'),{code:'inference_failed'}));
                 else pending.resolve({segments:data.segments,diagnostics:{model:'ettin-int8',revision:data.model,backend:data.backend,pipelineVersion:data.pipelineVersion,timing:pending.timing}});
                 this.idleTimer=this.timers.setTimeout(()=>this.reset(),60000);
             };}
