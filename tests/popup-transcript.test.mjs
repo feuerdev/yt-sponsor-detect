@@ -17,3 +17,12 @@ test('popup explains how to recover unavailable public captions',async()=>{
 test('disabled detection prevents the popup analysis request',async()=>{
  const f=fixture(false);await f.click();assert.equal(f.element('analyze-transcript-btn').disabled,true);assert.equal(f.requests.length,0);
 });
+
+
+for (const [control,value] of [['sponsor-threshold','0.9'],['sponsor-checkbox',false]])
+test(`${control} updates policy without a cache-clear request racing the new analysis`, () => {
+ const f=fixture(),element=f.element(control);
+ if(control==='sponsor-threshold')element.value=value;else element.checked=value;
+ element.events.change();
+ assert.equal(f.requests.length,0,'Settings invalidation is owned by the background, not a second popup clear');
+});

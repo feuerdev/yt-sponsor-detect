@@ -30,9 +30,9 @@ document.addEventListener('DOMContentLoaded',()=>{
         enabled.checked=settings.isEnabled;suggestions.checked=settings.labels[0].blocked;threshold.value=settings.labels[0].threshold;value.textContent=threshold.value;
         save();updateAnalyze();
         enabled.addEventListener('change',()=>{settings.isEnabled=enabled.checked;save();updateAnalyze();});
-        suggestions.addEventListener('change',()=>{settings.labels[0].blocked=suggestions.checked;save();clear();updateAnalyze();});
+        suggestions.addEventListener('change',()=>{settings.labels[0].blocked=suggestions.checked;save();updateAnalyze();});
         threshold.addEventListener('input',()=>{value.textContent=threshold.value;});
-        threshold.addEventListener('change',()=>{settings.labels[0].threshold=Number(threshold.value);save();clear();});
+        threshold.addEventListener('change',()=>{settings.labels[0].threshold=Number(threshold.value);save();});
         document.getElementById('clear-segments-btn').addEventListener('click',clear);
     });
 });

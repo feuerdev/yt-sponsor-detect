@@ -10,7 +10,7 @@ const source=readFileSync(new URL('../src/background.js',import.meta.url),'utf8'
 const deferred=()=>{let resolve;const promise=new Promise(done=>{resolve=done;});return {promise,resolve};};
 const tick=()=>new Promise(setImmediate);
 function fixture(){
- const f={messages:[],writes:[],classifications:[],reads:[],settings:{isEnabled:true,labels:[{name:'sponsor',threshold:.8,blocked:true}]},tab:{id:1,url:'https://www.youtube.com/watch?v=abcdefghijk'},language:{isReliable:true,languages:[{language:'en',percentage:100}]},snapshot:{videoId:'abcdefghijk',durationSeconds:20,rows:[{start:0,text:'Our first English caption.'},{start:10,text:'Our final English caption.'}]}};
+ const f={saved:{},messages:[],writes:[],classifications:[],reads:[],settings:{isEnabled:true,labels:[{name:'sponsor',threshold:.8,blocked:true}]},tab:{id:1,url:'https://www.youtube.com/watch?v=abcdefghijk'},language:{isReliable:true,languages:[{language:'en',percentage:100}]},snapshot:{videoId:'abcdefghijk',durationSeconds:20,rows:[{start:0,text:'Our first English caption.'},{start:10,text:'Our final English caption.'}]}};
  const context=vm.createContext({URL,MODEL_SPEC,sponsorLabels,validateSegments,captureOpenTranscript,panelCaptions,console:{log(){},error(){}},
   classifyCaptions:async(captions,threshold)=>{f.classifications.push({captions,threshold});return {segments:[{start:10,end:19,category:'sponsor',score:.9}],backend:'wasm'};},
   fetch:async()=>{f.fetching=deferred();return f.fetching.promise;},
@@ -19,7 +19,7 @@ function fixture(){
    i18n:{detectLanguage:async text=>{f.languageText=text;return f.languagePending?f.languagePending.promise:f.language;}},
    tabs:{query:async()=>[f.tab],get:async()=>f.tab,sendMessage:async(id,m)=>f.messages.push(m),onRemoved:{addListener:fn=>f.removed=fn},onUpdated:{addListener:fn=>f.updated=fn}},
    webRequest:{onCompleted:{addListener:fn=>f.captions=fn}},
-   storage:{sync:{get:async()=>f.settings},onChanged:{addListener:fn=>f.changed=fn},local:{get:async()=>({}),remove:async()=>{},set:async entry=>f.writes.push(entry)}}}});
+   storage:{sync:{get:async()=>f.settings},onChanged:{addListener:fn=>f.changed=fn},local:{get:async key=>key===null?{...f.saved}:{[key]:f.saved[key]},remove:async keys=>{if(f.removePending)await f.removePending.promise;for(const key of Array.isArray(keys)?keys:[keys])delete f.saved[key];},set:async entry=>{Object.assign(f.saved,entry);f.writes.push(entry);}}}}});
  vm.runInContext(source,context);f.state=()=>vm.runInContext('tabState[1]',context);
  f.request=(sender={id:'fixture',url:'chrome-extension://fixture/popup.html'})=>{f.reply=undefined;f.handler({type:'ANALYZE_OPEN_TRANSCRIPT'},sender,reply=>f.reply=reply);};
  f.finished=async()=>{for(let i=0;i<20&&!f.reply;i++)await tick();return f.reply;};return f;
@@ -85,4 +85,25 @@ test('a content script originating on YouTube home can acquire after SPA navigat
  f.handler({type:'GET_CACHED_SEGMENTS',videoId:'abcdefghijk'},{id:'fixture',frameId:0,url:'https://www.youtube.com/',tab:f.tab},()=>{});
  for(let i=0;i<30&&!f.classifications.length;i++)await tick();
  assert.equal(f.classifications.length,1);
+});
+
+
+for(const navigate of [false,true])
+test(`a delayed cache clear preserves ${navigate?'a different video':'a fresh analysis of the same video'}`,async()=>{
+ const f=fixture();f.request();assert.equal((await f.finished())?.ok,true);
+ f.removePending=deferred();
+ f.handler({type:'CLEAR_CACHE_FOR_ACTIVE_TAB'},{id:'fixture',url:'chrome-extension://fixture/popup.html'},()=>{});
+ await tick();
+ if(navigate){
+  f.tab={id:1,url:'https://www.youtube.com/watch?v=lmnopqrstuv'};
+  f.updated(1,{url:f.tab.url});f.snapshot={...f.snapshot,videoId:'lmnopqrstuv'};
+ }
+ f.request();await tick();await tick();
+ const current=f.state();
+ f.removePending.resolve();await f.finished();await tick();
+ assert.equal(f.state(),current,'The old clear must not cancel the newer analysis');
+ assert.equal(f.saved['sponsor-cache:'+f.snapshot.videoId]?.segments.length,1,
+  'The newer analysis must retain its completed cache');
+ assert.equal(f.messages.filter(m=>m.type==='CLEAR_SEGMENTS'&&!m.videoId).length,0,
+  'The old clear must not remove the newer suggestions');
 });

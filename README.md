@@ -66,7 +66,8 @@ strategies. Model inference runs in Chrome, not in the Node test suite.
 
 Transcript inference runs locally with bundled assets. The extension does not
 upload captions or load remote models. YouTube and the initial model download
-require network access. Settings and cached suggestions use Chrome's local storage.
+require network access. Settings use Chrome's sync storage. Cached suggestions
+stay in local storage.
 
 The project is experimental and marked `UNLICENSED`. Ettin weights are
 CC BY-NC-SA 4.0, and the Flow-derived decoder is GPL-3.0-only. See

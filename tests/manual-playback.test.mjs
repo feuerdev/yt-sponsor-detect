@@ -14,7 +14,7 @@ function fixture(settings = { isEnabled: true }) {
         removeEventListener(type, handler) { if (this.events[type] === handler) delete this.events[type]; }
         click(clientX = 120) { this.events.click?.({ currentTarget: this, clientX }); }
     }
-    const adClasses = new Set();
+    const adClasses = new Set(), timers = [];
     const player = new Element('player'), video = new Element('video'), bar = new Element('bar');
     player.classList = {contains: name => adClasses.has(name)};
     Object.assign(bar, {clientWidth:1200, getBoundingClientRect:()=>({left:100,width:1200})}); player.appendChild(bar);
@@ -22,7 +22,7 @@ function fixture(settings = { isEnabled: true }) {
     const all = () => { const result = []; const visit = node => { result.push(node); node.children.forEach(visit); }; visit(player); return result; };
     let changed, message;
     const context = vm.createContext({ console: { log() {}, error() {} }, URLSearchParams,
-        setTimeout() { return 1; }, clearTimeout() {},
+        setTimeout(fn, ms) { timers.push({fn, ms}); return timers.length; }, clearTimeout() {},
         window: { location: { search: '?v=first' } }, MutationObserver: class { observe() {} },
         document: { body: {}, createElement: tag => new Element(tag),
             getElementById: id => all().find(node => node.id === id) || null,
@@ -34,7 +34,7 @@ function fixture(settings = { isEnabled: true }) {
         },
     });
     vm.runInContext(source, context);
-    return { context, video, bar, all, ad: on => on ? adClasses.add('ad-showing') : adClasses.delete('ad-showing'), change: updates => changed(updates, 'sync'), message,
+    return { context, video, bar, all, timers, ad: on => on ? adClasses.add('ad-showing') : adClasses.delete('ad-showing'), change: updates => changed(updates, 'sync'), message,
         run: code => vm.runInContext(code, context),
         add: () => vm.runInContext("addSponsoredSegment({startTime:1,endTime:4,label:'synthetic sponsor'})", context),
         check: () => vm.runInContext('checkForSponsorBlock()', context),
@@ -160,4 +160,15 @@ test('partial coverage remains visible after analysis finishes',async()=>{
 test('content script is present before home-to-watch SPA navigation',()=>{
  const manifest=JSON.parse(readFileSync(new URL('../src/manifest.json',import.meta.url),'utf8'));
  assert.ok(manifest.content_scripts[0].matches.includes('*://*.youtube.com/*'));
+});
+
+
+test('a previous analysis cleanup cannot remove the next analysis indicator', async () => {
+ const f=fixture();await Promise.resolve();
+ f.message({type:'ANALYSIS_STARTED',payload:{processed:0,total:10}});
+ f.message({type:'ANALYSIS_FINISHED'});
+ f.message({type:'ANALYSIS_STARTED',payload:{processed:1,total:10}});
+ for(const timer of f.timers)timer.fn();
+ assert.ok(f.all().some(node=>node.id==='analysis-in-progress-indicator'),
+  'A completed analysis must not schedule removal of the next analysis indicator');
 });

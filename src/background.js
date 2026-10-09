@@ -320,22 +320,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         (async () => {
             try {
                 const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-                if (tab && tab.url && tab.url.includes("youtube.com/watch")) {
-                    const url = new URL(tab.url);
-                    const videoId = url.searchParams.get('v');
-                    if (videoId) {
-                        await chrome.storage.local.remove([videoId, CACHE_PREFIX + videoId]);
-                        console.log(`Cleared cache for video ${videoId}.`);
-                        
-                        // Also clear runtime state for the tab
-                        if (tabState[tab.id]) {
-                            delete tabState[tab.id];
-                            console.log(`Cleared runtime state for tab ${tab.id}.`);
-                        }
-
-                        // Also clear segments in the content script
-                        await chrome.tabs.sendMessage(tab.id, { type: "CLEAR_SEGMENTS" });
-                    }
+                const videoId = watchVideoId(tab);
+                if (videoId) {
+                    const state = tabState[tab.id];
+                    // Serialize clear with writes so a newer completed result cannot be erased.
+                    const clear = cacheWriteQueue.then(() =>
+                        chrome.storage.local.remove([videoId, CACHE_PREFIX + videoId]));
+                    cacheWriteQueue = clear.catch(() => {});
+                    await clear;
+                    if (tabState[tab.id] !== state) return;
+                    if (state) delete tabState[tab.id];
+                    await chrome.tabs.sendMessage(tab.id, {type: 'CLEAR_SEGMENTS', videoId});
                 }
             } catch(e) {
                 console.error("Error clearing cache for active tab:", e);

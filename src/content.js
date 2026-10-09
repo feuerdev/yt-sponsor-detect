@@ -24,6 +24,10 @@ chrome.storage.onChanged.addListener((changes, area) => {
         clearPlaybackControls();
         clearProgressBarHighlights();
         hideAnalysisIndicator();
+        document.getElementById('sponsor-analysis-error')?.remove();
+        document.getElementById('sponsor-transcript-coverage')?.remove();
+        if (isEnabled) requestVideoSegments(document.querySelector('video'),
+            new URLSearchParams(window.location.search).get('v'), videoGeneration);
     }
 });
 
@@ -114,8 +118,6 @@ function showAnalysisIndicator(processed, total) {
         indicator.style.fontSize = '14px';
         indicator.style.width = '250px';
         indicator.style.textAlign = 'center';
-        indicator.style.transition = 'opacity 0.3s ease-in-out';
-        indicator.style.opacity = '1';
 
         const text = document.createElement('span');
         text.id = 'analysis-indicator-text';
@@ -160,12 +162,7 @@ function updateAnalysisIndicator(processed, total) {
 }
 
 function hideAnalysisIndicator() {
-    const indicator = document.getElementById(ANALYSIS_INDICATOR_ID);
-    if (indicator) {
-        indicator.style.opacity = '0';
-        // Remove from DOM after transition
-        setTimeout(() => indicator.remove(), 300);
-    }
+    document.getElementById(ANALYSIS_INDICATOR_ID)?.remove();
 }
 
 function clearPlaybackControls() {
@@ -354,6 +351,27 @@ let lastVideoSrc = null;
 let lastVideoId = null;
 let videoGeneration = 0;
 
+function requestVideoSegments(video, videoId, generation) {
+    if (!video || !videoId) return;
+    console.log(`Requesting cached segments for video ${videoId}`);
+    chrome.runtime.sendMessage({ type: "GET_CACHED_SEGMENTS", videoId: videoId }, (response) => {
+        if (generation !== videoGeneration ||
+            document.querySelector('video') !== video ||
+            new URLSearchParams(window.location.search).get('v') !== videoId) return;
+        if (chrome.runtime.lastError) {
+            console.error("Error getting cached segments:", chrome.runtime.lastError.message);
+            return;
+        }
+        if(response?.cached)showTranscriptCoverage(response.captionProvenance);
+        if (response && response.segments && response.segments.length > 0) {
+            showTranscriptCoverage(response.captionProvenance);
+            console.log(`Received ${response.segments.length} cached segments for video ${videoId}.`);
+            response.segments.forEach(addSponsoredSegment);
+            updateProgressBarHighlights();
+        }
+    });
+}
+
 function initializeVideoListener() {
     const video = document.querySelector('video');
     const videoId = new URLSearchParams(window.location.search).get('v');
@@ -374,25 +392,7 @@ function initializeVideoListener() {
             document.getElementById('sponsor-transcript-coverage')?.remove();
             clearProgressBarHighlights();
 
-            if (videoId) {
-                console.log(`Requesting cached segments for video ${videoId}`);
-                chrome.runtime.sendMessage({ type: "GET_CACHED_SEGMENTS", videoId: videoId }, (response) => {
-                    if (generation !== videoGeneration ||
-                        document.querySelector('video') !== video ||
-                        new URLSearchParams(window.location.search).get('v') !== videoId) return;
-                    if (chrome.runtime.lastError) {
-                        console.error("Error getting cached segments:", chrome.runtime.lastError.message);
-                        return;
-                    }
-                    if(response?.cached)showTranscriptCoverage(response.captionProvenance);
-                    if (response && response.segments && response.segments.length > 0) {
-                        showTranscriptCoverage(response.captionProvenance);
-                        console.log(`Received ${response.segments.length} cached segments for video ${videoId}.`);
-                        response.segments.forEach(addSponsoredSegment);
-                        updateProgressBarHighlights();
-                    }
-                });
-            }
+            requestVideoSegments(video, videoId, generation);
 
             videoElement = video;
             videoElement.addEventListener('timeupdate', checkForSponsorBlock);
