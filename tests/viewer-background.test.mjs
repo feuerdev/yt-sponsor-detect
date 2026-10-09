@@ -6,6 +6,7 @@ import {initializeSettings} from '../src/viewer/settings.js';
 import {SessionCoordinator} from '../src/viewer/coordinator.js';
 import {ResultCache} from '../src/viewer/cache.js';
 import {MODEL_SPEC} from '../src/model-spec.js';
+import {TRANSCRIPT_VERSION} from '../src/viewer/transcript.js';
 import {captureOpenTranscript} from '../src/transcript-panel.js';
 import {panelToTranscript} from '../src/viewer/panel.js';
 const source=readFileSync(new URL('../src/viewer-background.js',import.meta.url),'utf8').replace(/^import .*;\n/gm,'').replace('export const coordinator','const coordinator');
@@ -19,7 +20,7 @@ function fixture(){
         onInstalled:event('installed'),onMessage:event('message'),sendMessage:async message=>{f.messages.push(message);if(message.type==='RUN_DETECTION')return {segments:[{start:1,end:4,category:'sponsor'}]};return {};},},
         storage:{sync:f.sync,local:f.local,onChanged:event('changed')},offscreen:{createDocument:async()=>{f.created++;if(f.create)await f.create();f.contexts=[{}];}},
         tabs:{onRemoved:event('removed'),onUpdated:event('updated'),sendMessage:async(id,message)=>{f.messages.push({...message,tabId:id});},get:async()=>({id:1,url:f.url||'https://www.youtube.com/watch?v=first'}),query:async()=>[{id:1,url:'https://www.youtube.com/watch?v=first'}]}};
-    const context=vm.createContext({chrome,initializeSettings,SessionCoordinator,ResultCache,MODEL_SPEC,captureOpenTranscript,panelToTranscript,URL});vm.runInContext(source,context);
+    const context=vm.createContext({chrome,initializeSettings,SessionCoordinator,ResultCache,MODEL_SPEC,TRANSCRIPT_VERSION,captureOpenTranscript,panelToTranscript,URL});vm.runInContext(source,context);
     f.coordinator=vm.runInContext('coordinator',context);
     f.sender={id:'extension',tab:{id:1,url:'https://www.youtube.com/watch?v=first'},url:'https://www.youtube.com/watch?v=first'};
     f.call=(message,sender=f.sender)=>new Promise(resolve=>{if(f.message(message,sender,resolve)!==true)resolve(undefined);});
@@ -64,4 +65,16 @@ test('actual viewer background retains public-panel recovery and rejects stale l
     let release;f.languagePending=new Promise(r=>{release=r;});const pending=f.call({type:'CAPTURE_PANEL',token:'a'});await tick();
     f.updated(1,{url:'https://www.youtube.com/watch?v=second'});release({isReliable:true,languages:[{language:'en',percentage:100}]});
     assert.equal((await pending).error,'fetch_failed');assert.equal(f.coordinator.sessions.size,0);
+});
+
+test('home-originated content can start after same-document navigation to watch',async()=>{
+    const f=fixture();await tick();const home={...f.sender,url:'https://www.youtube.com/',frameId:0};
+    const reply=await f.call({type:'START_SESSION',videoId:'first',token:'from-home'},home);
+    assert.equal(reply?.state?.status,'loading');assert.equal(f.coordinator.sessions.get(1)?.videoId,'first');
+});
+test('subframes and insecure senders cannot open viewer sessions',async()=>{
+    const f=fixture();await tick();
+    for(const sender of [{...f.sender,frameId:1},{...f.sender,url:'http://www.youtube.com/watch?v=first'}])
+        assert.equal(await f.call({type:'START_SESSION',videoId:'first',token:'wrong'},sender),undefined);
+    assert.equal(f.coordinator.sessions.size,0);
 });

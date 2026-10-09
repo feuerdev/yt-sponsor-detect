@@ -37,3 +37,10 @@ test('panel recovery requires reliable English and validates current-video ident
     assert.throws(()=>panelToTranscript(snapshot,'first',{isReliable:true,languages:[{language:'de',percentage:100}]}),/unsupported_language/);
     assert.throws(()=>panelToTranscript(snapshot,'second',english),/captions_unavailable/);
 });
+
+test('Ettin preserves a missing-model reason and retries successfully',async()=>{
+    const f=fixture();try{const failed=f.run();f.reply({ok:false,code:'model_unavailable'});
+        await assert.rejects(failed,error=>error.code==='model_unavailable');
+        const retry=f.run('retry');f.reply();assert.deepEqual((await retry).segments,[]);
+    }finally{f.adapter.reset();}
+});

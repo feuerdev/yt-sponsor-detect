@@ -3,6 +3,7 @@ import {initializeSettings} from './viewer/settings.js';
 import {SessionCoordinator} from './viewer/coordinator.js';
 import {ResultCache} from './viewer/cache.js';
 import {MODEL_SPEC} from './model-spec.js';
+import {TRANSCRIPT_VERSION} from './viewer/transcript.js';
 import {captureOpenTranscript} from './transcript-panel.js';
 import {panelToTranscript} from './viewer/panel.js';
 let creating;
@@ -14,7 +15,7 @@ async function ensureOffscreen() {
 }
 export const coordinator=new SessionCoordinator({
     settings:chrome.storage.sync,cache:new ResultCache(chrome.storage.local),
-    modelKey:JSON.stringify(['viewer-v2',MODEL_SPEC.directory,MODEL_SPEC.revision,MODEL_SPEC.files.at(-1).sha256,MODEL_SPEC.pipelineVersion,'word-cues',MODEL_SPEC.decoding]),
+    modelKey:JSON.stringify(['viewer-v2',MODEL_SPEC.directory,MODEL_SPEC.revision,MODEL_SPEC.files.at(-1).sha256,MODEL_SPEC.pipelineVersion,'word-cues',TRANSCRIPT_VERSION,MODEL_SPEC.decoding]),
     notify:(tabId,state)=>chrome.tabs.sendMessage(tabId,{type:'VIEWER_STATE',state}),
     cancel:jobId=>{if(jobs.has(jobId))jobs.get(jobId).cancelled=true;if(jobId)chrome.runtime.sendMessage({scope:'offscreen',type:'CANCEL_DETECTION',jobId}).catch(()=>{});},
     detect:async(transcript,{jobId})=>{
@@ -45,8 +46,11 @@ chrome.runtime.onMessage.addListener((message,sender,respond)=>{
     }
     let task;
     if (sender.tab && typeof sender.tab.id==='number') {
-        let url;try{url=new URL(sender.url||sender.tab.url);}catch{return false;}
-        if(url.hostname!=='www.youtube.com'||url.pathname!=='/watch')return false;
+        let url,source;try{source=new URL(sender.url||sender.tab.url);url=new URL(sender.tab.url||sender.url);}catch{return false;}
+        // A content script can survive YouTube's home-to-watch SPA navigation.
+        // The source origin must be trusted; the current tab URL owns video identity.
+        if(sender.id!==chrome.runtime.id||(sender.frameId!==undefined&&sender.frameId!==0)
+            ||source.origin!=='https://www.youtube.com'||url.origin!=='https://www.youtube.com'||url.pathname!=='/watch')return false;
         const tabId=sender.tab.id;
         if(message.type==='START_SESSION'&&message.videoId===url.searchParams.get('v'))task=coordinator.begin(tabId,message.videoId,message.token,{retry:message.retry===true});
         else if(message.type==='CAPTURE_PANEL'){

@@ -71,3 +71,23 @@ test('bridge cancellation releases listener and ignores a late response',async()
     win.emit({type:RESPONSE,nonce:'n',payload:{error:'no_captions'}});
     assert.equal(win.sent.type,'yt-sponsor:transcript-cancel:v1');
 });
+
+test('untimed text runs preserve caption reading order and share the line duration',()=>{
+    const parsed=parseJson3([{tStartMs:1000,dDurationMs:4000,segs:[{utf8:'hello friends '},{utf8:'welcome today'}]}],20);
+    assert.deepEqual(parsed.words.map(w=>w.text),['hello','friends','welcome','today']);
+    assert.deepEqual(parsed.words.map(w=>[w.start,w.end]),[[1,2],[2,3],[3,4],[4,5]]);assert.equal(parsed.timing,'estimated');
+});
+test('an untimed first ASR word still retains subsequent word offsets',()=>{
+    const parsed=parseJson3([{tStartMs:1000,dDurationMs:3000,segs:[{utf8:'sponsored'},{utf8:'by',tOffsetMs:1000},{utf8:'example',tOffsetMs:2000}]}],20);
+    assert.deepEqual(parsed.words.map(w=>[w.start,w.end]),[[1,2],[2,3],[3,4]]);
+});
+
+test('styled fragments within a word are concatenated without inventing whitespace',()=>{
+    const parsed=parseJson3([{tStartMs:0,dDurationMs:2000,segs:[{utf8:'spon'},{utf8:'sor message'}]}],20);
+    assert.deepEqual(parsed.words.map(w=>w.text),['sponsor','message']);assert.deepEqual(parsed.words.map(w=>[w.start,w.end]),[[0,1],[1,2]]);
+});
+
+test('whitespace-only text runs remain separators when estimating an untimed line',()=>{
+    const parsed=parseJson3([{tStartMs:0,dDurationMs:2000,segs:[{utf8:'hello'},{utf8:' '},{utf8:'world'}]}],20);
+    assert.deepEqual(parsed.words.map(w=>w.text),['hello','world']);
+});
