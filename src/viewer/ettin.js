@@ -1,5 +1,8 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Retains the existing pinned Ettin/Flow worker and CPU fallback.
+export function wordCaptions(transcript) {
+    return transcript.words.map(word=>({text:word.text,start:word.start,duration:word.end-word.start}));
+}
 export class EttinAdapter {
     constructor({createWorker,threshold,revision,pipelineVersion,timers=globalThis}){Object.assign(this,{createWorker,threshold,revision,pipelineVersion,timers});this.worker=null;this.pending=null;}
     reset(error='model_unavailable'){this.worker?.terminate();this.worker=null;this.timers.clearTimeout(this.idleTimer);
@@ -20,7 +23,7 @@ export class EttinAdapter {
         this.timers.clearTimeout(this.idleTimer);
         return new Promise((resolve,reject)=>{
             this.pending={jobId,resolve,reject,onProgress,timing:transcript.timing,timer:this.timers.setTimeout(()=>this.reset('inference_failed'),180000)};
-            try{this.worker.postMessage({id:jobId,captions:transcript.words.map(w=>({text:w.text,start:w.start,duration:w.end-w.start})),threshold:this.threshold});}
+            try{this.worker.postMessage({id:jobId,captions:wordCaptions(transcript),threshold:this.threshold});}
             catch{this.reset('model_unavailable');}
         });
     }

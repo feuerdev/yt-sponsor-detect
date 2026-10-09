@@ -133,3 +133,23 @@ For a caption-free export, add `--redact-captions --standalone --output bench/re
 A separate `bench/review-import.mjs --review-kind llm` route imports assistant transcript judgments without asserting human audiovisual review. Omitting the flag preserves the strict human route. LLM packets must declare `status: "llm-reviewed"` and `reviewMethod: "transcript-only"`, with `llmReviewerAttestation: true` and `reviewerAttestation: false` on each acquired source. Identity, source hash, population, policy, conflict, completeness, campaign and exposure checks remain enforced. Unavailable records cannot claim either kind of review. Import requires a new output directory and an unexposed bound ledger.
 
 LLM transcript references are not human watch attestations or population safety evidence. Keep review packets, exposure ledgers and generated reports locally with the inputs that produced them.
+
+
+## Evaluate the viewer's word-timing input
+
+The viewer now sends one timed word per cue to its retained Ettin engine. Historical sentence-cue runs do not establish its boundary accuracy. Prepare a separate local snapshot with the production JSON3 parser and shared worker formatter before comparing candidates:
+
+```sh
+node bench/viewer-dataset.mjs --manifest bench/local/your-reviewed-dataset.json --output bench/local/viewer-input
+npm run bench:run -- --manifest bench/local/viewer-input/dataset.json --split tune --model ettin-int8 --backend wasm --chrome /absolute/path/to/chrome
+# Run other pinned candidates/backend combinations sequentially on the same snapshot.
+npm run bench:tune -- --manifest bench/local/viewer-input/dataset.json --runs YOUR_TUNE_RUN_IDS --output bench/local/viewer-frozen-config.json
+npm run bench:run -- --manifest bench/local/viewer-input/dataset.json --split test --model ettin-int8 --backend wasm --config bench/local/viewer-frozen-config.json --chrome /absolute/path/to/chrome
+npm run bench:report -- --manifest bench/local/viewer-input/dataset.json --runs YOUR_RUN_IDS --output bench/local/viewer-report
+```
+
+Run inference on suitable ordinary hardware; these commands are not authorization to retry resource-deferred VPS workloads. Existing Ettin INT8/FP32 and SponsorSkip adapters accept the converted cue contract, so model pins and decoder comparisons stay intact. The snapshot preserves video/channel identity, tune/test splits, campaigns, references, reviewed negatives and the bound exposure ledger. Each converted fixture gets a new hash and parser/input version; the original registry and frozen files are untouched. Existing output is refused. A locked test ledger still requires a fresh holdout for a different frozen configuration; never reset it to accommodate a new pipeline.
+
+For captured JSON3, put the actual same-video `events` array in the source fixture's optional `viewerCaptionEvents` field and bind that fixture with the normal manifest hash/review process. ASR offsets then survive production parsing. Malformed raw events fail instead of silently falling back. Cue-only sources use the production creator-caption interpolation and are explicitly recorded as `estimated_from_cues`/`estimated`; they cannot establish ASR word-boundary quality. Fixture `viewerInput` provenance and dataset timing counts distinguish these cases. Raw events are omitted from the converted file; all output remains under ignored `bench/local/`.
+
+A preparation smoke check is available with `--manifest bench/datasets/synthetic.json` and a new output directory. It loads no model and proves no accuracy or latency. Browser adapter graph timing does not replace installed-extension acquisition/worker/playback timing.
