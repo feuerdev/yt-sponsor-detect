@@ -1,6 +1,6 @@
 {
   "name": "yt-sponsor-detect",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Experimental local classification of YouTube sponsor captions",
   "main": "src/background.js",
   "type": "module",

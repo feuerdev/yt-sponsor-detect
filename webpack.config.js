@@ -13,21 +13,27 @@ const config = {
         asyncWebAssembly: true
     },
     entry: {
-        background: './src/background.js',
-        popup: './src/popup.js',
-        content: './src/content.js',
+        'viewer-background': './src/viewer-background.js',
+        'viewer-popup': './src/viewer-popup.js',
+        'viewer-content': './src/viewer-content.js',
+        'viewer-page': './src/viewer-page.js',
+        'viewer-offscreen': './src/viewer-offscreen.js',
     },
     output: {
         path: path.resolve(__dirname, `dist`),
-        filename: '[name].js'
+        filename: '[name].js',
+        clean: true
     },
     plugins: [
         new HtmlWebpackPlugin({
             template: './src/popup.html',
-            filename: 'popup.html'
+            filename: 'popup.html',
+            inject: false
         }),
+        new HtmlWebpackPlugin({template: './src/viewer-offscreen.html', filename: 'viewer-offscreen.html', inject: false}),
         new CopyPlugin({
             patterns: [
+                {from: 'src/viewer.css', to: 'viewer.css'},
                 {
                     from: 'model',
                     to: 'model'

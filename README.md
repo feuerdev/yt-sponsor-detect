@@ -1,3 +1,26 @@
+# Local YouTube sponsor viewer
+
+The viewer redesign on this branch targets English paid sponsorships with automatic skipping on by default. Captions are acquired proactively and analyzed on-device while playback continues. A compact Undo control replays an estimated skipped interval; estimates can include regular content. Self-promotion is optional and initially off.
+
+**Implementation status:** the new viewing flow, transcript adapter and playback controls have source-level regression evidence. Production uses an experimental MobileBERT comparison baseline; model accuracy, ordinary-device performance and live YouTube integration are not established. Requirements and the exact evidence ledger are in [docs/viewer-experience.md](docs/viewer-experience.md). [Source attribution and separate model terms](docs/viewer-attribution.md) apply. No model binaries or raw captions are committed.
+
+```sh
+npm ci
+npm test
+npm run setup
+npm run build
+```
+
+Setup streams and SHA-256-verifies the exact production assets from `src/model-spec.js`; build requires those real assets. Load `dist/` as an unpacked extension in desktop Chrome 116+. The default controls work without opening the popup. Use the popup to pause skipping for the current video, toggle automatic skipping, retry retrieval, inspect estimated intervals or see local model diagnostics. Viewing preferences apply without reload.
+
+The MAIN-world script uses YouTube's internal player/caption endpoints, not the official caption-download API or a proxy. Retrieval failures and unavailable/unsupported captions produce visible states. English caption text is required; local audio transcription is a separate proof of concept. Caption fetching and initial asset setup need network access; inference never uploads transcript text and remote model loading is disabled. Internal endpoint compatibility and complete privacy/network behavior still require browser verification.
+
+`npm test` is sequential, dependency-free for lifecycle checks, and does not run inference or download models. It includes legacy-source regressions and separate tests of the new production viewer modules/entrypoints. Those fixtures do not prove detector accuracy. The isolated pinned benchmark in `bench/` compares NLI and word-level candidate decoding; its previous 50-video attempt could not obtain captions or complete learned-model loads within VPS limits. [Benchmark evidence](docs/benchmark-evidence.md) preserves those limitations.
+
+## Historical prototype documentation
+
+The material below describes earlier manual-first prototype work and evidence; it does not override the new viewer behavior or establish current production accuracy.
+
 # YouTube sponsor detection prototype
 
 > Current direction (7 October 2026): the isolated full-track benchmark in `bench/` takes precedence over historical sentence threshold tuning and automatic-skipping plans. See `bench/README.md` and `docs/benchmark-evidence.md`. The 50-video pilot was attempted but captions and learned-model runtime evidence are blocked; automatic skipping stays disabled.

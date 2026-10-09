@@ -17,10 +17,10 @@ assert.equal(pkg.version, manifest.version, 'Extension/package version must matc
 assert.equal(manifest.manifest_version, 3, 'Extension must use Manifest V3');
 assert.equal(pkg.type, 'module', 'Build scripts use ES modules');
 
+function jsFiles(dir) { return readdirSync(path.join(root, dir), {withFileTypes: true}).flatMap(entry => entry.isDirectory() ? jsFiles(dir + '/' + entry.name) : /\.(m?js)$/.test(entry.name) ? [dir + '/' + entry.name] : []); }
 const files = [
     ...readdirSync(root).filter(file => /\.(m?js)$/.test(file)),
-    ...['src', 'scripts'].flatMap(dir => readdirSync(path.join(root, dir))
-        .filter(file => /\.(m?js)$/.test(file)).map(file => `${dir}/${file}`)),
+    ...['src', 'scripts'].flatMap(jsFiles),
 ];
 
 for (const file of files) {
