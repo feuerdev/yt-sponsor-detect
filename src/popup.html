@@ -11,6 +11,8 @@
       .container {
         display: flex;
         align-items: center;
+        flex-wrap: wrap;
+        gap: 8px;
         margin-top: 10px;
       }
       label {
@@ -25,24 +27,7 @@
         border-bottom: 1px solid #eee;
         padding-bottom: 5px;
       }
-      .label-item {
-        display: grid;
-        grid-template-columns: 1fr auto auto auto auto;
-        gap: 8px;
-        align-items: center;
-        margin-bottom: 8px;
-      }
-      .label-item input[type="text"] {
-        width: 100%;
-        box-sizing: border-box;
-      }
-      .label-item input[type="range"] {
-        width: 80px; /* Adjust width as needed */
-      }
-      #add-label-btn {
-        margin-top: 10px;
-      }
-      #clear-segments-btn {
+      #clear-segments-btn, #analyze-transcript-btn {
         width: 100%;
       }
     </style>
@@ -55,12 +40,23 @@
     </div>
 
     <p>Suggestions require a click and can be wrong. Undo restores your previous playback position.</p>
-    <p>After changing categories or clearing suggestions, reload the video to analyze its captions again.</p>
-    <h4>Suggested Categories</h4>
-    <div id="labels-list">
-      <!-- Label items will be dynamically inserted here -->
+    <p>If caption detection is unavailable, open YouTube's transcript panel, clear any transcript search, then analyze it here. English transcripts only; panel timing is approximate.</p>
+    <div class="container">
+      <button id="analyze-transcript-btn" disabled>Analyze open transcript</button>
     </div>
-    <button id="add-label-btn">+ Add Category</button>
+    <p id="transcript-status" role="status" aria-live="polite"></p>
+    <h4>Paid sponsorships</h4>
+    <p>This model detects paid sponsorships. Self-promotion and custom categories are unavailable.</p>
+    <div class="container">
+      <input type="checkbox" id="sponsor-checkbox" />
+      <label for="sponsor-checkbox">Show paid-sponsor suggestions</label>
+    </div>
+    <div class="container">
+      <label for="sponsor-threshold">Minimum confidence</label>
+      <input type="range" id="sponsor-threshold" min="0" max="1" step="0.01" />
+      <output id="threshold-value" for="sponsor-threshold"></output>
+    </div>
+    <p>Confidence is a model score, not a guarantee that a suggestion is correct.</p>
 
     <div class="container setting">
       <button id="clear-segments-btn">Clear Current Video Suggestions</button>

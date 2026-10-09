@@ -1,0 +1,11 @@
+{
+  "version": "paid-selfpromo-v1",
+  "sponsor": "Explicit paid external sponsorship or advertising read.",
+  "selfpromo": "Creator's own paid product, membership, merchandise, course or service. Separate optional category.",
+  "neutral": "Ordinary reviews and unpaid product discussion; like/subscribe requests.",
+  "uncertain": "Affiliate-only or gifted products without clear paid read; conflicting crowd labels or unclear compensation. Require human review.",
+  "negativeEvidence": "Only explicitly reviewed intervals count as verified ordinary content. No crowd submission is unknown.",
+  "pilotLabelQuality": "SponsorBlock provisional, partial, unreviewed. No cloud labeling.",
+  "captionBoundary": "Native caption cue endpoints retained. Specialist word/character timestamps interpolate within cues, with explicit approximation.",
+  "review": "All candidates use the same versioned reviewed references; queue includes disagreements, unknown predictions, suspicious boundaries and negative cases."
+}

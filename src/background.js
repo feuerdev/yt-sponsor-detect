@@ -1,11 +1,8 @@
-import { env } from '@xenova/transformers';
-import { classifyText } from './classifier.js';
+import {captureOpenTranscript,panelCaptions} from './transcript-panel.js';
+import { classifyCaptions } from './classifier.js';
+import { sponsorLabels } from './sponsor-policy.js';
+import { validateSegments } from './caption-contract.js';
 import { MODEL_SPEC } from './model-spec.js';
-
-// Due to a bug in onnxruntime-web, we must disable multithreading for now.
-// See https://github.com/microsoft/onnxruntime/issues/14445 for more information.
-env.backends.onnx.wasm.numThreads = 1;
-env.backends.onnx.wasm.wasmPaths = '/ort/';
 
 console.log("Background script loaded.");
 
@@ -15,13 +12,10 @@ const CACHE_PREFIX = 'sponsor-cache:';
 const CACHE_MAX_ENTRIES = 30;
 const CACHE_TTL_MS = 48 * 3600000;
 function policyKey(labels) {
-    if (!Array.isArray(labels) || labels.length === 0 || labels.length > 30
-        || labels.some(label => !label || typeof label.name !== 'string' || !label.name.trim()
-            || label.name.length > 160 || !Number.isFinite(label.threshold)
-            || label.threshold < 0 || label.threshold > 1 || typeof label.blocked !== 'boolean')
-        || new Set(labels.map(label => label.name)).size !== labels.length) return null;
-    return JSON.stringify([2, MODEL_SPEC.revision, MODEL_SPEC.files.at(-1).sha256,
-        labels.map(({name, threshold, blocked}) => ({name, threshold, blocked}))]);
+    const policy=sponsorLabels(labels);
+    if (!policy) return null;
+    return JSON.stringify([3, MODEL_SPEC.revision, MODEL_SPEC.files.at(-1).sha256,
+        MODEL_SPEC.pipelineVersion,MODEL_SPEC.decoding.mergeGapCharacters,MODEL_SPEC.decoding.mergeGapSeconds,policy]);
 }
 function validSegments(segments) {
     return Array.isArray(segments) && segments.length <= 1000 && segments.every(segment =>
@@ -38,7 +32,7 @@ function cacheCompleted(tabId, videoId, labels, tabData) {
 }
 async function writeCompletedCache(tabId, videoId, labels, tabData) {
     const key = tabData.policyKey || policyKey(labels);
-    const settings = await chrome.storage.sync.get({isEnabled: true, labels: []});
+    const settings = await chrome.storage.sync.get({isEnabled: true, labels: null});
     if (tabState[tabId] !== tabData || !settings.isEnabled || policyKey(settings.labels) !== key
         || !validSegments(tabData.foundSegments)) return;
     const cached = await chrome.storage.local.get(null);
@@ -49,7 +43,7 @@ async function writeCompletedCache(tabId, videoId, labels, tabData) {
         await chrome.storage.local.remove(others.slice(0, others.length - CACHE_MAX_ENTRIES + 1).map(([name]) => name));
     if (tabState[tabId] !== tabData) return;
     await chrome.storage.local.set({[CACHE_PREFIX + videoId]: {
-        policyKey: key, complete: true, createdAt: Date.now(), segments: tabData.foundSegments.map(segment => ({...segment}))
+        policyKey: key, complete: true, createdAt: Date.now(), backend: tabData.backend || null, model: MODEL_SPEC.revision, captionProvenance: tabData.captionProvenance || null, segments: tabData.foundSegments.map(segment => ({...segment}))
     }});
 }
 chrome.storage.onChanged?.addListener((changes, area) => {
@@ -61,143 +55,41 @@ chrome.storage.onChanged?.addListener((changes, area) => {
     }
 });
 
-// New constants for sliding window
-const WINDOW_SIZE_CAPTIONS = 20; // Number of captions in a window
-const WINDOW_STEP_CAPTIONS = 5;  // Number of captions to slide forward for the next window
-const MIN_WINDOW_TEXT_LENGTH = 50; // Minimum number of characters in a window to be worth analyzing
-
 function formatTime(totalSeconds) {
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = Math.floor(totalSeconds % 60);
     return `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
 }
 
-async function processWindowQueue(tabId, videoId, labels) {
-    const tabData = tabState[tabId];
-    if (!tabData || tabData.isAnalyzing || tabData.windowQueue.length === 0) {
-        return;
-    }
-    tabData.isAnalyzing = true;
-    const totalWindows = tabData.windowQueue.length;
-    let processedWindows = 0;
-    let failed = false;
-
+async function processCaptions(tabId,videoId,labels) {
+    const tabData=tabState[tabId],policy=sponsorLabels(labels);
+    if (!tabData || tabData.isAnalyzing || !policy || !tabData.allCaptions.length) return;
+    tabData.isAnalyzing=true;
+    let failed=false;
+    const send=async(type,payload)=>{if(tabState[tabId]===tabData)await chrome.tabs.sendMessage(tabId,{type,videoId,payload}).catch(()=>{});};
+    await send('ANALYSIS_STARTED',{total:0,processed:0,captionProvenance:tabData.captionProvenance||null});
     try {
-        await chrome.tabs.sendMessage(tabId, { type: "ANALYSIS_STARTED", videoId, payload: { total: totalWindows, processed: 0 } });
-    } catch (e) { /* Tab might be closed, ignore */ }
-
-    try {
-        // Process all windows currently in the queue
-        while (tabState[tabId] === tabData && tabData.windowQueue.length > 0) {
-            const windowCaptions = tabData.windowQueue.shift(); // Get next window
-
-            let textToAnalyze = windowCaptions.map(c => c.text).join(' ');
-            if (textToAnalyze.length < MIN_WINDOW_TEXT_LENGTH) {
-                processedWindows++;
-                continue;
-            }
-            
-            const classificationLabels = labels.map(l => l.name);
-            const allScores = await classifyText(textToAnalyze, classificationLabels);
-            if (tabState[tabId] !== tabData) return;
-
-            const windowStartTime = parseFloat(windowCaptions[0].start);
-            const lastCaption = windowCaptions[windowCaptions.length - 1];
-            const windowEndTime = parseFloat(lastCaption.start) + parseFloat(lastCaption.duration);
-
-            const windowScore = {
-                startTime: windowStartTime,
-                endTime: windowEndTime,
-                scores: allScores
-            };
-            
-            tabData.windowScores.push(windowScore);
-            processedWindows++;
-            try {
-                await chrome.tabs.sendMessage(tabId, { type: "ANALYSIS_PROGRESS", videoId, payload: { total: totalWindows, processed: processedWindows } });
-            } catch(e) { /* Tab might be closed, ignore */ }
+        const result=policy[0].blocked?await classifyCaptions(tabData.allCaptions,policy[0].threshold,p=>{send('ANALYSIS_PROGRESS',p);}):{segments:[]};
+        if(tabState[tabId]!==tabData)return;
+        validateSegments(result.segments,tabData.allCaptions);
+        tabData.backend=result.backend;
+        for(const segment of result.segments){
+            if(tabState[tabId]!==tabData)return;
+            await processNewSegment(tabId,videoId,{startTime:segment.start,endTime:segment.end,label:'sponsor'});
         }
-
-        tabData.windowScores.sort((a, b) => a.startTime - b.startTime);
-
-        // After processing new windows, run the coalescing logic once.
-        if (tabState[tabId] === tabData && processedWindows > 0) {
-            await findAndProcessSponsoredSegments(tabId, videoId, labels);
-            if (tabState[tabId] === tabData) await cacheCompleted(tabId, videoId, labels, tabData);
-        }
-
-    } catch (error) {
-        failed = true;
-        if (tabState[tabId] === tabData) {
-            tabData.windowQueue.length = 0;
-            tabData.windowScores.length = 0;
-            tabData.foundSegments.length = 0;
-            await chrome.storage.local.remove(CACHE_PREFIX + videoId).catch(() => {});
-            const codes = ['model_unavailable', 'inference_failed', 'invalid_output'];
-            const code = codes.includes(error?.code) ? error.code : 'analysis_failed';
-            try {
-                await chrome.tabs.sendMessage(tabId, { type: 'CLEAR_SEGMENTS', videoId });
-                if (tabState[tabId] === tabData) {
-                    await chrome.tabs.sendMessage(tabId, { type: 'ANALYSIS_ERROR', videoId, payload: { code } });
-                }
-            } catch { /* Closed tabs require no playback action. */ }
-            // Allow the next caption request to rebuild a failed analysis from scratch.
-            if (tabState[tabId] === tabData) delete tabState[tabId];
+        if(tabState[tabId]===tabData)await cacheCompleted(tabId,videoId,labels,tabData);
+    } catch(error) {
+        failed=true;
+        if(tabState[tabId]===tabData){
+            tabData.foundSegments.length=0;
+            await chrome.storage.local.remove(CACHE_PREFIX+videoId).catch(()=>{});
+            const code=['model_unavailable','inference_failed','invalid_output'].includes(error?.code)?error.code:'analysis_failed';
+            await send('CLEAR_SEGMENTS');await send('ANALYSIS_ERROR',{code});
+            if(tabState[tabId]===tabData)delete tabState[tabId];
         }
     } finally {
-        tabData.isAnalyzing = false;
-        if (tabState[tabId] === tabData && !failed) {
-            try {
-                await chrome.tabs.sendMessage(tabId, { type: "ANALYSIS_FINISHED", videoId });
-            } catch(e) { /* Tab might be closed, ignore */ }
-        }
-    }
-}
-
-async function findAndProcessSponsoredSegments(tabId, videoId, labels) {
-    const tabData = tabState[tabId];
-    if (!tabData || tabData.videoId !== videoId) return;
-
-    for (const label of labels) {
-        if (!label.blocked) continue;
-
-        let currentSegment = null;
-        const scoreThreshold = label.threshold;
-
-        for (const window of tabData.windowScores) {
-            if (tabState[tabId] !== tabData) return;
-            const score = window.scores[label.name] || 0;
-
-            if (score > scoreThreshold) {
-                // Window is a candidate for this label
-                if (currentSegment) {
-                    if (window.startTime > currentSegment.endTime) {
-                        await processNewSegment(tabId, videoId, currentSegment);
-                        if (tabState[tabId] !== tabData) return;
-                        currentSegment = {startTime: window.startTime, endTime: window.endTime, label: label.name};
-                    } else {
-                        currentSegment.endTime = Math.max(currentSegment.endTime, window.endTime);
-                    }
-                } else {
-                    // Start a new potential segment
-                    currentSegment = {
-                        startTime: window.startTime,
-                        endTime: window.endTime,
-                        label: label.name
-                    };
-                }
-            } else {
-                // Window is not a candidate, so any active segment ends here
-                if (currentSegment) {
-                    await processNewSegment(tabId, videoId, currentSegment);
-                    currentSegment = null;
-                }
-            }
-        }
-        // Process any segment that was active at the very end
-        if (currentSegment && tabState[tabId] === tabData) {
-            await processNewSegment(tabId, videoId, currentSegment);
-        }
+        tabData.isAnalyzing=false;
+        if(!failed)await send('ANALYSIS_FINISHED');
     }
 }
 
@@ -249,6 +141,8 @@ chrome.webRequest.onCompleted.addListener(
 
     // Capture state before the first await: older responses must not revive a tab.
     const tabId = details.tabId;
+    // A user-selected public panel owns this request; late caption URLs must not replace it.
+    if(tabState[tabId]?.videoId===videoId && tabState[tabId]?.captionUrl==='public-transcript-panel')return;
     if (!tabState[tabId] || tabState[tabId].videoId !== videoId || tabState[tabId].captionUrl !== details.url) {
         console.log(`New video detected (${videoId}) on tab ${tabId}. Resetting state.`);
         tabState[tabId] = {
@@ -257,22 +151,26 @@ chrome.webRequest.onCompleted.addListener(
             captionsFetched: false,
             captionRequestPending: false,
             allCaptions: [],
-            windowScores: [],
             foundSegments: [],
-            lastWindowStartCaptionIndex: -1,
-            windowQueue: [],
             isAnalyzing: false
         };
     }
 
     const tabData = tabState[tabId];
+    const language=url.searchParams.get('tlang') || url.searchParams.get('lang');
+    if(!/^en(?:[-_]|$)/i.test(language || '')){
+        delete tabState[tabId];
+        await chrome.tabs.sendMessage(tabId,{type:'CLEAR_SEGMENTS',videoId}).catch(()=>{});
+        await chrome.tabs.sendMessage(tabId,{type:'ANALYSIS_ERROR',videoId,payload:{code:'unsupported_language'}}).catch(()=>{});
+        return;
+    }
     if (tabData.captionsFetched || tabData.captionRequestPending) return;
     tabData.captionRequestPending = true;
     const generation = policyGeneration;
 
     const { isEnabled, labels } = await chrome.storage.sync.get({ 
         isEnabled: true, 
-        labels: []
+        labels: null
     });
 
     if (generation !== policyGeneration || tabState[tabId] !== tabData || !isEnabled || !policyKey(labels)) {
@@ -315,24 +213,8 @@ chrome.webRequest.onCompleted.addListener(
             tabData.captionsFetched = true;
             tabData.allCaptions.push(...captions);
 
-            // Determine where to start creating new windows from
-            const startFromIndex = tabData.lastWindowStartCaptionIndex === -1
-                ? 0
-                : tabData.lastWindowStartCaptionIndex + WINDOW_STEP_CAPTIONS;
-            
-            let windowsAdded = 0;
-            for (let i = startFromIndex; i <= tabData.allCaptions.length - WINDOW_SIZE_CAPTIONS; i += WINDOW_STEP_CAPTIONS) {
-                const windowCaptions = tabData.allCaptions.slice(i, i + WINDOW_SIZE_CAPTIONS);
-                tabData.windowQueue.push(windowCaptions);
-                tabData.lastWindowStartCaptionIndex = i;
-                windowsAdded++;
-            }
-
-            if (windowsAdded > 0) {
-                 console.log(`Added ${windowsAdded} new windows to the queue for video ${videoId}.`);
-                 // This is fire-and-forget; the function handles its own concurrency.
-                 processWindowQueue(tabId, videoId, labels);
-            }
+            // Analyze every speech cue, including short tracks and the tail.
+            processCaptions(tabId,videoId,labels);
         }
       } catch (error) {
         if (tabState[tabId] === tabData) {
@@ -348,7 +230,64 @@ chrome.webRequest.onCompleted.addListener(
   { urls: ["*://*.youtube.com/*"] }
 );
 
+function watchVideoId(tab) {
+    try {
+        const url=new URL(tab?.url);
+        const id=url.searchParams.get('v');
+        return url.protocol==='https:' && url.hostname==='www.youtube.com' && url.pathname==='/watch'
+            && /^[a-zA-Z0-9_-]{11}$/.test(id || '') ? id : null;
+    }catch{return null;}
+}
+async function analyzeOpenTranscript(targetTab=null,automatic=false) {
+    const generation=policyGeneration;
+    let tab,videoId,state;
+    const cancelled=()=>generation!==policyGeneration || tabState[tab.id]!==state;
+    try {
+        if(targetTab)tab=targetTab;else [tab]=await chrome.tabs.query({active:true,currentWindow:true});videoId=watchVideoId(tab);
+        if(!videoId || !Number.isInteger(tab.id))return {ok:false,code:'not_youtube_video'};
+        const settings=await chrome.storage.sync.get({isEnabled:true,labels:null});
+        if(generation!==policyGeneration)return {ok:false,code:'cancelled'};
+        const labels=sponsorLabels(settings.labels);
+        if(!settings.isEnabled || !labels?.[0]?.blocked)return {ok:false,code:'disabled'};
+        if(watchVideoId(await chrome.tabs.get(tab.id))!==videoId)return {ok:false,code:'cancelled'};
+        if(tabState[tab.id]?.videoId===videoId && (tabState[tab.id].isAnalyzing
+            || tabState[tab.id].captionUrl==='public-transcript-panel'&&(tabState[tab.id].captionRequestPending||automatic&&tabState[tab.id].captionsFetched)))return {ok:false,code:'analysis_in_progress'};
+        state={videoId,captionUrl:'public-transcript-panel',captionRequestPending:true,captionsFetched:false,
+            allCaptions:[],foundSegments:[],isAnalyzing:false,policyKey:policyKey(settings.labels)};
+        tabState[tab.id]=state;
+        const results=await chrome.scripting.executeScript({target:{tabId:tab.id,frameIds:[0]},world:'MAIN',func:captureOpenTranscript,args:automatic?[videoId,true]:[videoId]});
+        if(cancelled())return {ok:false,code:'cancelled'};
+        const snapshot=results?.find(result=>result.frameId===0)?.result;
+        if(!snapshot)throw Error('captions_unavailable');
+        const language=await chrome.i18n.detectLanguage(snapshot.rows.map(row=>row.text).join(' '));
+        const currentVideoId=watchVideoId(await chrome.tabs.get(tab.id));
+        if(cancelled() || currentVideoId!==videoId)return {ok:false,code:'cancelled'};
+        const parsed=panelCaptions(snapshot,videoId,language,{allowPartial:automatic});
+        state.allCaptions=parsed.captions;state.captionProvenance=parsed.provenance;
+        state.captionRequestPending=false;state.captionsFetched=true;
+        await chrome.tabs.sendMessage(tab.id,{type:'CLEAR_SEGMENTS',videoId}).catch(()=>{});
+        if(cancelled())return {ok:false,code:'cancelled'};
+        await processCaptions(tab.id,videoId,settings.labels);
+        return cancelled()?{ok:false,code:'analysis_failed'}:{ok:true,captionProvenance:state.captionProvenance,segments:state.foundSegments.length};
+    }catch(error) {
+        const code=error?.message==='unsupported_language'?'unsupported_language':'captions_unavailable';
+        if(state && !cancelled()) {
+            delete tabState[tab.id];
+            await chrome.storage.local.remove(CACHE_PREFIX+videoId).catch(()=>{});
+            await chrome.tabs.sendMessage(tab.id,{type:'ANALYSIS_ERROR',videoId,payload:{code}}).catch(()=>{});
+        }
+        return {ok:false,code};
+    }finally{if(state)state.captionRequestPending=false;}
+}
+
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if(request.type==='ANALYZE_OPEN_TRANSCRIPT') {
+        if(sender.id!==chrome.runtime.id || sender.url!==chrome.runtime.getURL('popup.html')) {
+            sendResponse({ok:false,code:'invalid_request'});return false;
+        }
+        analyzeOpenTranscript().then(sendResponse);return true;
+    }
+
     if (request.type === 'GET_CACHED_SEGMENTS') {
         const videoId = request.videoId;
         (async () => {
@@ -357,7 +296,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                 if (typeof videoId !== 'string' || !/^[a-zA-Z0-9_-]{1,100}$/.test(videoId)) {
                     sendResponse({segments: []}); return;
                 }
-                const settings = await chrome.storage.sync.get({isEnabled: true, labels: []});
+                const settings = await chrome.storage.sync.get({isEnabled: true, labels: null});
                 const key = policyKey(settings.labels);
                 const data = await chrome.storage.local.get(CACHE_PREFIX + videoId);
                 const entry = data[CACHE_PREFIX + videoId];
@@ -365,7 +304,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     && entry.policyKey === key && Number.isFinite(entry.createdAt)
                     && Date.now() >= entry.createdAt && Date.now() - entry.createdAt <= CACHE_TTL_MS
                     && validSegments(entry.segments);
-                sendResponse({ segments: valid ? entry.segments : [] });
+                sendResponse({ segments: valid ? entry.segments : [], cached:!!valid, captionProvenance:valid?entry.captionProvenance:null });
+                // A normal watch-page content script requests its cache on load and SPA navigation.
+                // Acquire independently of CC/network traffic, including valid empty-result caching.
+                if(!valid && sender.id===chrome.runtime.id && sender.frameId===0
+                    && watchVideoId(sender.tab)===videoId && new URL(sender.url).origin==='https://www.youtube.com')
+                    await analyzeOpenTranscript(sender.tab,true);
             } catch (e) {
                 console.error("Error getting cached segments:", e);
                 sendResponse({ segments: [] });
@@ -376,22 +320,17 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         (async () => {
             try {
                 const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-                if (tab && tab.url && tab.url.includes("youtube.com/watch")) {
-                    const url = new URL(tab.url);
-                    const videoId = url.searchParams.get('v');
-                    if (videoId) {
-                        await chrome.storage.local.remove([videoId, CACHE_PREFIX + videoId]);
-                        console.log(`Cleared cache for video ${videoId}.`);
-                        
-                        // Also clear runtime state for the tab
-                        if (tabState[tab.id]) {
-                            delete tabState[tab.id];
-                            console.log(`Cleared runtime state for tab ${tab.id}.`);
-                        }
-
-                        // Also clear segments in the content script
-                        await chrome.tabs.sendMessage(tab.id, { type: "CLEAR_SEGMENTS" });
-                    }
+                const videoId = watchVideoId(tab);
+                if (videoId) {
+                    const state = tabState[tab.id];
+                    // Serialize clear with writes so a newer completed result cannot be erased.
+                    const clear = cacheWriteQueue.then(() =>
+                        chrome.storage.local.remove([videoId, CACHE_PREFIX + videoId]));
+                    cacheWriteQueue = clear.catch(() => {});
+                    await clear;
+                    if (tabState[tab.id] !== state) return;
+                    if (state) delete tabState[tab.id];
+                    await chrome.tabs.sendMessage(tab.id, {type: 'CLEAR_SEGMENTS', videoId});
                 }
             } catch(e) {
                 console.error("Error clearing cache for active tab:", e);
@@ -401,8 +340,6 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         return false;
     }
 });
-
-// Listen for messages from content scripts - REMOVED as it's no longer needed.
 
 // Clean up buffer when a tab is closed
 chrome.tabs.onRemoved.addListener((tabId) => {

@@ -1,0 +1,109 @@
+{
+  "acquisitionSummary": {
+    "selected": 2,
+    "available": 2,
+    "channelsSelected": 2,
+    "channelsAvailable": 2,
+    "verifiedNegativeHours": 0,
+    "qualityClaims": "provisional reference agreement only"
+  },
+  "attemptLedger": [
+    {
+      "at": "2026-10-07T15:30:31.758861+00:00",
+      "channelId": "UCwiaPYufmQOq5F1TI-FzQhw",
+      "phase": "captions",
+      "reason": "ValueError:empty_caption_response",
+      "status": "failure",
+      "videoId": "WSLW1A6Q5a4"
+    },
+    {
+      "at": "2026-10-07T15:30:33.075678+00:00",
+      "channelId": "UCR-DXc1voovS8nhAvccRZhg",
+      "phase": "captions",
+      "reason": "ValueError:empty_caption_response",
+      "status": "failure",
+      "videoId": "I9zqGeH8EIs"
+    },
+    {
+      "videoId": "WSLW1A6Q5a4",
+      "channelId": "UCwiaPYufmQOq5F1TI-FzQhw",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "ok",
+      "at": "2026-10-07T19:55:16.168Z",
+      "rawSourceHash": "da40b699a69c5a88fbd2f9e22577664b8c68d40071547f7fabd72f87eec287b3",
+      "fixtureHash": "d8c742ca6b03db77ca38f1fdd19f12dbeec47607e5e8cb066202187cbc4f972b"
+    },
+    {
+      "videoId": "I9zqGeH8EIs",
+      "channelId": "UCR-DXc1voovS8nhAvccRZhg",
+      "phase": "captions",
+      "method": "public-transcript-ui",
+      "status": "ok",
+      "at": "2026-10-07T19:55:21.920Z",
+      "rawSourceHash": "36c2d1839830b3abef455b9f2438ff7c29b5f6ea24f8bc9eb35fbe5ae7481247",
+      "fixtureHash": "4d52bd9f5f77357c58ad44366a75bc2b63a1ee3d05dc641601937f815f62326e"
+    }
+  ],
+  "kind": "published reproduction smoke only",
+  "schemaVersion": 1,
+  "selectionHash": "published-sponsorskip-examples-v1",
+  "videos": [
+    {
+      "acquiredAt": "2026-10-07T19:55:16.168Z",
+      "captionAvailability": "ok",
+      "channelId": "UCwiaPYufmQOq5F1TI-FzQhw",
+      "contamination": "published model demonstration; smoke only",
+      "crowdReferences": [
+        {
+          "category": "sponsor",
+          "segment": [
+            36,
+            96.7
+          ]
+        }
+      ],
+      "durationSeconds": 1158,
+      "referenceSnapshotAt": "2026-10-07",
+      "referenceSource": "https://github.com/edde746/sponsorskip#verification-status",
+      "split": "smoke",
+      "stratum": "published reproduction example; excluded from selection",
+      "title": "MAJOR Consequences! The 20+ Returning Characters of Shadowlands: Who’s Back & What They’re DOING!",
+      "videoId": "WSLW1A6Q5a4",
+      "captionType": "automatic",
+      "rawSourceHash": "da40b699a69c5a88fbd2f9e22577664b8c68d40071547f7fabd72f87eec287b3",
+      "fixtureHash": "d8c742ca6b03db77ca38f1fdd19f12dbeec47607e5e8cb066202187cbc4f972b",
+      "fixturePath": "bench/local/fixtures/WSLW1A6Q5a4.json",
+      "captionSource": "YouTube public transcript panel",
+      "timingResolutionSeconds": 1
+    },
+    {
+      "acquiredAt": "2026-10-07T19:55:21.920Z",
+      "captionAvailability": "ok",
+      "channelId": "UCR-DXc1voovS8nhAvccRZhg",
+      "contamination": "published model demonstration; smoke only",
+      "crowdReferences": [
+        {
+          "category": "sponsor",
+          "segment": [
+            190,
+            222.6
+          ]
+        }
+      ],
+      "durationSeconds": 633,
+      "referenceSnapshotAt": "2026-10-07",
+      "referenceSource": "https://github.com/edde746/sponsorskip#verification-status",
+      "split": "smoke",
+      "stratum": "published reproduction example; excluded from selection",
+      "title": "Elon never delivered... SO I DID!",
+      "videoId": "I9zqGeH8EIs",
+      "captionType": "manual",
+      "rawSourceHash": "36c2d1839830b3abef455b9f2438ff7c29b5f6ea24f8bc9eb35fbe5ae7481247",
+      "fixtureHash": "4d52bd9f5f77357c58ad44366a75bc2b63a1ee3d05dc641601937f815f62326e",
+      "fixturePath": "bench/local/fixtures/I9zqGeH8EIs.json",
+      "captionSource": "YouTube public transcript panel",
+      "timingResolutionSeconds": 1
+    }
+  ]
+}

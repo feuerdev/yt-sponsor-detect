@@ -3,14 +3,16 @@ import { readFileSync } from 'node:fs';
 import test from 'node:test';
 import vm from 'node:vm';
 import {MODEL_SPEC} from '../src/model-spec.js';
+import {sponsorLabels} from '../src/sponsor-policy.js';
+import {validateSegments} from '../src/caption-contract.js';
 const source = readFileSync(new URL('../src/background.js', import.meta.url), 'utf8')
     .replace(/^import .*;\n/gm, '');
 const deferred = () => { let resolve; const promise = new Promise(done => { resolve = done; }); return { promise, resolve }; };
 function fixture() {
     const pending = deferred(), cache = deferred(), messages = [], writes = [];
-    const context = vm.createContext({ MODEL_SPEC, console: { log() {}, error() {} },
+    const context = vm.createContext({ MODEL_SPEC,sponsorLabels,validateSegments, console: { log() {}, error() {} },
         env: { backends: { onnx: { wasm: {} } } },
-        classifyText: () => pending.promise,
+        classifyCaptions: async(captions,threshold,onProgress)=>{const s=await pending.promise;onProgress?.({processed:1,total:1});return {segments:s.sponsor>threshold?[{start:0,end:2,category:'sponsor',score:s.sponsor}]:[]};},
         chrome: {
             tabs: { async sendMessage(id, message) { messages.push(message); }, onRemoved: { addListener() {} } },
             storage: { sync: { async get() { return {isEnabled: true, labels: [{name:'sponsor',threshold:0.5,blocked:true}]}; } }, local: { get: () => cache.promise, async remove() {}, async set(value) { writes.push(value); } } },
@@ -20,7 +22,7 @@ function fixture() {
     });
     vm.runInContext(source, context);
     vm.runInContext(`tabState[1] = { videoId: 'first', isAnalyzing: false,
-        windowQueue: [[{ text: 'caption '.repeat(10), start: '0', duration: '2' }]],
+        allCaptions: [{ text: 'caption '.repeat(10), start: '0', duration: '2' }],
         windowScores: [], foundSegments: [] }`, context);
     return { context, pending, cache, messages, writes,
         run: text => vm.runInContext(text, context),
@@ -29,7 +31,7 @@ function fixture() {
 
 test('closed or cleared tab cancels in-flight analysis messages', async () => {
     const f = fixture();
-    const work = f.run("processWindowQueue(1, 'first', [{ name: 'sponsor', blocked: true, threshold: 0.5 }])");
+    const work = f.run("processCaptions(1, 'first', [{ name: 'sponsor', blocked: true, threshold: 0.5 }])");
     await Promise.resolve(); await Promise.resolve();
     f.run('delete tabState[1]');
     f.pending.resolve({ sponsor: 0.9 }); await work;
@@ -38,7 +40,7 @@ test('closed or cleared tab cancels in-flight analysis messages', async () => {
 
 test('recreated state for the same video does not accept an older analysis', async () => {
     const f = fixture();
-    const work = f.run("processWindowQueue(1, 'first', [{ name: 'sponsor', blocked: true, threshold: 0.5 }])");
+    const work = f.run("processCaptions(1, 'first', [{ name: 'sponsor', blocked: true, threshold: 0.5 }])");
     await Promise.resolve(); await Promise.resolve();
     f.run("tabState[1] = { videoId: 'first', windowScores: [], foundSegments: [] }");
     f.pending.resolve({ sponsor: 0.9 }); await work;
@@ -58,7 +60,7 @@ test('clearing state while reading cached segments prevents an obsolete cache wr
 test('current analysis still emits and caches a successful segment', async () => {
     const f = fixture();
     f.cache.resolve({}); f.pending.resolve({ sponsor: 0.9 });
-    await f.run("processWindowQueue(1, 'first', [{ name: 'sponsor', blocked: true, threshold: 0.5 }])");
+    await f.run("processCaptions(1, 'first', [{ name: 'sponsor', blocked: true, threshold: 0.5 }])");
     assert.deepEqual(f.messages.map(message => message.type), [
         'ANALYSIS_STARTED', 'ANALYSIS_PROGRESS', 'SPONSORED_SEGMENT_FOUND', 'ANALYSIS_FINISHED',
     ]);
@@ -70,9 +72,9 @@ test('current analysis still emits and caches a successful segment', async () =>
 function captionFixture() {
     let listener, removed;
     const requests = [], messages = [];
-    const context = vm.createContext({ URL, MODEL_SPEC, console: { log() {}, error() {} },
+    const context = vm.createContext({ URL, MODEL_SPEC,sponsorLabels,validateSegments, console: { log() {}, error() {} },
         env: { backends: { onnx: { wasm: {} } } },
-        classifyText: async () => ({ sponsor: 0 }),
+        classifyCaptions: async () => ({segments:[]}),
         fetch: url => { const work = deferred(); requests.push({ url, ...work }); return work.promise; },
         chrome: {
             tabs: { async sendMessage(id, message) { messages.push(message); },
@@ -89,7 +91,7 @@ function captionFixture() {
         Array.from({ length: 20 }, (_, i) => ({ tStartMs: i * 1000, dDurationMs: 1000,
             segs: [{ utf8: 'caption fixture text' }] })) }); } });
     return { context, requests, messages, reply, removed: id => removed(id),
-        request: videoId => listener({ tabId: 1, url: `https://www.youtube.com/api/timedtext?v=${videoId}` }),
+        request: videoId => listener({ tabId: 1, url: `https://www.youtube.com/api/timedtext?v=${videoId}&lang=en` }),
         run: text => vm.runInContext(text, context),
     };
 }
@@ -128,10 +130,10 @@ test('current caption fetch still collects and analyzes captions', async () => {
 test('classifier failure clears partial evidence and reports unavailable instead of finished', async () => {
     const f = fixture();
     const failedState = f.run('tabState[1]');
-    f.context.classifyText = async () => { throw Object.assign(new Error('inert failure'), { code: 'model_unavailable' }); };
-    await f.run("processWindowQueue(1, 'first', [{ name: 'sponsor', blocked: true, threshold: 0.5 }])");
+    f.context.classifyCaptions = async () => { throw Object.assign(new Error('inert failure'), { code: 'model_unavailable' }); };
+    await f.run("processCaptions(1, 'first', [{ name: 'sponsor', blocked: true, threshold: 0.5 }])");
     assert.deepEqual(f.messages.map(message => message.type), ['ANALYSIS_STARTED', 'CLEAR_SEGMENTS', 'ANALYSIS_ERROR']);
-    assert.equal(failedState.windowScores.length, 0);
+    assert.equal(failedState.foundSegments.length, 0);
     assert.equal(failedState.isAnalyzing, false);
     assert.equal(f.run('tabState[1]'), undefined);
 });

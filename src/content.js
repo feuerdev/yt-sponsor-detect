@@ -24,6 +24,10 @@ chrome.storage.onChanged.addListener((changes, area) => {
         clearPlaybackControls();
         clearProgressBarHighlights();
         hideAnalysisIndicator();
+        document.getElementById('sponsor-analysis-error')?.remove();
+        document.getElementById('sponsor-transcript-coverage')?.remove();
+        if (isEnabled) requestVideoSegments(document.querySelector('video'),
+            new URLSearchParams(window.location.search).get('v'), videoGeneration);
     }
 });
 
@@ -58,14 +62,16 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sponsoredSegments.length = 0;
     clearPlaybackControls();
     document.getElementById('sponsor-analysis-error')?.remove();
+    document.getElementById('sponsor-transcript-coverage')?.remove();
     clearProgressBarHighlights();
   } else if (request.type === "ANALYSIS_ERROR") {
     sponsoredSegments.length = 0;
     clearProgressBarHighlights();
     clearPlaybackControls();
-    showAnalysisError();
+    showAnalysisError(request.payload?.code);
   } else if (request.type === "ANALYSIS_STARTED") {
     document.getElementById('sponsor-analysis-error')?.remove();
+    showTranscriptCoverage(request.payload.captionProvenance);
     showAnalysisIndicator(request.payload.processed, request.payload.total);
   } else if (request.type === "ANALYSIS_PROGRESS") {
     updateAnalysisIndicator(request.payload.processed, request.payload.total);
@@ -112,8 +118,6 @@ function showAnalysisIndicator(processed, total) {
         indicator.style.fontSize = '14px';
         indicator.style.width = '250px';
         indicator.style.textAlign = 'center';
-        indicator.style.transition = 'opacity 0.3s ease-in-out';
-        indicator.style.opacity = '1';
 
         const text = document.createElement('span');
         text.id = 'analysis-indicator-text';
@@ -149,7 +153,7 @@ function updateAnalysisIndicator(processed, total) {
     const progressBar = document.getElementById('analysis-indicator-progress');
 
     if (indicatorText) {
-        indicatorText.textContent = `Analyzing... (${processed}/${total} windows)`;
+        indicatorText.textContent = total > 0 ? `Analyzing... (${processed}/${total} windows)` : 'Loading sponsor detector...';
     }
     if (progressBar) {
         const percentage = total > 0 ? (processed / total) * 100 : 0;
@@ -158,12 +162,7 @@ function updateAnalysisIndicator(processed, total) {
 }
 
 function hideAnalysisIndicator() {
-    const indicator = document.getElementById(ANALYSIS_INDICATOR_ID);
-    if (indicator) {
-        indicator.style.opacity = '0';
-        // Remove from DOM after transition
-        setTimeout(() => indicator.remove(), 300);
-    }
+    document.getElementById(ANALYSIS_INDICATOR_ID)?.remove();
 }
 
 function clearPlaybackControls() {
@@ -171,25 +170,46 @@ function clearPlaybackControls() {
     document.getElementById('sponsor-undo-notice')?.remove();
 }
 
+function contentPlaybackAvailable(video) {
+    return video?.readyState >= 1 && Number.isFinite(video.duration) && video.duration > 0
+        && !video.error && !document.querySelector('#movie_player')?.classList?.contains('ad-showing');
+}
+
 function playbackIdentity(video) {
     return { video, generation: videoGeneration, src: video.src,
         videoId: new URLSearchParams(window.location.search).get('v') };
 }
 function isCurrentPlayback(identity) {
-    return isEnabled && identity.video === document.querySelector('video')
+    return isEnabled && contentPlaybackAvailable(identity.video) && identity.video === document.querySelector('video')
         && identity.generation === videoGeneration && identity.src === identity.video.src
         && identity.videoId === new URLSearchParams(window.location.search).get('v');
 }
 
-function showAnalysisError() {
+function showTranscriptCoverage(provenance) {
+    document.getElementById('sponsor-transcript-coverage')?.remove();
+    if(provenance?.coverage!=='partial' || !Number.isFinite(provenance.coverageStart)
+        || !Number.isFinite(provenance.coverageEnd))return;
+    const container=getNotificationContainer();if(!container)return;
+    const status=document.createElement('div');status.id='sponsor-transcript-coverage';status.setAttribute('role','status');
+    status.textContent=`Partial transcript analyzed: ${formatTime(provenance.coverageStart)}–${formatTime(provenance.coverageEnd)}. Other portions were not checked.`;
+    status.style.backgroundColor='rgba(0,0,0,0.8)';status.style.color='white';status.style.padding='8px';container.appendChild(status);
+}
+function showAnalysisError(code) {
     hideAnalysisIndicator();
+    document.getElementById('sponsor-transcript-coverage')?.remove();
     const container = getNotificationContainer();
     if (!container) return;
     document.getElementById('sponsor-analysis-error')?.remove();
     const status = document.createElement('div');
     status.id = 'sponsor-analysis-error';
     status.setAttribute('role', 'status');
-    status.textContent = 'Sponsor detection unavailable. Playback unchanged.';
+    status.textContent = ({
+        captions_unavailable:'YouTube transcript unavailable. Playback unchanged.',
+        unsupported_language:'Sponsor detection currently requires an English transcript. Playback unchanged.',
+        model_unavailable:'Sponsor model unavailable. Playback unchanged.',
+        inference_failed:'Sponsor analysis failed. Playback unchanged.',
+        invalid_output:'Sponsor analysis returned invalid results. Playback unchanged.',
+    })[code] || 'Sponsor detection unavailable. Playback unchanged.';
     status.style.backgroundColor = 'rgba(0,0,0,0.8)';
     status.style.color = 'white';
     status.style.padding = '8px';
@@ -225,8 +245,7 @@ function showSkipNotification(video, segment, previousTime) {
 }
 
 function performSkip(video, segment) {
-    if (!isEnabled || segment.skipDisabled || !sponsoredSegments.includes(segment)
-        || !Number.isFinite(video.duration) || video.duration <= 0
+    if (!isEnabled || !contentPlaybackAvailable(video) || segment.skipDisabled || !sponsoredSegments.includes(segment)
         || !Number.isFinite(video.currentTime) || video.currentTime < segment.startTime
         || video.currentTime >= segment.endTime - 0.1) return;
     const destination = Math.min(segment.endTime, video.duration);
@@ -266,7 +285,8 @@ function updateProgressBarHighlights() {
     const progressBar = document.querySelector('.ytp-progress-bar');
     const video = document.querySelector('video');
 
-    if (!progressBar || !video || !video.duration) {
+    if (!progressBar || !contentPlaybackAvailable(video)) {
+        clearProgressBarHighlights();
         return;
     }
 
@@ -311,7 +331,11 @@ function clearProgressBarHighlights() {
 function checkForSponsorBlock() {
     if (!isEnabled) return;
     const video = document.querySelector('video');
-    if (!video || video.readyState < 1 || !Number.isFinite(video.duration) || video.duration <= 0) return;
+    if (!contentPlaybackAvailable(video)) {
+        clearPlaybackControls();
+        clearProgressBarHighlights();
+        return;
+    }
     updateProgressBarHighlights();
     for (const segment of sponsoredSegments) {
         if (!segment.skipDisabled && video.currentTime >= segment.startTime && video.currentTime < segment.endTime - 0.1) {
@@ -322,39 +346,31 @@ function checkForSponsorBlock() {
     document.getElementById('sponsor-skip-suggestion')?.remove();
 }
 
-function handleProgressBarClick(event) {
-    const video = document.querySelector('video');
-    const progressBar = event.currentTarget;
-    if (!video || !video.duration || !progressBar) return;
-
-    const rect = progressBar.getBoundingClientRect();
-    const clickX = event.clientX - rect.left;
-    const clickedTime = (clickX / progressBar.clientWidth) * video.duration;
-
-    for (const segment of sponsoredSegments) {
-        if (clickedTime >= segment.startTime && clickedTime <= segment.endTime) {
-            if (segment.skipDisabled) {
-                return; 
-            }
-            console.log(`User clicked segment. Disabling suggestion for [${formatTime(segment.startTime)} - ${formatTime(segment.endTime)}]`);
-            segment.skipDisabled = true;
-
-            const highlightId = `sponsored-highlight-${segment.startTime}-${segment.endTime}`;
-            const highlight = document.getElementById(highlightId);
-            if (highlight) {
-                highlight.style.backgroundColor = 'rgba(128, 128, 128, 0.6)'; 
-                highlight.title = 'Skipping disabled for this segment.';
-            }
-            break;
-        }
-    }
-}
-
 let videoElement = null;
 let lastVideoSrc = null;
 let lastVideoId = null;
 let videoGeneration = 0;
-let progressBarWithListener = null;
+
+function requestVideoSegments(video, videoId, generation) {
+    if (!video || !videoId) return;
+    console.log(`Requesting cached segments for video ${videoId}`);
+    chrome.runtime.sendMessage({ type: "GET_CACHED_SEGMENTS", videoId: videoId }, (response) => {
+        if (generation !== videoGeneration ||
+            document.querySelector('video') !== video ||
+            new URLSearchParams(window.location.search).get('v') !== videoId) return;
+        if (chrome.runtime.lastError) {
+            console.error("Error getting cached segments:", chrome.runtime.lastError.message);
+            return;
+        }
+        if(response?.cached)showTranscriptCoverage(response.captionProvenance);
+        if (response && response.segments && response.segments.length > 0) {
+            showTranscriptCoverage(response.captionProvenance);
+            console.log(`Received ${response.segments.length} cached segments for video ${videoId}.`);
+            response.segments.forEach(addSponsoredSegment);
+            updateProgressBarHighlights();
+        }
+    });
+}
 
 function initializeVideoListener() {
     const video = document.querySelector('video');
@@ -370,46 +386,17 @@ function initializeVideoListener() {
             if (videoElement) {
                 videoElement.removeEventListener('timeupdate', checkForSponsorBlock);
             }
-            if (progressBarWithListener) {
-                progressBarWithListener.removeEventListener('click', handleProgressBarClick);
-                progressBarWithListener = null;
-            }
-
             sponsoredSegments.length = 0;
             clearPlaybackControls();
             document.getElementById('sponsor-analysis-error')?.remove();
+            document.getElementById('sponsor-transcript-coverage')?.remove();
             clearProgressBarHighlights();
 
-            if (videoId) {
-                console.log(`Requesting cached segments for video ${videoId}`);
-                chrome.runtime.sendMessage({ type: "GET_CACHED_SEGMENTS", videoId: videoId }, (response) => {
-                    if (generation !== videoGeneration ||
-                        document.querySelector('video') !== video ||
-                        new URLSearchParams(window.location.search).get('v') !== videoId) return;
-                    if (chrome.runtime.lastError) {
-                        console.error("Error getting cached segments:", chrome.runtime.lastError.message);
-                        return;
-                    }
-                    if (response && response.segments && response.segments.length > 0) {
-                        console.log(`Received ${response.segments.length} cached segments for video ${videoId}.`);
-                        response.segments.forEach(addSponsoredSegment);
-                        updateProgressBarHighlights();
-                    }
-                });
-            }
+            requestVideoSegments(video, videoId, generation);
 
             videoElement = video;
             videoElement.addEventListener('timeupdate', checkForSponsorBlock);
             console.log("Attached listener to new video element.");
-        }
-
-        const progressBar = document.querySelector('.ytp-progress-bar');
-        if (progressBar !== progressBarWithListener) {
-            if (progressBarWithListener) {
-                progressBarWithListener.removeEventListener('click', handleProgressBarClick);
-            }
-            progressBarWithListener = progressBar;
-            if (progressBar) progressBar.addEventListener('click', handleProgressBarClick);
         }
 
     } else if (videoElement) {
@@ -425,10 +412,6 @@ function initializeVideoListener() {
         if (videoElement) {
             videoElement.removeEventListener('timeupdate', checkForSponsorBlock);
             videoElement = null;
-        }
-        if (progressBarWithListener) {
-            progressBarWithListener.removeEventListener('click', handleProgressBarClick);
-            progressBarWithListener = null;
         }
     }
 }

@@ -1,0 +1,4993 @@
+{
+  "schemaVersion": 1,
+  "frozenAt": "2026-10-07T20:46:04.991Z",
+  "selectionHash": "013b92e97f22267616fe70f665b5d719f7f1ead983718fbd1147d948884f6f66",
+  "registryHash": "8c851b363db380136ba7a973c2982133f823c5d7a85c55918dcd38b609d53ba6",
+  "fixtureSetHash": "bc6ffaec22e33642504a393cb8e652e057d9179d948dbb859980035d8fa809b7",
+  "models": {
+    "mobilebert-fp32/wasm": {
+      "config": {
+        "threshold": 0.9,
+        "mergeGapSeconds": 0
+      },
+      "tuneRunId": "mac-20261007-v3-tune-mobilebert-fp32-wasm",
+      "tuneInferenceKey": "fdcde6121a22a9f5c7679cff27a015cacfebbdbaae510c9eea3d9f73ff086f23",
+      "availableTuneVideos": 5,
+      "status": "no_conservative_operating_point",
+      "trials": [
+        {
+          "config": {
+            "threshold": 0.9,
+            "mergeGapSeconds": 0
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.5": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.7": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 0,
+            "missedReferenceSeconds": 148.70600000000013,
+            "coverageRecall": 0,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 0,
+            "boundaries": {
+              "matched": 0,
+              "start": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              },
+              "end": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              },
+              "recall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.5,
+            "mergeGapSeconds": 0
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 1,
+                "predicted": 10,
+                "reference": 4,
+                "precision": 0.1,
+                "recall": 0.25,
+                "f1": 0.14285714285714285
+              },
+              "0.5": {
+                "matched": 1,
+                "predicted": 10,
+                "reference": 4,
+                "precision": 0.1,
+                "recall": 0.25,
+                "f1": 0.14285714285714285
+              },
+              "0.7": {
+                "matched": 0,
+                "predicted": 10,
+                "reference": 4,
+                "precision": 0,
+                "recall": 0,
+                "f1": 0
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 84.88400000000007,
+            "missedReferenceSeconds": 63.82200000000005,
+            "coverageRecall": 0.5708175863784918,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 1227.116,
+            "boundaries": {
+              "matched": 1,
+              "start": {
+                "biasSeconds": -35.962999999999965,
+                "absoluteMedianSeconds": 35.962999999999965,
+                "absoluteP95Seconds": 35.962999999999965
+              },
+              "end": {
+                "biasSeconds": 8.683999999999969,
+                "absoluteMedianSeconds": 8.683999999999969,
+                "absoluteP95Seconds": 8.683999999999969
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 0,
+                "high": 0.16666666666666666,
+                "definedReplicates": 473
+              },
+              "recall": {
+                "low": 0.25,
+                "high": 0.25,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.5708175863784918,
+                "high": 0.5708175863784918,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.6,
+            "mergeGapSeconds": 0
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 1,
+                "predicted": 3,
+                "reference": 4,
+                "precision": 0.3333333333333333,
+                "recall": 0.25,
+                "f1": 0.2857142857142857
+              },
+              "0.5": {
+                "matched": 1,
+                "predicted": 3,
+                "reference": 4,
+                "precision": 0.3333333333333333,
+                "recall": 0.25,
+                "f1": 0.2857142857142857
+              },
+              "0.7": {
+                "matched": 0,
+                "predicted": 3,
+                "reference": 4,
+                "precision": 0,
+                "recall": 0,
+                "f1": 0
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 48.353000000000065,
+            "missedReferenceSeconds": 100.35300000000007,
+            "coverageRecall": 0.3251583661721788,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 242.64699999999993,
+            "boundaries": {
+              "matched": 1,
+              "start": {
+                "biasSeconds": -16.962999999999965,
+                "absoluteMedianSeconds": 16.962999999999965,
+                "absoluteP95Seconds": 16.962999999999965
+              },
+              "end": {
+                "biasSeconds": 8.683999999999969,
+                "absoluteMedianSeconds": 8.683999999999969,
+                "absoluteP95Seconds": 8.683999999999969
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 0.3333333333333333,
+                "high": 0.3333333333333333,
+                "definedReplicates": 351
+              },
+              "recall": {
+                "low": 0.25,
+                "high": 0.25,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.3251583661721788,
+                "high": 0.3251583661721788,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.7,
+            "mergeGapSeconds": 0
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 1,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 0.5,
+                "recall": 0.25,
+                "f1": 0.3333333333333333
+              },
+              "0.5": {
+                "matched": 1,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 0.5,
+                "recall": 0.25,
+                "f1": 0.3333333333333333
+              },
+              "0.7": {
+                "matched": 0,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 0,
+                "recall": 0,
+                "f1": 0
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 48.353000000000065,
+            "missedReferenceSeconds": 100.35300000000007,
+            "coverageRecall": 0.3251583661721788,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 127.64699999999993,
+            "boundaries": {
+              "matched": 1,
+              "start": {
+                "biasSeconds": -16.962999999999965,
+                "absoluteMedianSeconds": 16.962999999999965,
+                "absoluteP95Seconds": 16.962999999999965
+              },
+              "end": {
+                "biasSeconds": 8.683999999999969,
+                "absoluteMedianSeconds": 8.683999999999969,
+                "absoluteP95Seconds": 8.683999999999969
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 0.5,
+                "high": 0.5,
+                "definedReplicates": 351
+              },
+              "recall": {
+                "low": 0.25,
+                "high": 0.25,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.3251583661721788,
+                "high": 0.3251583661721788,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.8,
+            "mergeGapSeconds": 0
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 0,
+                "predicted": 1,
+                "reference": 4,
+                "precision": 0,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.5": {
+                "matched": 0,
+                "predicted": 1,
+                "reference": 4,
+                "precision": 0,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.7": {
+                "matched": 0,
+                "predicted": 1,
+                "reference": 4,
+                "precision": 0,
+                "recall": 0,
+                "f1": 0
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 0,
+            "missedReferenceSeconds": 148.70600000000013,
+            "coverageRecall": 0,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 102,
+            "boundaries": {
+              "matched": 0,
+              "start": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              },
+              "end": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "recall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.95,
+            "mergeGapSeconds": 0
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.5": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.7": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 0,
+            "missedReferenceSeconds": 148.70600000000013,
+            "coverageRecall": 0,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 0,
+            "boundaries": {
+              "matched": 0,
+              "start": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              },
+              "end": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              },
+              "recall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.99,
+            "mergeGapSeconds": 0
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.5": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.7": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 0,
+            "missedReferenceSeconds": 148.70600000000013,
+            "coverageRecall": 0,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 0,
+            "boundaries": {
+              "matched": 0,
+              "start": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              },
+              "end": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              },
+              "recall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "mobilebert-int8/wasm": {
+      "config": {
+        "threshold": 0.9,
+        "mergeGapSeconds": 0
+      },
+      "tuneRunId": "mac-20261007-v3-tune-mobilebert-int8-wasm",
+      "tuneInferenceKey": "ffd8e6cdfc137645e1f37306d0299ee99541df17bffd92d14a44cbe39a651ec5",
+      "availableTuneVideos": 5,
+      "status": "no_conservative_operating_point",
+      "trials": [
+        {
+          "config": {
+            "threshold": 0.9,
+            "mergeGapSeconds": 0
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.5": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.7": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 0,
+            "missedReferenceSeconds": 148.70600000000013,
+            "coverageRecall": 0,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 0,
+            "boundaries": {
+              "matched": 0,
+              "start": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              },
+              "end": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              },
+              "recall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.5,
+            "mergeGapSeconds": 0
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 1,
+                "predicted": 8,
+                "reference": 4,
+                "precision": 0.125,
+                "recall": 0.25,
+                "f1": 0.16666666666666666
+              },
+              "0.5": {
+                "matched": 1,
+                "predicted": 8,
+                "reference": 4,
+                "precision": 0.125,
+                "recall": 0.25,
+                "f1": 0.16666666666666666
+              },
+              "0.7": {
+                "matched": 0,
+                "predicted": 8,
+                "reference": 4,
+                "precision": 0,
+                "recall": 0,
+                "f1": 0
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 84.88400000000007,
+            "missedReferenceSeconds": 63.82200000000005,
+            "coverageRecall": 0.5708175863784918,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 763.116,
+            "boundaries": {
+              "matched": 1,
+              "start": {
+                "biasSeconds": -35.962999999999965,
+                "absoluteMedianSeconds": 35.962999999999965,
+                "absoluteP95Seconds": 35.962999999999965
+              },
+              "end": {
+                "biasSeconds": 8.683999999999969,
+                "absoluteMedianSeconds": 8.683999999999969,
+                "absoluteP95Seconds": 8.683999999999969
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 0,
+                "high": 0.14285714285714285,
+                "definedReplicates": 473
+              },
+              "recall": {
+                "low": 0.25,
+                "high": 0.25,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.5708175863784918,
+                "high": 0.5708175863784918,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.6,
+            "mergeGapSeconds": 0
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 1,
+                "predicted": 4,
+                "reference": 4,
+                "precision": 0.25,
+                "recall": 0.25,
+                "f1": 0.25
+              },
+              "0.5": {
+                "matched": 1,
+                "predicted": 4,
+                "reference": 4,
+                "precision": 0.25,
+                "recall": 0.25,
+                "f1": 0.25
+              },
+              "0.7": {
+                "matched": 0,
+                "predicted": 4,
+                "reference": 4,
+                "precision": 0,
+                "recall": 0,
+                "f1": 0
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 65.68900000000008,
+            "missedReferenceSeconds": 83.01700000000005,
+            "coverageRecall": 0.44173738786599076,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 348.3109999999999,
+            "boundaries": {
+              "matched": 1,
+              "start": {
+                "biasSeconds": -16.962999999999965,
+                "absoluteMedianSeconds": 16.962999999999965,
+                "absoluteP95Seconds": 16.962999999999965
+              },
+              "end": {
+                "biasSeconds": 8.683999999999969,
+                "absoluteMedianSeconds": 8.683999999999969,
+                "absoluteP95Seconds": 8.683999999999969
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 0.25,
+                "high": 0.25,
+                "definedReplicates": 351
+              },
+              "recall": {
+                "low": 0.25,
+                "high": 0.25,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.44173738786599076,
+                "high": 0.44173738786599076,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.7,
+            "mergeGapSeconds": 0
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 1,
+                "predicted": 3,
+                "reference": 4,
+                "precision": 0.3333333333333333,
+                "recall": 0.25,
+                "f1": 0.2857142857142857
+              },
+              "0.5": {
+                "matched": 1,
+                "predicted": 3,
+                "reference": 4,
+                "precision": 0.3333333333333333,
+                "recall": 0.25,
+                "f1": 0.2857142857142857
+              },
+              "0.7": {
+                "matched": 0,
+                "predicted": 3,
+                "reference": 4,
+                "precision": 0,
+                "recall": 0,
+                "f1": 0
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 48.353000000000065,
+            "missedReferenceSeconds": 100.35300000000007,
+            "coverageRecall": 0.3251583661721788,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 242.64699999999993,
+            "boundaries": {
+              "matched": 1,
+              "start": {
+                "biasSeconds": -16.962999999999965,
+                "absoluteMedianSeconds": 16.962999999999965,
+                "absoluteP95Seconds": 16.962999999999965
+              },
+              "end": {
+                "biasSeconds": 8.683999999999969,
+                "absoluteMedianSeconds": 8.683999999999969,
+                "absoluteP95Seconds": 8.683999999999969
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 0.3333333333333333,
+                "high": 0.3333333333333333,
+                "definedReplicates": 351
+              },
+              "recall": {
+                "low": 0.25,
+                "high": 0.25,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.3251583661721788,
+                "high": 0.3251583661721788,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.8,
+            "mergeGapSeconds": 0
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.5": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.7": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 0,
+            "missedReferenceSeconds": 148.70600000000013,
+            "coverageRecall": 0,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 0,
+            "boundaries": {
+              "matched": 0,
+              "start": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              },
+              "end": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              },
+              "recall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.95,
+            "mergeGapSeconds": 0
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.5": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.7": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 0,
+            "missedReferenceSeconds": 148.70600000000013,
+            "coverageRecall": 0,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 0,
+            "boundaries": {
+              "matched": 0,
+              "start": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              },
+              "end": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              },
+              "recall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.99,
+            "mergeGapSeconds": 0
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.5": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.7": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 0,
+            "missedReferenceSeconds": 148.70600000000013,
+            "coverageRecall": 0,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 0,
+            "boundaries": {
+              "matched": 0,
+              "start": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              },
+              "end": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              },
+              "recall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "ettin-fp32/wasm": {
+      "config": {
+        "threshold": 0.8,
+        "mergeGapCharacters": 24,
+        "mergeGapSeconds": 1.5,
+        "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+        "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+      },
+      "tuneRunId": "mac-20261007-v3-tune-ettin-fp32-wasm",
+      "tuneInferenceKey": "c8ef040b253a7b9bfe5177e8f9709408b525a988178d4a89464a24c9aec44702",
+      "availableTuneVideos": 5,
+      "status": "diagnostic_operating_point",
+      "trials": [
+        {
+          "config": {
+            "threshold": 0.7,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 4,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.6666666666666666,
+                "recall": 1,
+                "f1": 0.8
+              },
+              "0.5": {
+                "matched": 4,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.6666666666666666,
+                "recall": 1,
+                "f1": 0.8
+              },
+              "0.7": {
+                "matched": 3,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.5,
+                "recall": 0.75,
+                "f1": 0.6
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 139.572,
+            "missedReferenceSeconds": 9.134000000000128,
+            "coverageRecall": 0.9385767891006407,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 67.40200000000004,
+            "boundaries": {
+              "matched": 4,
+              "start": {
+                "biasSeconds": 1.6417500000000018,
+                "absoluteMedianSeconds": 1.4720000000000155,
+                "absoluteP95Seconds": 3.340100000000002
+              },
+              "end": {
+                "biasSeconds": 1.3722499999999904,
+                "absoluteMedianSeconds": 0.9760000000000133,
+                "absoluteP95Seconds": 7.0349499999999985
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 0,
+                "high": 0.8,
+                "definedReplicates": 472
+              },
+              "recall": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.9385767891006407,
+                "high": 0.9385767891006407,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.5,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 4,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.6666666666666666,
+                "recall": 1,
+                "f1": 0.8
+              },
+              "0.5": {
+                "matched": 4,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.6666666666666666,
+                "recall": 1,
+                "f1": 0.8
+              },
+              "0.7": {
+                "matched": 3,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.5,
+                "recall": 0.75,
+                "f1": 0.6
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 139.572,
+            "missedReferenceSeconds": 9.134000000000128,
+            "coverageRecall": 0.9385767891006407,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 67.40200000000004,
+            "boundaries": {
+              "matched": 4,
+              "start": {
+                "biasSeconds": 1.6417500000000018,
+                "absoluteMedianSeconds": 1.4720000000000155,
+                "absoluteP95Seconds": 3.340100000000002
+              },
+              "end": {
+                "biasSeconds": 1.3722499999999904,
+                "absoluteMedianSeconds": 0.9760000000000133,
+                "absoluteP95Seconds": 7.0349499999999985
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 0,
+                "high": 0.8,
+                "definedReplicates": 472
+              },
+              "recall": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.9385767891006407,
+                "high": 0.9385767891006407,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.6,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 4,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.6666666666666666,
+                "recall": 1,
+                "f1": 0.8
+              },
+              "0.5": {
+                "matched": 4,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.6666666666666666,
+                "recall": 1,
+                "f1": 0.8
+              },
+              "0.7": {
+                "matched": 3,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.5,
+                "recall": 0.75,
+                "f1": 0.6
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 139.572,
+            "missedReferenceSeconds": 9.134000000000128,
+            "coverageRecall": 0.9385767891006407,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 67.40200000000004,
+            "boundaries": {
+              "matched": 4,
+              "start": {
+                "biasSeconds": 1.6417500000000018,
+                "absoluteMedianSeconds": 1.4720000000000155,
+                "absoluteP95Seconds": 3.340100000000002
+              },
+              "end": {
+                "biasSeconds": 1.3722499999999904,
+                "absoluteMedianSeconds": 0.9760000000000133,
+                "absoluteP95Seconds": 7.0349499999999985
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 0,
+                "high": 0.8,
+                "definedReplicates": 472
+              },
+              "recall": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.9385767891006407,
+                "high": 0.9385767891006407,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.8,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 3,
+                "predicted": 3,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.75,
+                "f1": 0.8571428571428571
+              },
+              "0.5": {
+                "matched": 3,
+                "predicted": 3,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.75,
+                "f1": 0.8571428571428571
+              },
+              "0.7": {
+                "matched": 3,
+                "predicted": 3,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.75,
+                "f1": 0.8571428571428571
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 122.28399999999999,
+            "missedReferenceSeconds": 26.42200000000014,
+            "coverageRecall": 0.8223205519615878,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 0,
+            "boundaries": {
+              "matched": 3,
+              "start": {
+                "biasSeconds": 1.553333333333337,
+                "absoluteMedianSeconds": 1.0370000000000346,
+                "absoluteP95Seconds": 3.3374000000000064
+              },
+              "end": {
+                "biasSeconds": -0.8556666666666786,
+                "absoluteMedianSeconds": 0.703000000000003,
+                "absoluteP95Seconds": 1.1944000000000217
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "recall": {
+                "low": 0.75,
+                "high": 0.75,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.8223205519615878,
+                "high": 0.8223205519615878,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.9,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 2,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.5,
+                "f1": 0.6666666666666666
+              },
+              "0.5": {
+                "matched": 2,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.5,
+                "f1": 0.6666666666666666
+              },
+              "0.7": {
+                "matched": 2,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.5,
+                "f1": 0.6666666666666666
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 109.24400000000003,
+            "missedReferenceSeconds": 39.4620000000001,
+            "coverageRecall": 0.7346307479187116,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 0,
+            "boundaries": {
+              "matched": 2,
+              "start": {
+                "biasSeconds": 0.5335000000000036,
+                "absoluteMedianSeconds": 0.5335000000000036,
+                "absoluteP95Seconds": 0.9866500000000314
+              },
+              "end": {
+                "biasSeconds": -0.9320000000000164,
+                "absoluteMedianSeconds": 0.9320000000000164,
+                "absoluteP95Seconds": 1.217300000000023
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "recall": {
+                "low": 0.5,
+                "high": 0.5,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.7346307479187116,
+                "high": 0.7346307479187116,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.95,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 2,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.5,
+                "f1": 0.6666666666666666
+              },
+              "0.5": {
+                "matched": 2,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.5,
+                "f1": 0.6666666666666666
+              },
+              "0.7": {
+                "matched": 2,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.5,
+                "f1": 0.6666666666666666
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 95.46300000000008,
+            "missedReferenceSeconds": 53.24300000000005,
+            "coverageRecall": 0.6419579573117427,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 0,
+            "boundaries": {
+              "matched": 2,
+              "start": {
+                "biasSeconds": 7.423999999999978,
+                "absoluteMedianSeconds": 7.423999999999978,
+                "absoluteP95Seconds": 13.172299999999927
+              },
+              "end": {
+                "biasSeconds": -0.9320000000000164,
+                "absoluteMedianSeconds": 0.9320000000000164,
+                "absoluteP95Seconds": 1.217300000000023
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "recall": {
+                "low": 0.5,
+                "high": 0.5,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.6419579573117427,
+                "high": 0.6419579573117427,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.99,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.5": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.7": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 0,
+            "missedReferenceSeconds": 148.70600000000013,
+            "coverageRecall": 0,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 0,
+            "boundaries": {
+              "matched": 0,
+              "start": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              },
+              "end": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              },
+              "recall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "ettin-fp32/webgpu": {
+      "config": {
+        "threshold": 0.8,
+        "mergeGapCharacters": 24,
+        "mergeGapSeconds": 1.5,
+        "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+        "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+      },
+      "tuneRunId": "mac-20261007-v3-tune-ettin-fp32-webgpu",
+      "tuneInferenceKey": "cfeaad04ad22b07e9173a628e9b9d227f83d96db975f426a34478caac4473546",
+      "availableTuneVideos": 5,
+      "status": "diagnostic_operating_point",
+      "trials": [
+        {
+          "config": {
+            "threshold": 0.7,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 4,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.6666666666666666,
+                "recall": 1,
+                "f1": 0.8
+              },
+              "0.5": {
+                "matched": 4,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.6666666666666666,
+                "recall": 1,
+                "f1": 0.8
+              },
+              "0.7": {
+                "matched": 3,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.5,
+                "recall": 0.75,
+                "f1": 0.6
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 139.572,
+            "missedReferenceSeconds": 9.134000000000128,
+            "coverageRecall": 0.9385767891006407,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 65.47600000000011,
+            "boundaries": {
+              "matched": 4,
+              "start": {
+                "biasSeconds": 1.6417500000000018,
+                "absoluteMedianSeconds": 1.4720000000000155,
+                "absoluteP95Seconds": 3.340100000000002
+              },
+              "end": {
+                "biasSeconds": 1.3722499999999904,
+                "absoluteMedianSeconds": 0.9760000000000133,
+                "absoluteP95Seconds": 7.0349499999999985
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 0,
+                "high": 0.8,
+                "definedReplicates": 472
+              },
+              "recall": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.9385767891006407,
+                "high": 0.9385767891006407,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.5,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 4,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.6666666666666666,
+                "recall": 1,
+                "f1": 0.8
+              },
+              "0.5": {
+                "matched": 4,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.6666666666666666,
+                "recall": 1,
+                "f1": 0.8
+              },
+              "0.7": {
+                "matched": 3,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.5,
+                "recall": 0.75,
+                "f1": 0.6
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 139.572,
+            "missedReferenceSeconds": 9.134000000000128,
+            "coverageRecall": 0.9385767891006407,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 65.47600000000011,
+            "boundaries": {
+              "matched": 4,
+              "start": {
+                "biasSeconds": 1.6417500000000018,
+                "absoluteMedianSeconds": 1.4720000000000155,
+                "absoluteP95Seconds": 3.340100000000002
+              },
+              "end": {
+                "biasSeconds": 1.3722499999999904,
+                "absoluteMedianSeconds": 0.9760000000000133,
+                "absoluteP95Seconds": 7.0349499999999985
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 0,
+                "high": 0.8,
+                "definedReplicates": 472
+              },
+              "recall": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.9385767891006407,
+                "high": 0.9385767891006407,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.6,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 4,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.6666666666666666,
+                "recall": 1,
+                "f1": 0.8
+              },
+              "0.5": {
+                "matched": 4,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.6666666666666666,
+                "recall": 1,
+                "f1": 0.8
+              },
+              "0.7": {
+                "matched": 3,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.5,
+                "recall": 0.75,
+                "f1": 0.6
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 139.572,
+            "missedReferenceSeconds": 9.134000000000128,
+            "coverageRecall": 0.9385767891006407,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 65.47600000000011,
+            "boundaries": {
+              "matched": 4,
+              "start": {
+                "biasSeconds": 1.6417500000000018,
+                "absoluteMedianSeconds": 1.4720000000000155,
+                "absoluteP95Seconds": 3.340100000000002
+              },
+              "end": {
+                "biasSeconds": 1.3722499999999904,
+                "absoluteMedianSeconds": 0.9760000000000133,
+                "absoluteP95Seconds": 7.0349499999999985
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 0,
+                "high": 0.8,
+                "definedReplicates": 472
+              },
+              "recall": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.9385767891006407,
+                "high": 0.9385767891006407,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.8,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 3,
+                "predicted": 3,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.75,
+                "f1": 0.8571428571428571
+              },
+              "0.5": {
+                "matched": 3,
+                "predicted": 3,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.75,
+                "f1": 0.8571428571428571
+              },
+              "0.7": {
+                "matched": 3,
+                "predicted": 3,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.75,
+                "f1": 0.8571428571428571
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 122.28399999999999,
+            "missedReferenceSeconds": 26.42200000000014,
+            "coverageRecall": 0.8223205519615878,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 0,
+            "boundaries": {
+              "matched": 3,
+              "start": {
+                "biasSeconds": 1.553333333333337,
+                "absoluteMedianSeconds": 1.0370000000000346,
+                "absoluteP95Seconds": 3.3374000000000064
+              },
+              "end": {
+                "biasSeconds": -0.8556666666666786,
+                "absoluteMedianSeconds": 0.703000000000003,
+                "absoluteP95Seconds": 1.1944000000000217
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "recall": {
+                "low": 0.75,
+                "high": 0.75,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.8223205519615878,
+                "high": 0.8223205519615878,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.9,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 2,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.5,
+                "f1": 0.6666666666666666
+              },
+              "0.5": {
+                "matched": 2,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.5,
+                "f1": 0.6666666666666666
+              },
+              "0.7": {
+                "matched": 2,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.5,
+                "f1": 0.6666666666666666
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 109.24400000000003,
+            "missedReferenceSeconds": 39.4620000000001,
+            "coverageRecall": 0.7346307479187116,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 0,
+            "boundaries": {
+              "matched": 2,
+              "start": {
+                "biasSeconds": 0.5335000000000036,
+                "absoluteMedianSeconds": 0.5335000000000036,
+                "absoluteP95Seconds": 0.9866500000000314
+              },
+              "end": {
+                "biasSeconds": -0.9320000000000164,
+                "absoluteMedianSeconds": 0.9320000000000164,
+                "absoluteP95Seconds": 1.217300000000023
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "recall": {
+                "low": 0.5,
+                "high": 0.5,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.7346307479187116,
+                "high": 0.7346307479187116,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.95,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 2,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.5,
+                "f1": 0.6666666666666666
+              },
+              "0.5": {
+                "matched": 2,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.5,
+                "f1": 0.6666666666666666
+              },
+              "0.7": {
+                "matched": 2,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.5,
+                "f1": 0.6666666666666666
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 95.46300000000008,
+            "missedReferenceSeconds": 53.24300000000005,
+            "coverageRecall": 0.6419579573117427,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 0,
+            "boundaries": {
+              "matched": 2,
+              "start": {
+                "biasSeconds": 7.423999999999978,
+                "absoluteMedianSeconds": 7.423999999999978,
+                "absoluteP95Seconds": 13.172299999999927
+              },
+              "end": {
+                "biasSeconds": -0.9320000000000164,
+                "absoluteMedianSeconds": 0.9320000000000164,
+                "absoluteP95Seconds": 1.217300000000023
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "recall": {
+                "low": 0.5,
+                "high": 0.5,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.6419579573117427,
+                "high": 0.6419579573117427,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.99,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.5": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.7": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 0,
+            "missedReferenceSeconds": 148.70600000000013,
+            "coverageRecall": 0,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 0,
+            "boundaries": {
+              "matched": 0,
+              "start": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              },
+              "end": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              },
+              "recall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "ettin-int8/wasm": {
+      "config": {
+        "threshold": 0.8,
+        "mergeGapCharacters": 24,
+        "mergeGapSeconds": 1.5,
+        "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+        "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+      },
+      "tuneRunId": "mac-20261007-v3-tune-ettin-int8-wasm",
+      "tuneInferenceKey": "9674f8d3730814342474b5d342ab63e7ddf639cf4478f0691aa71c2042813d46",
+      "availableTuneVideos": 5,
+      "status": "diagnostic_operating_point",
+      "trials": [
+        {
+          "config": {
+            "threshold": 0.7,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 4,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.6666666666666666,
+                "recall": 1,
+                "f1": 0.8
+              },
+              "0.5": {
+                "matched": 4,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.6666666666666666,
+                "recall": 1,
+                "f1": 0.8
+              },
+              "0.7": {
+                "matched": 3,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.5,
+                "recall": 0.75,
+                "f1": 0.6
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 139.572,
+            "missedReferenceSeconds": 9.134000000000128,
+            "coverageRecall": 0.9385767891006407,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 67.40200000000004,
+            "boundaries": {
+              "matched": 4,
+              "start": {
+                "biasSeconds": 1.6417500000000018,
+                "absoluteMedianSeconds": 1.4720000000000155,
+                "absoluteP95Seconds": 3.340100000000002
+              },
+              "end": {
+                "biasSeconds": 1.3722499999999904,
+                "absoluteMedianSeconds": 0.9760000000000133,
+                "absoluteP95Seconds": 7.0349499999999985
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 0,
+                "high": 0.8,
+                "definedReplicates": 472
+              },
+              "recall": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.9385767891006407,
+                "high": 0.9385767891006407,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.5,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 4,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.6666666666666666,
+                "recall": 1,
+                "f1": 0.8
+              },
+              "0.5": {
+                "matched": 4,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.6666666666666666,
+                "recall": 1,
+                "f1": 0.8
+              },
+              "0.7": {
+                "matched": 3,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.5,
+                "recall": 0.75,
+                "f1": 0.6
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 139.572,
+            "missedReferenceSeconds": 9.134000000000128,
+            "coverageRecall": 0.9385767891006407,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 67.40200000000004,
+            "boundaries": {
+              "matched": 4,
+              "start": {
+                "biasSeconds": 1.6417500000000018,
+                "absoluteMedianSeconds": 1.4720000000000155,
+                "absoluteP95Seconds": 3.340100000000002
+              },
+              "end": {
+                "biasSeconds": 1.3722499999999904,
+                "absoluteMedianSeconds": 0.9760000000000133,
+                "absoluteP95Seconds": 7.0349499999999985
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 0,
+                "high": 0.8,
+                "definedReplicates": 472
+              },
+              "recall": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.9385767891006407,
+                "high": 0.9385767891006407,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.6,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 4,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.6666666666666666,
+                "recall": 1,
+                "f1": 0.8
+              },
+              "0.5": {
+                "matched": 4,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.6666666666666666,
+                "recall": 1,
+                "f1": 0.8
+              },
+              "0.7": {
+                "matched": 3,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.5,
+                "recall": 0.75,
+                "f1": 0.6
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 139.572,
+            "missedReferenceSeconds": 9.134000000000128,
+            "coverageRecall": 0.9385767891006407,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 67.40200000000004,
+            "boundaries": {
+              "matched": 4,
+              "start": {
+                "biasSeconds": 1.6417500000000018,
+                "absoluteMedianSeconds": 1.4720000000000155,
+                "absoluteP95Seconds": 3.340100000000002
+              },
+              "end": {
+                "biasSeconds": 1.3722499999999904,
+                "absoluteMedianSeconds": 0.9760000000000133,
+                "absoluteP95Seconds": 7.0349499999999985
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 0,
+                "high": 0.8,
+                "definedReplicates": 472
+              },
+              "recall": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.9385767891006407,
+                "high": 0.9385767891006407,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.8,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 3,
+                "predicted": 3,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.75,
+                "f1": 0.8571428571428571
+              },
+              "0.5": {
+                "matched": 3,
+                "predicted": 3,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.75,
+                "f1": 0.8571428571428571
+              },
+              "0.7": {
+                "matched": 3,
+                "predicted": 3,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.75,
+                "f1": 0.8571428571428571
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 122.28399999999999,
+            "missedReferenceSeconds": 26.42200000000014,
+            "coverageRecall": 0.8223205519615878,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 0,
+            "boundaries": {
+              "matched": 3,
+              "start": {
+                "biasSeconds": 1.553333333333337,
+                "absoluteMedianSeconds": 1.0370000000000346,
+                "absoluteP95Seconds": 3.3374000000000064
+              },
+              "end": {
+                "biasSeconds": -0.8556666666666786,
+                "absoluteMedianSeconds": 0.703000000000003,
+                "absoluteP95Seconds": 1.1944000000000217
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "recall": {
+                "low": 0.75,
+                "high": 0.75,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.8223205519615878,
+                "high": 0.8223205519615878,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.9,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 2,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.5,
+                "f1": 0.6666666666666666
+              },
+              "0.5": {
+                "matched": 2,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.5,
+                "f1": 0.6666666666666666
+              },
+              "0.7": {
+                "matched": 2,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.5,
+                "f1": 0.6666666666666666
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 109.24400000000003,
+            "missedReferenceSeconds": 39.4620000000001,
+            "coverageRecall": 0.7346307479187116,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 0,
+            "boundaries": {
+              "matched": 2,
+              "start": {
+                "biasSeconds": 0.5335000000000036,
+                "absoluteMedianSeconds": 0.5335000000000036,
+                "absoluteP95Seconds": 0.9866500000000314
+              },
+              "end": {
+                "biasSeconds": -0.9320000000000164,
+                "absoluteMedianSeconds": 0.9320000000000164,
+                "absoluteP95Seconds": 1.217300000000023
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "recall": {
+                "low": 0.5,
+                "high": 0.5,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.7346307479187116,
+                "high": 0.7346307479187116,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.95,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 2,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.5,
+                "f1": 0.6666666666666666
+              },
+              "0.5": {
+                "matched": 2,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.5,
+                "f1": 0.6666666666666666
+              },
+              "0.7": {
+                "matched": 2,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.5,
+                "f1": 0.6666666666666666
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 95.46300000000008,
+            "missedReferenceSeconds": 53.24300000000005,
+            "coverageRecall": 0.6419579573117427,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 0,
+            "boundaries": {
+              "matched": 2,
+              "start": {
+                "biasSeconds": 7.423999999999978,
+                "absoluteMedianSeconds": 7.423999999999978,
+                "absoluteP95Seconds": 13.172299999999927
+              },
+              "end": {
+                "biasSeconds": -0.9320000000000164,
+                "absoluteMedianSeconds": 0.9320000000000164,
+                "absoluteP95Seconds": 1.217300000000023
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "recall": {
+                "low": 0.5,
+                "high": 0.5,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.6419579573117427,
+                "high": 0.6419579573117427,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.99,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.5": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.7": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 0,
+            "missedReferenceSeconds": 148.70600000000013,
+            "coverageRecall": 0,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 0,
+            "boundaries": {
+              "matched": 0,
+              "start": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              },
+              "end": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              },
+              "recall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "ettin-int8/webgpu": {
+      "config": {
+        "threshold": 0.8,
+        "mergeGapCharacters": 24,
+        "mergeGapSeconds": 1.5,
+        "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+        "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+      },
+      "tuneRunId": "mac-20261007-v3-tune-ettin-int8-webgpu",
+      "tuneInferenceKey": "941a796a802d3a57a8b5f8d96e6ada244fe3adbb4600d62dd4445c72b7997e36",
+      "availableTuneVideos": 5,
+      "status": "diagnostic_operating_point",
+      "trials": [
+        {
+          "config": {
+            "threshold": 0.7,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 4,
+                "predicted": 5,
+                "reference": 4,
+                "precision": 0.8,
+                "recall": 1,
+                "f1": 0.8888888888888888
+              },
+              "0.5": {
+                "matched": 4,
+                "predicted": 5,
+                "reference": 4,
+                "precision": 0.8,
+                "recall": 1,
+                "f1": 0.8888888888888888
+              },
+              "0.7": {
+                "matched": 3,
+                "predicted": 5,
+                "reference": 4,
+                "precision": 0.6,
+                "recall": 0.75,
+                "f1": 0.6666666666666666
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 139.572,
+            "missedReferenceSeconds": 9.134000000000128,
+            "coverageRecall": 0.9385767891006407,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 8.05600000000004,
+            "boundaries": {
+              "matched": 4,
+              "start": {
+                "biasSeconds": 1.6417500000000018,
+                "absoluteMedianSeconds": 1.4720000000000155,
+                "absoluteP95Seconds": 3.340100000000002
+              },
+              "end": {
+                "biasSeconds": 1.3722499999999904,
+                "absoluteMedianSeconds": 0.9760000000000133,
+                "absoluteP95Seconds": 7.0349499999999985
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 0,
+                "high": 1,
+                "definedReplicates": 472
+              },
+              "recall": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.9385767891006407,
+                "high": 0.9385767891006407,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.5,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 4,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.6666666666666666,
+                "recall": 1,
+                "f1": 0.8
+              },
+              "0.5": {
+                "matched": 4,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.6666666666666666,
+                "recall": 1,
+                "f1": 0.8
+              },
+              "0.7": {
+                "matched": 3,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.5,
+                "recall": 0.75,
+                "f1": 0.6
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 139.572,
+            "missedReferenceSeconds": 9.134000000000128,
+            "coverageRecall": 0.9385767891006407,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 65.47600000000011,
+            "boundaries": {
+              "matched": 4,
+              "start": {
+                "biasSeconds": 1.6417500000000018,
+                "absoluteMedianSeconds": 1.4720000000000155,
+                "absoluteP95Seconds": 3.340100000000002
+              },
+              "end": {
+                "biasSeconds": 1.3722499999999904,
+                "absoluteMedianSeconds": 0.9760000000000133,
+                "absoluteP95Seconds": 7.0349499999999985
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 0,
+                "high": 0.8,
+                "definedReplicates": 472
+              },
+              "recall": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.9385767891006407,
+                "high": 0.9385767891006407,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.6,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 4,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.6666666666666666,
+                "recall": 1,
+                "f1": 0.8
+              },
+              "0.5": {
+                "matched": 4,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.6666666666666666,
+                "recall": 1,
+                "f1": 0.8
+              },
+              "0.7": {
+                "matched": 3,
+                "predicted": 6,
+                "reference": 4,
+                "precision": 0.5,
+                "recall": 0.75,
+                "f1": 0.6
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 139.572,
+            "missedReferenceSeconds": 9.134000000000128,
+            "coverageRecall": 0.9385767891006407,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 65.47600000000011,
+            "boundaries": {
+              "matched": 4,
+              "start": {
+                "biasSeconds": 1.6417500000000018,
+                "absoluteMedianSeconds": 1.4720000000000155,
+                "absoluteP95Seconds": 3.340100000000002
+              },
+              "end": {
+                "biasSeconds": 1.3722499999999904,
+                "absoluteMedianSeconds": 0.9760000000000133,
+                "absoluteP95Seconds": 7.0349499999999985
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 0,
+                "high": 0.8,
+                "definedReplicates": 472
+              },
+              "recall": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.9385767891006407,
+                "high": 0.9385767891006407,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.8,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 3,
+                "predicted": 3,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.75,
+                "f1": 0.8571428571428571
+              },
+              "0.5": {
+                "matched": 3,
+                "predicted": 3,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.75,
+                "f1": 0.8571428571428571
+              },
+              "0.7": {
+                "matched": 3,
+                "predicted": 3,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.75,
+                "f1": 0.8571428571428571
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 122.28399999999999,
+            "missedReferenceSeconds": 26.42200000000014,
+            "coverageRecall": 0.8223205519615878,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 0,
+            "boundaries": {
+              "matched": 3,
+              "start": {
+                "biasSeconds": 1.553333333333337,
+                "absoluteMedianSeconds": 1.0370000000000346,
+                "absoluteP95Seconds": 3.3374000000000064
+              },
+              "end": {
+                "biasSeconds": -0.8556666666666786,
+                "absoluteMedianSeconds": 0.703000000000003,
+                "absoluteP95Seconds": 1.1944000000000217
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "recall": {
+                "low": 0.75,
+                "high": 0.75,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.8223205519615878,
+                "high": 0.8223205519615878,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.9,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 2,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.5,
+                "f1": 0.6666666666666666
+              },
+              "0.5": {
+                "matched": 2,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.5,
+                "f1": 0.6666666666666666
+              },
+              "0.7": {
+                "matched": 2,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.5,
+                "f1": 0.6666666666666666
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 109.24400000000003,
+            "missedReferenceSeconds": 39.4620000000001,
+            "coverageRecall": 0.7346307479187116,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 0,
+            "boundaries": {
+              "matched": 2,
+              "start": {
+                "biasSeconds": 0.5335000000000036,
+                "absoluteMedianSeconds": 0.5335000000000036,
+                "absoluteP95Seconds": 0.9866500000000314
+              },
+              "end": {
+                "biasSeconds": -0.9320000000000164,
+                "absoluteMedianSeconds": 0.9320000000000164,
+                "absoluteP95Seconds": 1.217300000000023
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "recall": {
+                "low": 0.5,
+                "high": 0.5,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.7346307479187116,
+                "high": 0.7346307479187116,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.95,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 2,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.5,
+                "f1": 0.6666666666666666
+              },
+              "0.5": {
+                "matched": 2,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.5,
+                "f1": 0.6666666666666666
+              },
+              "0.7": {
+                "matched": 2,
+                "predicted": 2,
+                "reference": 4,
+                "precision": 1,
+                "recall": 0.5,
+                "f1": 0.6666666666666666
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 95.46300000000008,
+            "missedReferenceSeconds": 53.24300000000005,
+            "coverageRecall": 0.6419579573117427,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 0,
+            "boundaries": {
+              "matched": 2,
+              "start": {
+                "biasSeconds": 7.423999999999978,
+                "absoluteMedianSeconds": 7.423999999999978,
+                "absoluteP95Seconds": 13.172299999999927
+              },
+              "end": {
+                "biasSeconds": -0.9320000000000164,
+                "absoluteMedianSeconds": 0.9320000000000164,
+                "absoluteP95Seconds": 1.217300000000023
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "recall": {
+                "low": 0.5,
+                "high": 0.5,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.6419579573117427,
+                "high": 0.6419579573117427,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.99,
+            "mergeGapCharacters": 24,
+            "mergeGapSeconds": 1.5,
+            "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+            "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.5": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.7": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 0,
+            "missedReferenceSeconds": 148.70600000000013,
+            "coverageRecall": 0,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 0,
+            "boundaries": {
+              "matched": 0,
+              "start": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              },
+              "end": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              },
+              "recall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "sponsorskip-base/webgpu": {
+      "config": {
+        "threshold": 0.99,
+        "thresholdLo": 0.3,
+        "mergeGapSeconds": 2,
+        "minLengthSeconds": 1,
+        "wordTailSeconds": 0.4,
+        "sourceRevision": "01e53cbe8beb02f0ce125736b88df99396793595"
+      },
+      "tuneRunId": "mac-20261007-v3-tune-sponsorskip-base-webgpu",
+      "tuneInferenceKey": "43e897f443a2d79ef8dca04f53316d135b04b48742081615c8bb43aed8b21938",
+      "availableTuneVideos": 5,
+      "status": "diagnostic_operating_point",
+      "trials": [
+        {
+          "config": {
+            "threshold": 0.7,
+            "thresholdLo": 0.3,
+            "mergeGapSeconds": 2,
+            "minLengthSeconds": 1,
+            "wordTailSeconds": 0.4,
+            "sourceRevision": "01e53cbe8beb02f0ce125736b88df99396793595"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 4,
+                "predicted": 4,
+                "reference": 4,
+                "precision": 1,
+                "recall": 1,
+                "f1": 1
+              },
+              "0.5": {
+                "matched": 4,
+                "predicted": 4,
+                "reference": 4,
+                "precision": 1,
+                "recall": 1,
+                "f1": 1
+              },
+              "0.7": {
+                "matched": 3,
+                "predicted": 4,
+                "reference": 4,
+                "precision": 0.75,
+                "recall": 0.75,
+                "f1": 0.75
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 145.97800000000007,
+            "missedReferenceSeconds": 2.7280000000000655,
+            "coverageRecall": 0.9816550778045267,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 13.530999999999949,
+            "boundaries": {
+              "matched": 4,
+              "start": {
+                "biasSeconds": -0.7035000000000036,
+                "absoluteMedianSeconds": 1.1430000000000184,
+                "absoluteP95Seconds": 3.1606500000000395
+              },
+              "end": {
+                "biasSeconds": 1.9972499999999833,
+                "absoluteMedianSeconds": 0.4800000000000324,
+                "absoluteP95Seconds": 7.282400000000009
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "recall": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.9816550778045267,
+                "high": 0.9816550778045267,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.5,
+            "thresholdLo": 0.3,
+            "mergeGapSeconds": 2,
+            "minLengthSeconds": 1,
+            "wordTailSeconds": 0.4,
+            "sourceRevision": "01e53cbe8beb02f0ce125736b88df99396793595"
+          },
+          "status": "invalid_output",
+          "failures": [
+            {
+              "videoId": "-HzHFSxRcro",
+              "reason": "Invalid prediction"
+            }
+          ],
+          "summary": {
+            "attempted": 5,
+            "scored": 4,
+            "statusCounts": {
+              "ok": 4,
+              "invalid_output": 1
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 4,
+                "predicted": 4,
+                "reference": 4,
+                "precision": 1,
+                "recall": 1,
+                "f1": 1
+              },
+              "0.5": {
+                "matched": 4,
+                "predicted": 4,
+                "reference": 4,
+                "precision": 1,
+                "recall": 1,
+                "f1": 1
+              },
+              "0.7": {
+                "matched": 3,
+                "predicted": 4,
+                "reference": 4,
+                "precision": 0.75,
+                "recall": 0.75,
+                "f1": 0.75
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 145.97800000000007,
+            "missedReferenceSeconds": 2.7280000000000655,
+            "coverageRecall": 0.9816550778045267,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 13.530999999999949,
+            "boundaries": {
+              "matched": 4,
+              "start": {
+                "biasSeconds": -0.7035000000000036,
+                "absoluteMedianSeconds": 1.1430000000000184,
+                "absoluteP95Seconds": 3.1606500000000395
+              },
+              "end": {
+                "biasSeconds": 1.9972499999999833,
+                "absoluteMedianSeconds": 0.4800000000000324,
+                "absoluteP95Seconds": 7.282400000000009
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "recall": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.9816550778045267,
+                "high": 0.9816550778045267,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.6,
+            "thresholdLo": 0.3,
+            "mergeGapSeconds": 2,
+            "minLengthSeconds": 1,
+            "wordTailSeconds": 0.4,
+            "sourceRevision": "01e53cbe8beb02f0ce125736b88df99396793595"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 4,
+                "predicted": 4,
+                "reference": 4,
+                "precision": 1,
+                "recall": 1,
+                "f1": 1
+              },
+              "0.5": {
+                "matched": 4,
+                "predicted": 4,
+                "reference": 4,
+                "precision": 1,
+                "recall": 1,
+                "f1": 1
+              },
+              "0.7": {
+                "matched": 3,
+                "predicted": 4,
+                "reference": 4,
+                "precision": 0.75,
+                "recall": 0.75,
+                "f1": 0.75
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 145.97800000000007,
+            "missedReferenceSeconds": 2.7280000000000655,
+            "coverageRecall": 0.9816550778045267,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 13.530999999999949,
+            "boundaries": {
+              "matched": 4,
+              "start": {
+                "biasSeconds": -0.7035000000000036,
+                "absoluteMedianSeconds": 1.1430000000000184,
+                "absoluteP95Seconds": 3.1606500000000395
+              },
+              "end": {
+                "biasSeconds": 1.9972499999999833,
+                "absoluteMedianSeconds": 0.4800000000000324,
+                "absoluteP95Seconds": 7.282400000000009
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "recall": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.9816550778045267,
+                "high": 0.9816550778045267,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.8,
+            "thresholdLo": 0.3,
+            "mergeGapSeconds": 2,
+            "minLengthSeconds": 1,
+            "wordTailSeconds": 0.4,
+            "sourceRevision": "01e53cbe8beb02f0ce125736b88df99396793595"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 4,
+                "predicted": 4,
+                "reference": 4,
+                "precision": 1,
+                "recall": 1,
+                "f1": 1
+              },
+              "0.5": {
+                "matched": 4,
+                "predicted": 4,
+                "reference": 4,
+                "precision": 1,
+                "recall": 1,
+                "f1": 1
+              },
+              "0.7": {
+                "matched": 3,
+                "predicted": 4,
+                "reference": 4,
+                "precision": 0.75,
+                "recall": 0.75,
+                "f1": 0.75
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 145.97800000000007,
+            "missedReferenceSeconds": 2.7280000000000655,
+            "coverageRecall": 0.9816550778045267,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 13.530999999999949,
+            "boundaries": {
+              "matched": 4,
+              "start": {
+                "biasSeconds": -0.7035000000000036,
+                "absoluteMedianSeconds": 1.1430000000000184,
+                "absoluteP95Seconds": 3.1606500000000395
+              },
+              "end": {
+                "biasSeconds": 1.9972499999999833,
+                "absoluteMedianSeconds": 0.4800000000000324,
+                "absoluteP95Seconds": 7.282400000000009
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "recall": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.9816550778045267,
+                "high": 0.9816550778045267,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.9,
+            "thresholdLo": 0.3,
+            "mergeGapSeconds": 2,
+            "minLengthSeconds": 1,
+            "wordTailSeconds": 0.4,
+            "sourceRevision": "01e53cbe8beb02f0ce125736b88df99396793595"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 4,
+                "predicted": 4,
+                "reference": 4,
+                "precision": 1,
+                "recall": 1,
+                "f1": 1
+              },
+              "0.5": {
+                "matched": 4,
+                "predicted": 4,
+                "reference": 4,
+                "precision": 1,
+                "recall": 1,
+                "f1": 1
+              },
+              "0.7": {
+                "matched": 3,
+                "predicted": 4,
+                "reference": 4,
+                "precision": 0.75,
+                "recall": 0.75,
+                "f1": 0.75
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 145.97800000000007,
+            "missedReferenceSeconds": 2.7280000000000655,
+            "coverageRecall": 0.9816550778045267,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 13.530999999999949,
+            "boundaries": {
+              "matched": 4,
+              "start": {
+                "biasSeconds": -0.7035000000000036,
+                "absoluteMedianSeconds": 1.1430000000000184,
+                "absoluteP95Seconds": 3.1606500000000395
+              },
+              "end": {
+                "biasSeconds": 1.9972499999999833,
+                "absoluteMedianSeconds": 0.4800000000000324,
+                "absoluteP95Seconds": 7.282400000000009
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "recall": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.9816550778045267,
+                "high": 0.9816550778045267,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.95,
+            "thresholdLo": 0.3,
+            "mergeGapSeconds": 2,
+            "minLengthSeconds": 1,
+            "wordTailSeconds": 0.4,
+            "sourceRevision": "01e53cbe8beb02f0ce125736b88df99396793595"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 4,
+                "predicted": 4,
+                "reference": 4,
+                "precision": 1,
+                "recall": 1,
+                "f1": 1
+              },
+              "0.5": {
+                "matched": 4,
+                "predicted": 4,
+                "reference": 4,
+                "precision": 1,
+                "recall": 1,
+                "f1": 1
+              },
+              "0.7": {
+                "matched": 3,
+                "predicted": 4,
+                "reference": 4,
+                "precision": 0.75,
+                "recall": 0.75,
+                "f1": 0.75
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 145.97800000000007,
+            "missedReferenceSeconds": 2.7280000000000655,
+            "coverageRecall": 0.9816550778045267,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 13.530999999999949,
+            "boundaries": {
+              "matched": 4,
+              "start": {
+                "biasSeconds": -0.7035000000000036,
+                "absoluteMedianSeconds": 1.1430000000000184,
+                "absoluteP95Seconds": 3.1606500000000395
+              },
+              "end": {
+                "biasSeconds": 1.9972499999999833,
+                "absoluteMedianSeconds": 0.4800000000000324,
+                "absoluteP95Seconds": 7.282400000000009
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "recall": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.9816550778045267,
+                "high": 0.9816550778045267,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        },
+        {
+          "config": {
+            "threshold": 0.99,
+            "thresholdLo": 0.3,
+            "mergeGapSeconds": 2,
+            "minLengthSeconds": 1,
+            "wordTailSeconds": 0.4,
+            "sourceRevision": "01e53cbe8beb02f0ce125736b88df99396793595"
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 4,
+                "predicted": 4,
+                "reference": 4,
+                "precision": 1,
+                "recall": 1,
+                "f1": 1
+              },
+              "0.5": {
+                "matched": 4,
+                "predicted": 4,
+                "reference": 4,
+                "precision": 1,
+                "recall": 1,
+                "f1": 1
+              },
+              "0.7": {
+                "matched": 3,
+                "predicted": 4,
+                "reference": 4,
+                "precision": 0.75,
+                "recall": 0.75,
+                "f1": 0.75
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 145.97800000000007,
+            "missedReferenceSeconds": 2.7280000000000655,
+            "coverageRecall": 0.9816550778045267,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 13.530999999999949,
+            "boundaries": {
+              "matched": 4,
+              "start": {
+                "biasSeconds": -0.7035000000000036,
+                "absoluteMedianSeconds": 1.1430000000000184,
+                "absoluteP95Seconds": 3.1606500000000395
+              },
+              "end": {
+                "biasSeconds": 1.9972499999999833,
+                "absoluteMedianSeconds": 0.4800000000000324,
+                "absoluteP95Seconds": 7.282400000000009
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "recall": {
+                "low": 1,
+                "high": 1,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0.9816550778045267,
+                "high": 0.9816550778045267,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        }
+      ]
+    },
+    "keyword/javascript": {
+      "config": {
+        "threshold": 1,
+        "mergeGapSeconds": 0
+      },
+      "tuneRunId": "mac-20261007-v3-tune-keyword-javascript",
+      "tuneInferenceKey": "4388f9906b9e9120daf3f374ddbe89df322339f84109a7be7e48c4f991716a0e",
+      "availableTuneVideos": 5,
+      "status": "no_conservative_operating_point",
+      "trials": [
+        {
+          "config": {
+            "threshold": 1,
+            "mergeGapSeconds": 0
+          },
+          "status": "valid",
+          "failures": [],
+          "summary": {
+            "attempted": 5,
+            "scored": 5,
+            "statusCounts": {
+              "ok": 5
+            },
+            "metrics": {
+              "0.3": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.5": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              },
+              "0.7": {
+                "matched": 0,
+                "predicted": 0,
+                "reference": 4,
+                "precision": null,
+                "recall": 0,
+                "f1": 0
+              }
+            },
+            "referenceSeconds": 148.70600000000013,
+            "coveredReferenceSeconds": 0,
+            "missedReferenceSeconds": 148.70600000000013,
+            "coverageRecall": 0,
+            "reviewedNegativeHours": 0,
+            "confirmedFalseSkips": 0,
+            "falseSkipsPerHour": null,
+            "ordinaryRemovedSeconds": 0,
+            "ordinarySecondsPerHour": null,
+            "predictedUnknownSeconds": 0,
+            "boundaries": {
+              "matched": 0,
+              "start": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              },
+              "end": {
+                "biasSeconds": null,
+                "absoluteMedianSeconds": null,
+                "absoluteP95Seconds": null
+              }
+            },
+            "worstOrdinaryLoss": [],
+            "interpretation": "Agreement with available references. Unknown/unreviewed time is not verified ordinary content. Failures excluded from quality, counted in coverage."
+          },
+          "uncertainty": {
+            "available": true,
+            "channels": 4,
+            "iterations": 500,
+            "seed": 42,
+            "method": "percentile channel cluster bootstrap; limited precision with few channels",
+            "intervals": {
+              "precision": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              },
+              "recall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "coverageRecall": {
+                "low": 0,
+                "high": 0,
+                "definedReplicates": 351
+              },
+              "ordinarySecondsPerHour": {
+                "low": null,
+                "high": null,
+                "definedReplicates": 0
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "tuningBudget": "Seven decoder operating points per learned candidate; label wording/windowing fixed before acquisition. No repeated inference for thresholds.",
+  "selectionRule": "Diagnostic: greatest recall at observed >=95% provisional segment agreement precision, with at least one match. If none qualifies or no scored videos, preserve published/default configuration and abstain from model selection. This is not a release gate.",
+  "inferenceSourceCommit": "fca26dbdac104eb677a249892a9dbf8320984bfe",
+  "sourcePolicy": "Model/adapters/decoders/runtime pins unchanged from successful v3 tuning; no adaptation after holdout exposure. Reporting/tuning-validation changes are separate."
+}

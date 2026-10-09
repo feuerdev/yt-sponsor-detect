@@ -5,3 +5,13 @@ model/
 
 # Local recovery checkpoints
 /artifacts/
+
+# Benchmark weights, captions, caches and generated evidence
+/bench/assets/
+/bench/local/
+/bench/results/
+/bench/browser/vendor/
+/bench/__pycache__/
+
+# Local documentation and testing reports (existing tracked docs remain tracked)
+/docs/

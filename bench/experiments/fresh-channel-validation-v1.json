@@ -1,0 +1,54 @@
+{
+  "schemaVersion": 1,
+  "registeredAt": "2026-10-08T12:37:52.747262+00:00",
+  "sourceHead": "8aa00f968610e5b47899fc3f776a0617dde7a89b",
+  "purpose": "New channel-disjoint development and locked validation cohort; selection before caption availability or model inference",
+  "channels": [
+    {
+      "name": "Stuff Made Here",
+      "channelId": "UCj1VqrHhDte54oLgPG4xpuQ",
+      "split": "test"
+    },
+    {
+      "name": "DIY Perks",
+      "channelId": "UCUQo7nzH1sXVpzL92VesANw",
+      "split": "tune"
+    },
+    {
+      "name": "ElectroBOOM",
+      "channelId": "UCJ0-OtVpF0wOKEqT2Z1HEtA",
+      "split": "tune"
+    },
+    {
+      "name": "Fireship",
+      "channelId": "UCsBjURrPoezykLs9EqgamOA",
+      "split": "test"
+    },
+    {
+      "name": "NileRed",
+      "channelId": "UCFhXFikryT4aFcLkLw2LBLA",
+      "split": "tune"
+    },
+    {
+      "name": "Project Farm",
+      "channelId": "UC2rzsm1Qi6N1X-wuOg_p0Ng",
+      "split": "test"
+    }
+  ],
+  "selection": "Three newest public RSS entries per channel, ordered by publishedAt descending then videoId. Exclude original benchmark/smoke/canary IDs and all original channels. No replacement based on transcript availability, label count or model result. Exclusions and feed failures retained. All durations eligible.",
+  "split": "SHA256 ordered channel IDs: first three tune, remaining three test. Exact allocation fixed here.",
+  "labels": "Snapshot public SponsorBlock sponsor/selfpromo after selecting IDs; absence remains unknown; overlapping paid/selfpromo disputed before inference",
+  "candidates": [
+    "flow-window-union/0.8 baseline",
+    "fixed registered overlap study operating points",
+    "fixed three-point self-sponsorship policy study"
+  ],
+  "selectionPolicy": "Reuse existing fixed conservative selection/promotion rules on development tune only; no expanding candidate grids",
+  "validation": "Freeze model/code/config/fixtures before first test prediction; separate exposure ledger, never modify original exposed ledger. Compare configurations declared before exposure; report unknown and unavailable separately. Human reference review and campaign checks remain required.",
+  "trainingOverlap": "Unknown. Recent uploads and channel disjointness from our benchmark do not establish absence from upstream model training. Do not infer training cutoff from repository modification time.",
+  "resources": {
+    "maximumAccountMiB": 28672,
+    "minimumAvailableMiB": 4096
+  },
+  "inference": "Chrome only; acquisition runs with extension detection disabled. No subagents/API credits."
+}

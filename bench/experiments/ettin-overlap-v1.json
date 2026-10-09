@@ -1,0 +1,45 @@
+{
+  "schemaVersion": 1,
+  "registeredAt": "2026-10-07T22:44:26.973498+00:00",
+  "sourceHead": "67e5d21cd67c44d4ca17b9c1565858d0fad58ac7",
+  "purpose": "Improve overlap decoding without tuning on exposed test channels",
+  "split": "tune only; old test remains exposed and excluded",
+  "model": "ettin-int8",
+  "backends": [
+    "webgpu",
+    "wasm"
+  ],
+  "candidateFamilies": [
+    "flow-window-union",
+    "mean-logit-consensus",
+    "context-logit-consensus"
+  ],
+  "thresholds": [
+    0.5,
+    0.6,
+    0.7,
+    0.8,
+    0.9,
+    0.95,
+    0.99
+  ],
+  "mergeGapCharacters": 24,
+  "mergeGapSeconds": 1.5,
+  "candidateBudget": 21,
+  "inferenceBudget": "Reuse authenticated cached browser logits only. No Node/cloud ML inference. No repeated inference for thresholds.",
+  "baseline": {
+    "family": "flow-window-union",
+    "threshold": 0.8
+  },
+  "folds": "Leave one channel out; choose only on remaining channels and evaluate excluded channel once per fixed candidate",
+  "trainingSelection": "At least one matched sponsor at IoU>=0.5 and provisional agreement precision>=0.95; maximize recall, then coverage recall, then minimize unknown predicted seconds, then prefer baseline family/threshold closest to 0.8",
+  "promotionRequirements": [
+    "At least 3 positive channels and 12 sponsor references",
+    "Out-of-fold provisional precision>=0.95 and recall not below baseline",
+    "Out-of-fold coverage recall increases and unknown predicted seconds not above baseline",
+    "Reviewed negative exposure and independent fresh test before automatic skipping"
+  ],
+  "unknownRegions": "Unmatched predictions remain unknown, never relabeled as false positives or ordinary content",
+  "trainingOverlap": "Unknown upstream training overlap explicitly retained; no independent-generalization claim",
+  "frozenBenchmark": "No modification of original manifest, frozen config, adapters, test ledger or old results"
+}

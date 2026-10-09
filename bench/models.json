@@ -1,0 +1,338 @@
+{
+  "schemaVersion": 1,
+  "models": [
+    {
+      "repository": "Xenova/mobilebert-uncased-mnli",
+      "revision": "8b0ea66ab7b190bba77418ba03b67d69cfc9a1ee",
+      "directory": "mobilebert-uncased-mnli",
+      "task": "zero-shot-classification",
+      "quantized": false,
+      "rights": "unverified; release and redistribution blocked pending review",
+      "files": [
+        {
+          "path": "config.json",
+          "size": 1092,
+          "sha256": "93b1698798a8ff921b49c40d3afa7584342b94b06fde7851d342134eadaf61c7"
+        },
+        {
+          "path": "tokenizer.json",
+          "size": 711396,
+          "sha256": "d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66"
+        },
+        {
+          "path": "tokenizer_config.json",
+          "size": 400,
+          "sha256": "cbba05b96360d6653cf739f5cd890b10a46cc7ea77a5301abb8273ca1859f3d8"
+        },
+        {
+          "path": "onnx/model.onnx",
+          "size": 99027471,
+          "sha256": "c89f04edd11a473bdade25b0e28a752cc51cde403d294062c50703cfbc370eb3"
+        }
+      ],
+      "id": "mobilebert-fp32",
+      "adapter": "mobilebert",
+      "precision": "fp32",
+      "backends": [
+        "wasm"
+      ],
+      "supportedCategories": [
+        "sponsor",
+        "selfpromo"
+      ],
+      "runtime": "@xenova/transformers@2.17.2",
+      "modelFile": "model",
+      "preprocessing": {
+        "cueWindow": 20,
+        "cueStride": 5,
+        "minCharacters": 50,
+        "labels": [
+          "paid sponsorship",
+          "self promotion",
+          "ordinary content"
+        ],
+        "hypothesis": "This example is {}.",
+        "maxLength": 512,
+        "truncation": "premise-hypothesis pair bounded to graph max_position_embeddings; Transformers 2 tokenizer model_max_length override"
+      },
+      "decoding": {
+        "threshold": 0.9,
+        "mergeGapSeconds": 0
+      }
+    },
+    {
+      "repository": "Xenova/mobilebert-uncased-mnli",
+      "revision": "8b0ea66ab7b190bba77418ba03b67d69cfc9a1ee",
+      "directory": "mobilebert-int8",
+      "task": "zero-shot-classification",
+      "quantized": false,
+      "rights": "unverified; release and redistribution blocked pending review",
+      "files": [
+        {
+          "path": "config.json",
+          "size": 1092,
+          "sha256": "93b1698798a8ff921b49c40d3afa7584342b94b06fde7851d342134eadaf61c7"
+        },
+        {
+          "path": "tokenizer.json",
+          "size": 711396,
+          "sha256": "d241a60d5e8f04cc1b2b3e9ef7a4921b27bf526d9f6050ab90f9267a1f9e5c66"
+        },
+        {
+          "path": "tokenizer_config.json",
+          "size": 400,
+          "sha256": "cbba05b96360d6653cf739f5cd890b10a46cc7ea77a5301abb8273ca1859f3d8"
+        },
+        {
+          "path": "onnx/model_int8.onnx",
+          "size": 26437902,
+          "sha256": "48fd803f69f0ab11e4d7048af25ff575bc31c34041bd33f300dc48cbe5302407"
+        }
+      ],
+      "id": "mobilebert-int8",
+      "adapter": "mobilebert",
+      "precision": "int8",
+      "backends": [
+        "wasm"
+      ],
+      "supportedCategories": [
+        "sponsor",
+        "selfpromo"
+      ],
+      "runtime": "@xenova/transformers@2.17.2",
+      "modelFile": "model_int8",
+      "preprocessing": {
+        "cueWindow": 20,
+        "cueStride": 5,
+        "minCharacters": 50,
+        "labels": [
+          "paid sponsorship",
+          "self promotion",
+          "ordinary content"
+        ],
+        "hypothesis": "This example is {}.",
+        "maxLength": 512,
+        "truncation": "premise-hypothesis pair bounded to graph max_position_embeddings; Transformers 2 tokenizer model_max_length override"
+      },
+      "decoding": {
+        "threshold": 0.9,
+        "mergeGapSeconds": 0
+      }
+    },
+    {
+      "id": "ettin-fp32",
+      "adapter": "ettin",
+      "repository": "CuriousDragon/ettin-17m-sponsor-combined-android",
+      "revision": "d4939256c49e92d158429a55fcf39477d003dd58",
+      "sourceRevision": "4c5d62ea8e70e2cd8c45d707a404e3692c0434bf",
+      "directory": "ettin-fp32",
+      "precision": "fp32",
+      "backends": [
+        "wasm",
+        "webgpu"
+      ],
+      "supportedCategories": [
+        "sponsor"
+      ],
+      "runtime": "onnxruntime-web@1.29.0 + @huggingface/tokenizers@0.1.3",
+      "rights": "CC-BY-NC-SA-4.0; CuriousDragon; sponsorblock labels; base encoder MIT",
+      "files": [
+        {
+          "path": "sponsor_detector_combined.fp32.onnx",
+          "size": 68479529,
+          "sha256": "c76d992b39fff0fcb6485e2fc86733ba307fc359ad5c5471d96b730a618ca845"
+        },
+        {
+          "path": "config.json",
+          "size": 1852,
+          "sha256": "6a288d0f8ed552a2e6273c46dcb97a8b1d382b62a7863640165c2e86d28ff07a"
+        },
+        {
+          "path": "tokenizer.json",
+          "size": 3583228,
+          "sha256": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30"
+        },
+        {
+          "path": "tokenizer_config.json",
+          "size": 350,
+          "sha256": "b777be9359fc2dd0dd89a5fab5d6f1ebdc937040cf47be84b75e431c5129885b"
+        }
+      ],
+      "preprocessing": {
+        "normalization": [
+          "collapse_whitespace",
+          "lowercase",
+          "replace_urls",
+          "replace_numbers"
+        ],
+        "maxLength": 768,
+        "overlapTokens": 128,
+        "labels": [
+          "O",
+          "B-SPONSOR",
+          "I-SPONSOR",
+          "L-SPONSOR",
+          "U-SPONSOR"
+        ],
+        "implementation": "flow-pure-v2; cue normalization followed by tokenizer NFC; Python-codepoint offsets"
+      },
+      "decoding": {
+        "threshold": 0.7,
+        "mergeGapCharacters": 24,
+        "mergeGapSeconds": 1.5,
+        "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+        "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+      }
+    },
+    {
+      "id": "ettin-int8",
+      "adapter": "ettin",
+      "repository": "CuriousDragon/ettin-17m-sponsor-combined-android",
+      "revision": "d4939256c49e92d158429a55fcf39477d003dd58",
+      "sourceRevision": "4c5d62ea8e70e2cd8c45d707a404e3692c0434bf",
+      "directory": "ettin-int8",
+      "precision": "int8",
+      "backends": [
+        "wasm",
+        "webgpu"
+      ],
+      "supportedCategories": [
+        "sponsor"
+      ],
+      "runtime": "onnxruntime-web@1.29.0 + @huggingface/tokenizers@0.1.3",
+      "rights": "CC-BY-NC-SA-4.0; CuriousDragon; sponsorblock labels; base encoder MIT",
+      "files": [
+        {
+          "path": "sponsor_detector_combined.int8.onnx",
+          "size": 29799099,
+          "sha256": "5006c192c9ba17c9283d7366307cccc9d80d67bab4301c1749e8f737a8b6d40f"
+        },
+        {
+          "path": "config.json",
+          "size": 1852,
+          "sha256": "6a288d0f8ed552a2e6273c46dcb97a8b1d382b62a7863640165c2e86d28ff07a"
+        },
+        {
+          "path": "tokenizer.json",
+          "size": 3583228,
+          "sha256": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30"
+        },
+        {
+          "path": "tokenizer_config.json",
+          "size": 350,
+          "sha256": "b777be9359fc2dd0dd89a5fab5d6f1ebdc937040cf47be84b75e431c5129885b"
+        }
+      ],
+      "preprocessing": {
+        "normalization": [
+          "collapse_whitespace",
+          "lowercase",
+          "replace_urls",
+          "replace_numbers"
+        ],
+        "maxLength": 768,
+        "overlapTokens": 128,
+        "labels": [
+          "O",
+          "B-SPONSOR",
+          "I-SPONSOR",
+          "L-SPONSOR",
+          "U-SPONSOR"
+        ],
+        "implementation": "flow-pure-v2; cue normalization followed by tokenizer NFC; Python-codepoint offsets"
+      },
+      "decoding": {
+        "threshold": 0.7,
+        "mergeGapCharacters": 24,
+        "mergeGapSeconds": 1.5,
+        "parity": "150 pinned pure-pipeline differential cases; verified common cases; zero-duration proposals omitted and complex NFC offsets rejected",
+        "sourceRevision": "6bfbf2b58490c22156836586f1ae27f437590154"
+      }
+    },
+    {
+      "id": "sponsorskip-base",
+      "adapter": "sponsorskip",
+      "repository": "edde746/sponsorskip-modernbert",
+      "revision": "3468d080e70e4be8272d979ce5fd10bcea7cf9f5",
+      "directory": "sponsorskip-base",
+      "precision": "fp16",
+      "backends": [
+        "webgpu"
+      ],
+      "supportedCategories": [
+        "sponsor",
+        "selfpromo"
+      ],
+      "runtime": "onnxruntime-web@1.29.0 + @huggingface/tokenizers@0.1.3",
+      "rights": "CC-BY-NC-SA-4.0 weights; edde746 reference decoder GPL-3.0-or-later",
+      "files": [
+        {
+          "path": "detector_fp16.onnx",
+          "size": 282949814,
+          "sha256": "e0e36c1408a854363a700d8babb3edd186a9aa655cb40964562cb0b24ccfff29"
+        },
+        {
+          "path": "detector_meta.json",
+          "size": 118408,
+          "sha256": "932f7cc2636b5f7d7af4d50fbcbd81a6061e8d9b700f593ddbbf43fa98cad095"
+        },
+        {
+          "path": "tokenizer/tokenizer.json",
+          "size": 3583228,
+          "sha256": "6c8aaa9a542084f2457eab775d4eeb51f92a70c0fd9de28d5edb0ddec3c08d30"
+        },
+        {
+          "path": "tokenizer/tokenizer_config.json",
+          "size": 380,
+          "sha256": "fb54f027372062b2ca52282efb04d178a8b57167a00cd8f4e816515823a2c016"
+        },
+        {
+          "path": "tokenizer/special_tokens_map.json",
+          "size": 119,
+          "sha256": "bd6c46d516f20b0681e5b64d15c98487be518793a0a2ac23e78c88c81db88f3b"
+        }
+      ],
+      "preprocessing": {
+        "maxLength": 2048,
+        "strideFraction": 0.5,
+        "pooling": "first visible subtoken per word; overlap average",
+        "specialTokens": "pruned vocab remapping including padding"
+      },
+      "decoding": {
+        "threshold": 0.7,
+        "thresholdLo": 0.3,
+        "mergeGapSeconds": 2,
+        "minLengthSeconds": 1,
+        "wordTailSeconds": 0.4,
+        "sourceRevision": "01e53cbe8beb02f0ce125736b88df99396793595"
+      }
+    },
+    {
+      "id": "keyword",
+      "adapter": "keyword",
+      "precision": null,
+      "backends": [
+        "javascript"
+      ],
+      "supportedCategories": [
+        "sponsor"
+      ],
+      "runtime": "browser JavaScript",
+      "revision": "frozen-keyword-v1",
+      "files": [],
+      "preprocessing": {
+        "phrases": [
+          "sponsored by",
+          "sponsor of this video",
+          "thanks to our sponsor",
+          "paid promotion"
+        ]
+      },
+      "decoding": {
+        "threshold": 1,
+        "mergeGapSeconds": 0
+      },
+      "rights": "project code; diagnostic baseline only"
+    }
+  ]
+}
