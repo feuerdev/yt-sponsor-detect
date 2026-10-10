@@ -63,6 +63,7 @@ chrome.runtime.onMessage.addListener((message,sender,respond)=>{
         task=(async()=>{
             const [tab]=await chrome.tabs.query({active:true,currentWindow:true});
             if(!tab)return null;
+            await restoreSession(tab);
             if(message.type==='PAUSE_VIDEO')return coordinator.pause(tab.id,message.paused);
             if(message.type==='RETRY_VIDEO'){await chrome.tabs.sendMessage(tab.id,{type:'RETRY_VIDEO'});return {retry:true};}
             return coordinator.snapshot(coordinator.sessions.get(tab.id));
@@ -86,4 +87,17 @@ async function capturePanel(tabId,token) {
     const language=await chrome.i18n.detectLanguage(text);if(!current())return {error:'fetch_failed'};
     try{return {transcript:panelToTranscript(snapshot,session.videoId,language)};}
     catch(error){return {error:error.message==='unsupported_language'?'unsupported_language':'invalid_captions'};}
+}
+
+async function restoreSession(tab) {
+    if(coordinator.sessions.has(tab.id))return;
+    let url;try{url=new URL(tab.url);}catch{return;}
+    if(url.origin!=='https://www.youtube.com'||url.pathname!=='/watch')return;
+    let visit;try{visit=await chrome.tabs.sendMessage(tab.id,{type:'GET_PLAYER_SESSION'});}catch{return;}
+    if(!visit||visit.videoId!==url.searchParams.get('v')||typeof visit.token!=='string'||!visit.token||visit.token.length>100)return;
+    const current=await chrome.tabs.get(tab.id);if(current.url!==tab.url)return;
+    // Another popup refresh or a navigation may have established a newer session.
+    if(coordinator.sessions.has(tab.id))return;
+    const state=await coordinator.begin(tab.id,visit.videoId,visit.token,{paused:visit.paused===true});
+    if(state?.status==='loading')await chrome.tabs.sendMessage(tab.id,{type:'RETRY_VIDEO'}).catch(()=>{});
 }
