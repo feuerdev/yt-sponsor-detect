@@ -1,74 +1,32 @@
-# YouTube sponsor detection
+# Local YouTube sponsor viewer
 
-An experimental Chrome extension that detects paid sponsorships in YouTube
-videos using Ettin INT8, running locally in the browser. It highlights suggested
-segments and offers **Skip** and **Undo**. Automatic skipping is disabled.
+An experimental desktop Chrome extension for English paid sponsors, using the pinned Ettin INT8 detector locally with WebGPU and CPU/WASM fallback. This viewer redesign enables automatic skipping by default, keeps playback running during analysis, and provides a compact Undo control. Undo returns to the estimated interval start and prevents repeated skipping for the visit. Estimates can include ordinary content.
 
-## Features
+Captions are acquired proactively with English-track fallback. If internal YouTube requests fail, the existing public transcript-panel recovery is retained; its panel may briefly open and is restored when safe. Partial panel transcripts show limited coverage and are not cached as complete results. Videos without usable English speech captions remain playable. Self-promotion is not currently supported by the retained model.
 
-- Automatically acquires available English transcripts, without enabling captions.
-- Analyzes transcripts with a bundled model, using WebGPU with a CPU/WASM fallback.
-- Shows timed sponsor suggestions and a coverage notice for partial transcripts.
-- Caches suggestions locally for up to 48 hours.
-- Lets you enable or disable suggestions and adjust minimum confidence in the popup.
-
-Suggestions can miss sponsors or include ordinary speech. Self-promotion, custom
-categories, live streams and non-English transcripts are unsupported. Videos
-without a usable transcript cannot be analyzed.
+The popup focuses on the current video: enable, automatic skipping, pause, retry, estimated intervals and optional diagnostics. Viewing preferences apply without reloading. Classification phrases and numeric thresholds are hidden from normal settings.
 
 ## Build and install
 
-Use Chrome 116+ and Node.js 24.15+.
+Use desktop Chrome 116+ and Node.js 24.15+.
 
 ```sh
-git clone https://github.com/feuerdev/yt-sponsor-detect.git
-cd yt-sponsor-detect
 npm ci
+npm test
 npm run setup
 npm run build
 ```
 
-Setup downloads the pinned model assets and verifies their checksums. The build
-bundles the model and runtime into `dist/`. Model assets and build output are not
-tracked in Git.
+Setup streams and verifies the pinned assets from `src/model-spec.js`; builds require those real assets. Load `dist/` as an unpacked extension through `chrome://extensions`. No model binaries, raw captions, browser profiles or authentication state are committed.
 
-1. Open `chrome://extensions` and enable **Developer mode**.
-2. Select **Load unpacked** and choose the project's `dist/` folder.
-3. Open or reload a YouTube video with an English transcript.
+## Evidence and limits
 
-After rebuilding, reload the extension and the video page.
+The previous benchmark branch's pinned Ettin/Flow pipeline, GPU failure recovery, caption-panel recovery and evaluation tooling are preserved. The new viewer uses provided word timestamps where available and estimated panel timing otherwise. That timing/preprocessing path needs its own evaluation; prior cue-based quality measurements do not establish viewer accuracy or an ordinary-content-loss bound.
 
-## Usage
-
-Detection starts automatically when a video loads. YouTube's transcript panel may
-open briefly during acquisition. Captions can stay off.
-
-During a suggested segment, click **Skip** to jump to its end. Click **Undo** to
-restore your previous playback position. Use the extension popup to change
-settings or clear the current video's suggestions.
-
-If detection is unavailable, open YouTube's transcript panel, clear its search,
-and select **Analyze open transcript** in the popup to retry. Transcript-panel
-timestamps are approximate, and partial transcripts only cover part of a video.
-
-## Development
-
-```sh
-npm test               # source, decoder and lifecycle checks
-npm run verify:model   # verify downloaded model assets
-npm run build          # build the extension with verified assets
-```
-
-The separate [browser benchmark](bench/README.md) compares models and decoding
-strategies. Model inference runs in Chrome, not in the Node test suite.
+[The implementation and evidence ledger](docs/viewer-experience.md) distinguishes source fixtures, rendered native-media checks, historical benchmark work and remaining installed-extension/live YouTube/model checks. Synthetic detector fixtures do not prove accuracy. No other device is currently available for new ordinary-device measurements, and neural workloads are not retried on the constrained VPS.
 
 ## Privacy and licensing
 
-Transcript inference runs locally with bundled assets. The extension does not
-upload captions or load remote models. YouTube and the initial model download
-require network access. Settings use Chrome's sync storage. Cached suggestions
-stay in local storage.
+Inference uses bundled local assets and does not upload captions. YouTube requests and initial asset setup need network access. Settings use Chrome sync storage; complete estimated intervals stay in local storage for up to 48 hours. Full runtime network behavior still needs installed-browser verification.
 
-The project is experimental and marked `UNLICENSED`. Ettin weights are
-CC BY-NC-SA 4.0, and the Flow-derived decoder is GPL-3.0-only. See
-[third-party notices](licenses/NOTICE.md) for attribution and component licenses.
+The original project remains UNLICENSED. Ettin weights are CC BY-NC-SA 4.0; the retained Flow decoder is GPL-3.0-only. Viewer modules adapting SponsorSkip's design are GPL-3.0-or-later. See [third-party notices](licenses/NOTICE.md) and [viewer attribution](docs/viewer-attribution.md). No store release, commercial rights clearance, merge or deployment is part of this change.

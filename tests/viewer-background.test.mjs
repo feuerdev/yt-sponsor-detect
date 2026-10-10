@@ -1,0 +1,103 @@
+import assert from 'node:assert/strict';
+import test from 'node:test';
+import vm from 'node:vm';
+import {readFileSync} from 'node:fs';
+import {initializeSettings} from '../src/viewer/settings.js';
+import {SessionCoordinator} from '../src/viewer/coordinator.js';
+import {ResultCache} from '../src/viewer/cache.js';
+import {MODEL_SPEC} from '../src/model-spec.js';
+import {TRANSCRIPT_VERSION} from '../src/viewer/transcript.js';
+import {captureOpenTranscript} from '../src/transcript-panel.js';
+import {panelToTranscript} from '../src/viewer/panel.js';
+const source=readFileSync(new URL('../src/viewer-background.js',import.meta.url),'utf8').replace(/^import .*;\n/gm,'').replace('export const coordinator','const coordinator');
+const tick=async()=>{for(let i=0;i<4;i++)await new Promise(resolve=>setImmediate(resolve));};
+const transcript={videoId:'first',duration:30,timing:'word',track:'automatic',language:'en',words:[{text:'sponsor',start:1,end:2}]};
+function storage(initial={}){const values={...initial};return {values,get:async key=>key===null?structuredClone(values):{[key]:structuredClone(values[key])},set:async value=>Object.assign(values,structuredClone(value)),remove:async keys=>{for(const key of [].concat(keys))delete values[key];}};}
+function fixture(){
+    const f={sync:storage(),local:storage(),messages:[],contexts:[],created:0};
+    const event=name=>({addListener:fn=>{f[name]=fn;}});
+    const chrome={scripting:{executeScript:async()=>f.panelPending?await f.panelPending:[{result:f.panel}]},i18n:{detectLanguage:async()=>f.languagePending?await f.languagePending:{isReliable:true,languages:[{language:'en',percentage:100}]}},runtime:{id:'extension',getURL:path=>'chrome-extension://extension/'+path,getContexts:async()=>f.contexts,
+        onInstalled:event('installed'),onMessage:event('message'),sendMessage:async message=>{f.messages.push(message);if(message.type==='RUN_DETECTION')return {segments:[{start:1,end:4,category:'sponsor'}]};return {};},},
+        storage:{sync:f.sync,local:f.local,onChanged:event('changed')},offscreen:{createDocument:async()=>{f.created++;if(f.create)await f.create();f.contexts=[{}];}},
+        tabs:{onRemoved:event('removed'),onUpdated:event('updated'),sendMessage:async(id,message)=>{f.messages.push({...message,tabId:id});if(message.type==='GET_PLAYER_SESSION')return f.playerSession;},get:async()=>({id:1,url:f.url||'https://www.youtube.com/watch?v=first'}),query:async()=>[{id:1,url:'https://www.youtube.com/watch?v=first'}]}};
+    const context=vm.createContext({chrome,initializeSettings,SessionCoordinator,ResultCache,MODEL_SPEC,TRANSCRIPT_VERSION,captureOpenTranscript,panelToTranscript,URL});vm.runInContext(source,context);
+    f.coordinator=vm.runInContext('coordinator',context);
+    f.sender={id:'extension',tab:{id:1,url:'https://www.youtube.com/watch?v=first'},url:'https://www.youtube.com/watch?v=first'};
+    f.call=(message,sender=f.sender)=>new Promise(resolve=>{if(f.message(message,sender,resolve)!==true)resolve(undefined);});
+    return f;
+}
+test('actual background boot initializes auto defaults and serves first video without popup',async()=>{
+    const f=fixture();await tick();assert.equal(f.sync.values.autoSkip,true);
+    assert.equal((await f.call({type:'START_SESSION',videoId:'first',token:'a'})).state.status,'loading');
+    const result=await f.call({type:'SUBMIT_TRANSCRIPT',token:'a',transcript});assert.equal(result.state.status,'ready');assert.equal(f.created,1);
+    assert.ok(f.messages.some(m=>m.type==='RUN_DETECTION'));assert.ok(f.local.values['viewer-cache:first']);
+});
+test('only current YouTube page identity can open a transcript session',async()=>{
+    const f=fixture();await tick();assert.equal(await f.call({type:'START_SESSION',videoId:'second',token:'a'}),undefined);
+    assert.equal(await f.call({type:'START_SESSION',videoId:'first',token:'a'},{...f.sender,url:'https://other.example/watch?v=first'}),undefined);
+    assert.equal(f.coordinator.sessions.size,0);
+});
+test('navigation during offscreen creation cancels before allocating inference work',async()=>{
+    const f=fixture();await tick();let release;f.create=()=>new Promise(resolve=>{release=resolve;});
+    await f.call({type:'START_SESSION',videoId:'first',token:'a'});const pending=f.call({type:'SUBMIT_TRANSCRIPT',token:'a',transcript});await tick();
+    f.updated(1,{url:'https://www.youtube.com/watch?v=second'});release();assert.equal((await pending).state,null);
+    assert.equal(f.messages.some(m=>m.type==='RUN_DETECTION'),false);assert.equal(f.local.values['viewer-cache:first'],undefined);
+});
+test('same-video URL changes preserve session, next video and tab removal clear it',async()=>{
+    const f=fixture();await tick();await f.call({type:'START_SESSION',videoId:'first',token:'a'});
+    f.updated(1,{url:'https://www.youtube.com/watch?v=first&t=10'});assert.equal(f.coordinator.sessions.size,1);
+    f.updated(1,{url:'https://www.youtube.com/watch?v=second'});assert.equal(f.coordinator.sessions.size,0);
+    await f.call({type:'START_SESSION',videoId:'first',token:'b'});f.removed(1);assert.equal(f.coordinator.sessions.size,0);
+});
+test('popup pause and status route through active tab, disable prevents cached restore',async()=>{
+    const f=fixture();await tick();await f.call({type:'START_SESSION',videoId:'first',token:'a'});await f.call({type:'SUBMIT_TRANSCRIPT',token:'a',transcript});
+    const popup={id:'extension',url:'chrome-extension://extension/popup.html'};
+    assert.equal((await f.call({type:'GET_VIDEO_STATUS'},popup)).state.status,'ready');
+    assert.equal((await f.call({type:'PAUSE_VIDEO',paused:true},popup)).state.paused,true);
+    await f.sync.set({isEnabled:false});f.changed({isEnabled:{newValue:false}},'sync');
+    assert.equal((await f.call({type:'START_SESSION',videoId:'first',token:'b'})).state.status,'disabled');
+});
+
+test('actual viewer background retains public-panel recovery and rejects stale language results',async()=>{
+    const f=fixture();await tick();await f.call({type:'START_SESSION',videoId:'first',token:'a'});
+    f.panel={videoId:'first',durationSeconds:30,rows:[{start:0,end:30,text:'English caption'}]};
+    const recovered=await f.call({type:'CAPTURE_PANEL',token:'a'});assert.equal(recovered.transcript.track,'public-panel');
+    let release;f.languagePending=new Promise(r=>{release=r;});const pending=f.call({type:'CAPTURE_PANEL',token:'a'});await tick();
+    f.updated(1,{url:'https://www.youtube.com/watch?v=second'});release({isReliable:true,languages:[{language:'en',percentage:100}]});
+    assert.equal((await pending).error,'fetch_failed');assert.equal(f.coordinator.sessions.size,0);
+});
+
+test('home-originated content can start after same-document navigation to watch',async()=>{
+    const f=fixture();await tick();const home={...f.sender,url:'https://www.youtube.com/',frameId:0};
+    const reply=await f.call({type:'START_SESSION',videoId:'first',token:'from-home'},home);
+    assert.equal(reply?.state?.status,'loading');assert.equal(f.coordinator.sessions.get(1)?.videoId,'first');
+});
+test('subframes and insecure senders cannot open viewer sessions',async()=>{
+    const f=fixture();await tick();
+    for(const sender of [{...f.sender,frameId:1},{...f.sender,url:'http://www.youtube.com/watch?v=first'}])
+        assert.equal(await f.call({type:'START_SESSION',videoId:'first',token:'wrong'},sender),undefined);
+    assert.equal(f.coordinator.sessions.size,0);
+});
+
+test('popup restores current content session and completed cache after service-worker restart',async()=>{
+    const f=fixture();await tick();
+    await f.call({type:'START_SESSION',videoId:'first',token:'visit'});
+    await f.call({type:'SUBMIT_TRANSCRIPT',token:'visit',transcript});
+    f.coordinator.sessions.clear();
+    f.playerSession={videoId:'first',token:'visit'};
+    const result=await f.call({type:'GET_VIDEO_STATUS'},{id:'extension',url:'chrome-extension://extension/popup.html'});
+    assert.equal(result.state?.status,'ready');assert.equal(result.state.token,'visit');
+    assert.deepEqual(result.state.segments,[{start:1,end:4,category:'sponsor'}]);
+});
+
+test('worker recovery restarts uncached analysis and preserves per-video pause',async()=>{
+    const f=fixture();await tick();f.playerSession={videoId:'first',token:'visit',paused:true};
+    const result=await f.call({type:'GET_VIDEO_STATUS'},{id:'extension',url:'chrome-extension://extension/popup.html'});
+    assert.equal(result.state?.status,'loading');assert.equal(result.state.paused,true);
+    assert.ok(f.messages.some(m=>m.type==='RETRY_VIDEO'&&m.tabId===1));
+});
+test('worker recovery rejects another video identity from a stale content session',async()=>{
+    const f=fixture();await tick();f.playerSession={videoId:'second',token:'visit'};
+    const result=await f.call({type:'GET_VIDEO_STATUS'},{id:'extension',url:'chrome-extension://extension/popup.html'});
+    assert.equal(result.state,null);assert.equal(f.coordinator.sessions.size,0);
+});

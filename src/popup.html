@@ -1,67 +1,15 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Sponsor Skipper</title>
-    <style>
-      body {
-        font-family: sans-serif;
-        padding: 15px;
-        min-width: 300px; /* Increased width */
-      }
-      .container {
-        display: flex;
-        align-items: center;
-        flex-wrap: wrap;
-        gap: 8px;
-        margin-top: 10px;
-      }
-      label {
-        margin-left: 10px;
-      }
-      .setting {
-        margin-top: 20px;
-      }
-      h4 {
-        margin-top: 25px;
-        margin-bottom: 5px;
-        border-bottom: 1px solid #eee;
-        padding-bottom: 5px;
-      }
-      #clear-segments-btn, #analyze-transcript-btn {
-        width: 100%;
-      }
-    </style>
-  </head>
-  <body>
-    <h3>Sponsor Skipper</h3>
-    <div class="container">
-      <input type="checkbox" id="enabled-checkbox" />
-      <label for="enabled-checkbox">Enable sponsor suggestions</label>
-    </div>
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Sponsor Skipper</title>
+<style>
+:root{color-scheme:light dark;font:14px/1.5 system-ui,sans-serif}body{margin:0;padding:18px;width:340px;box-sizing:border-box;background:#101827;color:#e5edf8}h1{font-size:20px;margin:0}p{margin:8px 0;color:#b8c6d9}.status{padding:12px;margin:16px 0;background:#1c2a3e;border-radius:9px}label{display:flex;gap:10px;align-items:center;padding:8px 0}input{accent-color:#38bdf8}button{font:inherit;background:#253b55;color:inherit;border:1px solid #55728f;border-radius:6px;padding:7px 10px;cursor:pointer}button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid #7dd3fc;outline-offset:2px}button[hidden]{display:none}button:disabled{opacity:.5;cursor:default}ol{padding-left:22px}li{margin:8px 0}small{color:#b8c6d9}details{margin-top:16px}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:11px/1.4 monospace}.actions{display:flex;gap:8px;margin:12px 0}#error{color:#fecaca}
+</style></head><body>
+<h1>Sponsor Skipper</h1><p>English sponsors. Analyzed on your device.</p>
+<div class="status" role="status" aria-live="polite" id="status">Reading this video…</div>
+<label><input id="enabled" type="checkbox" disabled> Enable sponsor detection</label>
+<label><input id="automatic" type="checkbox" disabled> Skip sponsors automatically</label>
 
-    <p>Suggestions require a click and can be wrong. Undo restores your previous playback position.</p>
-    <p>If caption detection is unavailable, open YouTube's transcript panel, clear any transcript search, then analyze it here. English transcripts only; panel timing is approximate.</p>
-    <div class="container">
-      <button id="analyze-transcript-btn" disabled>Analyze open transcript</button>
-    </div>
-    <p id="transcript-status" role="status" aria-live="polite"></p>
-    <h4>Paid sponsorships</h4>
-    <p>This model detects paid sponsorships. Self-promotion and custom categories are unavailable.</p>
-    <div class="container">
-      <input type="checkbox" id="sponsor-checkbox" />
-      <label for="sponsor-checkbox">Show paid-sponsor suggestions</label>
-    </div>
-    <div class="container">
-      <label for="sponsor-threshold">Minimum confidence</label>
-      <input type="range" id="sponsor-threshold" min="0" max="1" step="0.01" />
-      <output id="threshold-value" for="sponsor-threshold"></output>
-    </div>
-    <p>Confidence is a model score, not a guarantee that a suggestion is correct.</p>
-
-    <div class="container setting">
-      <button id="clear-segments-btn">Clear Current Video Suggestions</button>
-    </div>
-
-    <script src="popup.js" type="module"></script>
-  </body>
-</html>
+<div class="actions"><button id="pause" disabled>Pause skipping for this video</button><button id="retry" hidden>Retry analysis</button></div>
+<p id="error" role="alert"></p><ol id="segments" aria-label="Detected intervals"></ol>
+<small>Undo on the player replays the skipped interval. Estimates can include regular content.</small>
+<details><summary>Analysis details</summary><pre id="diagnostics">No analysis yet.</pre></details>
+<script src="viewer-popup.js"></script></body></html>

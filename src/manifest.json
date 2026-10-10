@@ -1,37 +1,51 @@
 {
   "manifest_version": 3,
   "name": "YouTube Sponsor Skipper",
-  "version": "0.1.0",
-  "description": "Suggests paid-sponsor intervals using a local model. Skipping requires a click and supports Undo.",
+  "version": "0.2.0",
+  "description": "Automatically skips estimated English sponsor segments using local caption analysis.",
   "permissions": [
-    "scripting",
-    "webRequest",
     "storage",
-    "offscreen"
+    "offscreen",
+    "scripting"
   ],
   "host_permissions": [
-    "*://*.youtube.com/*"
+    "https://www.youtube.com/*"
   ],
   "background": {
-    "service_worker": "background.js",
+    "service_worker": "viewer-background.js",
     "type": "module"
   },
   "content_scripts": [
     {
       "matches": [
-        "*://*.youtube.com/*"
+        "https://www.youtube.com/*"
       ],
       "js": [
-        "content.js"
-      ]
+        "viewer-page.js"
+      ],
+      "world": "MAIN",
+      "run_at": "document_start"
+    },
+    {
+      "matches": [
+        "https://www.youtube.com/*"
+      ],
+      "js": [
+        "viewer-content.js"
+      ],
+      "css": [
+        "viewer.css"
+      ],
+      "world": "ISOLATED",
+      "run_at": "document_start"
     }
   ],
   "action": {
     "default_popup": "popup.html",
-    "default_title": "Sponsor Skipper Settings"
+    "default_title": "Sponsor Skipper"
   },
   "content_security_policy": {
-    "extension_pages": "default-src 'self'; worker-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self' https://*.youtube.com; media-src *; script-src 'self' 'wasm-unsafe-eval'"
+    "extension_pages": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; style-src 'self' 'unsafe-inline'; connect-src 'self'"
   },
   "minimum_chrome_version": "116"
 }

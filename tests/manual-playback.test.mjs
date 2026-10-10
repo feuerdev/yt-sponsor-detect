@@ -159,7 +159,7 @@ test('partial coverage remains visible after analysis finishes',async()=>{
 });
 test('content script is present before home-to-watch SPA navigation',()=>{
  const manifest=JSON.parse(readFileSync(new URL('../src/manifest.json',import.meta.url),'utf8'));
- assert.ok(manifest.content_scripts[0].matches.includes('*://*.youtube.com/*'));
+ assert.ok(manifest.content_scripts.every(script=>script.matches.includes('https://www.youtube.com/*')));
 });
 
 
