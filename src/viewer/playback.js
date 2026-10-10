@@ -38,7 +38,8 @@ export class PlaybackController {
         if(type==='playing'||type==='play')this.buffering=false;
         if(type==='seeking'){this.cancel();return;}
         if(type==='seeked') {
-            if(!this.ownSeek){const at=this.video.currentTime;for(const segment of this.segments)if(at>=segment.start&&at<segment.end)this.suppressed.push({...segment});}
+            // Respect intentional seeks in automatic mode; manual mode still offers Skip.
+            if(!this.ownSeek&&this.autoSkip){const at=this.video.currentTime;for(const segment of this.segments)if(at>=segment.start&&at<segment.end)this.suppressed.push({...segment});}
             this.ownSeek=false;
         }
         this.schedule();

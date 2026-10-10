@@ -53,3 +53,11 @@ Five real browser comparisons completed on exact production word-cue development
 These are three available original tune videos of nine selected, from one channel, with six acquisition failures retained. References came from the previous separately labeled LLM transcript review. All word timing is estimated from old cue input. The previously exposed test ledger was copied with its byte hash and relocation provenance, and no new test inference was run. This is development evidence, not an independent held-out winner, human audiovisual boundary proof, rare-failure bound, or performance claim for low-end devices.
 
 Resource policy was chosen after native sampling: maximum same-user RSS 30720 MiB, minimum available-page proxy 4096 MiB, one model browser at a time. It includes unrelated applications/shared-page duplication and is not model RAM. Five comparison peak samples were 21131–22599 MiB; no GPU memory measurement is available. Private model/caption/profile data and detailed local evidence remain ignored.
+
+## Manual-mode review fixes, 10 October 2026
+
+Manual Skip now receives mouse clicks. Timeline seeks in manual mode preserve the Skip offer, while explicit Undo still suppresses it for the visit. Intentional seeks in automatic mode remain respected.
+
+Both new regressions failed before the fixes. The controller check covers seek, Skip and Undo. The native Chrome check renders the production PlayerUI and CSS and sends a trusted mouse click. These controlled checks do not establish live YouTube playback or model accuracy.
+
+Validation: 277 tests passed with zero failures/skips, including all four native Chrome checks. Reproduce with `BENCH_CHROME='/Applications/Google Chrome.app/Contents/MacOS/Google Chrome' BENCH_MEMORY_BUDGET=30720 BENCH_MIN_AVAILABLE=4096 npm test`. The pinned-asset production build passed with two size warnings. `git diff --check` passed.

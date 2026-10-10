@@ -3,11 +3,11 @@ import test from 'node:test';
 import {PlaybackController} from '../src/viewer/playback.js';
 function fixture() {
     const events=new Map(),timers=new Map(),skips=[];let next=0;
-    const f={id:'first',ad:false,skips,timers};
+    const f={id:'first',ad:false,skips,timers,offer:null};
     f.video={currentTime:0,duration:120,playbackRate:1,readyState:4,paused:false,seeking:false,
         addEventListener:(name,handler)=>events.set(name,handler),removeEventListener:(name,handler)=>{if(events.get(name)===handler)events.delete(name);},
         emit:name=>events.get(name)?.({type:name})};
-    f.events=events;f.controller=new PlaybackController({videoId:()=>f.id,isAd:()=>f.ad,onSkip:event=>skips.push(event),
+    f.events=events;f.controller=new PlaybackController({videoId:()=>f.id,isAd:()=>f.ad,onSkip:event=>skips.push(event),onOffer:offer=>{f.offer=offer;},
         timers:{setTimeout:(fn,delay)=>{timers.set(++next,{fn,delay});return next;},clearTimeout:id=>timers.delete(id)}});
     f.controller.attach(f.video,'first','token');
     f.enable=(settings={})=>f.controller.configure({isEnabled:true,autoSkip:true,...settings});
@@ -30,6 +30,17 @@ test('Undo restores segment start and suppresses overlapping refreshed results f
 test('intentional seeking into a sponsor is respected',()=>{
     const f=fixture();f.enable();f.result();f.video.seeking=true;f.video.currentTime=12;f.video.emit('seeking');
     assert.equal(f.timers.size,0);f.video.seeking=false;f.video.emit('seeked');assert.equal(f.video.currentTime,12);assert.equal(f.skips.length,0);
+});
+test('manual seeking into a sponsor keeps Skip available until explicit Undo',()=>{
+    const f=fixture();f.enable({autoSkip:false});f.result();
+    f.video.seeking=true;f.video.currentTime=12;f.video.emit('seeking');
+    f.video.seeking=false;f.video.emit('seeked');
+    assert.equal(f.video.currentTime,12);assert.ok(f.offer,'Timeline seeking must preserve the manual Skip offer');
+    assert.equal(f.offer.skip(),true);assert.equal(f.video.currentTime,20);
+    f.video.emit('seeked');assert.equal(f.skips[0].undo(),true);assert.equal(f.video.currentTime,10);
+    f.video.emit('seeked');f.video.currentTime=12;f.video.emit('timeupdate');
+    assert.equal(f.offer,null,'Explicit Undo must still suppress the manual offer for this visit');
+    assert.equal(f.video.currentTime,12);
 });
 test('paused and buffering playback do not seek; resume re-arms the boundary',()=>{
     const f=fixture();f.enable();f.result();f.video.paused=true;f.video.emit('pause');assert.equal(f.timers.size,0);
