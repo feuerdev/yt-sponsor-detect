@@ -1,0 +1,11 @@
+{
+  "manifest_version": 3,
+  "name": "Local Sponsor Audio Experiment",
+  "version": "0.1.0",
+  "minimum_chrome_version": "116",
+  "description": "Explicit 20-second local tab-audio transcription experiment. No automatic sponsor skipping.",
+  "permissions": ["activeTab", "tabCapture", "offscreen"],
+  "background": {"service_worker": "background.js", "type": "module"},
+  "action": {"default_popup": "popup.html", "default_title": "Local audio experiment"},
+  "content_security_policy": {"extension_pages": "default-src 'self'; script-src 'self' 'wasm-unsafe-eval'; worker-src 'self'; connect-src 'self'; style-src 'self' 'unsafe-inline'; media-src 'self' blob:"}
+}

@@ -15,3 +15,7 @@ model/
 
 # Local documentation and testing reports (existing tracked docs remain tracked)
 /docs/
+
+# Local audio experiment weights and build
+/audio-poc/model/
+/audio-poc-dist/
