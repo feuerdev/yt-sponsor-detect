@@ -10,7 +10,7 @@ export default {
     plugins:[new CopyPlugin({patterns:[
         ...['manifest.json','popup.html','offscreen.html','worker.js','experiment.js'].map(name=>({from:path.join(root,'audio-poc',name),to:name})),
         {from:path.join(root,'node_modules/@xenova/transformers/dist/transformers.min.js'),to:'vendor/transformers.min.js'},
-        {from:path.join(root,'audio-poc/model/whisper-tiny.en'),to:'model/whisper-tiny.en'},
+        {from:path.join(root,'audio-poc/model/whisper-tiny.en'),to:'model/whisper-tiny.en',toType:'dir'},
         {from:'*.wasm',context:path.join(root,'node_modules/@xenova/transformers/dist'),to:'ort'},
         {from:path.join(root,'src/viewer/LICENSE'),to:'licenses/EXPERIMENT-GPL-3.0.txt'},
         {from:path.join(root,'node_modules/@xenova/transformers/LICENSE'),to:'licenses/TRANSFORMERS-APACHE-2.0.txt'},

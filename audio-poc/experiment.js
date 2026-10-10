@@ -9,6 +9,14 @@ export function validateResult(value,seconds) {
         previous=start;return true;
     });
 }
+// Whisper's final phrase can extend into padded input. Preserve that end as
+// unresolved for a small overshoot; never turn it into a precise capture boundary.
+function resolveFinalEnd(value,seconds) {
+    const chunks=value?.chunks,last=Array.isArray(chunks)?chunks.at(-1):null;
+    const [start,end]=Array.isArray(last?.timestamp)?last.timestamp:[];
+    if(!Number.isFinite(start)||start<0||start>seconds||!Number.isFinite(end)||end<=seconds||end>seconds+1)return value;
+    return {...value,chunks:[...chunks.slice(0,-1),{...last,timestamp:[start,null]}],timestampAdjustment:{reportedFinalEnd:end,reason:'outside_captured_audio'}};
+}
 export class AudioExperiment {
     constructor({mediaDevices,createContext,createWorker,workletURL,notify=()=>{},timers=globalThis,clock=()=>performance.now()}) {
         Object.assign(this,{mediaDevices,createContext,createWorker,workletURL,notify,timers,clock});this.job=null;this.state={status:'idle'};
@@ -66,13 +74,14 @@ export class AudioExperiment {
         this.publish(job,{status:'transcribing',seconds,captureMs});
         try {
             job.worker=this.createWorker();
-            const result=await new Promise((resolve,reject)=>{
+            const rawResult=await new Promise((resolve,reject)=>{
                 job.reject=reject;job.worker.onmessage=({data})=>data?.error?reject(new Error('transcription_failed')):resolve(data);
                 job.worker.onerror=()=>reject(new Error('transcription_failed'));
                 job.inferenceTimer=this.timers.setTimeout(()=>reject(new Error('transcription_timeout')),120000);
                 job.worker.postMessage({pcm,sampleRate:SAMPLE_RATE},[pcm.buffer]);
             });
             if(this.job!==job)return;
+            const result=resolveFinalEnd(rawResult,seconds);
             if(!validateResult(result,seconds))throw new Error('invalid_transcript');
             this.state={status:'ready',...result,seconds,captureMs,inferenceMs:this.clock()-inferenceStarted,sampleRate:job.sampleRate,timeline:'seconds since captured audio began; not YouTube video timestamps'};this.notify(this.state);this.job=null;
         }catch(error){if(this.job===job)await this.fail(job,error.message==='transcription_timeout'?'transcription_timeout':'transcription_failed');}

@@ -49,3 +49,21 @@ test('streaming downsampling produces 16k mono samples per second and bounded tr
         assert.equal(chunks.reduce((sum,c)=>sum+c.length,0)+resampler.offset,16000);assert.ok(chunks.every(c=>c.length===4096&&c.every(value=>value===0)));}
     assert.throws(()=>new Resampler(8000,()=>{}),/unsupported_rate/);
 });
+
+test('small final Whisper timestamp overshoot is unresolved, not a rejected transcript or invented end',async()=>{
+    const f=fixture();await f.experiment.start('opaque');for(let i=0;i<24;i++)f.feed();
+    const pending=f.experiment.finish();await tick();
+    const raw={text:'Known spoken fixture',chunks:[{text:'Known spoken fixture',timestamp:[0,7]}]};
+    f.worker.onmessage({data:raw});await pending;
+    assert.equal(f.experiment.state.status,'ready');
+    assert.deepEqual(f.experiment.state.chunks[0].timestamp,[0,null]);
+    assert.deepEqual(f.experiment.state.timestampAdjustment,{reportedFinalEnd:7,reason:'outside_captured_audio'});
+    assert.equal(raw.chunks[0].timestamp[1],7);
+});
+test('large final timestamp overshoots and invalid starts still fail transcription validation',async()=>{
+    for(const timestamp of [[0,10],[7,7]]){
+        const f=fixture();await f.experiment.start('opaque');for(let i=0;i<24;i++)f.feed();
+        const pending=f.experiment.finish();await tick();f.worker.onmessage({data:{text:'fixture',chunks:[{text:'fixture',timestamp}]}});await pending;
+        assert.equal(f.experiment.state.status,'error');assert.equal(f.terminated,true);
+    }
+});
