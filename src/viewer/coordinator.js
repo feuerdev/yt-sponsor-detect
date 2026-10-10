@@ -20,12 +20,12 @@ export class SessionCoordinator {
         const old=this.sessions.get(tabId); this.sessions.delete(tabId);
         if (old) this.cancel(old.jobId);
     }
-    async begin(tabId,videoId,token,{retry=false}={}) {
+    async begin(tabId,videoId,token,{retry=false,paused=false}={}) {
         if (!validVideoId(videoId) || typeof token!=='string' || !token || token.length>100) throw new Error('invalid_session');
         const existing=this.sessions.get(tabId);
         if (!retry && existing?.videoId===videoId && existing.token===token) return this.snapshot(existing);
         this.clear(tabId);
-        const session={videoId,token,status:'loading',segments:[],jobId:tabId+':'+token,paused:existing?.videoId===videoId&&existing.paused===true};
+        const session={videoId,token,status:'loading',segments:[],jobId:tabId+':'+token,paused:paused===true||(existing?.videoId===videoId&&existing.paused===true)};
         this.sessions.set(tabId,session);
         const settings=await loadSettings(this.settings); if (!this.current(tabId,session)) return null;
         if (!settings.isEnabled) { session.status='disabled'; return this.snapshot(session); }

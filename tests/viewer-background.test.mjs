@@ -19,7 +19,7 @@ function fixture(){
     const chrome={scripting:{executeScript:async()=>f.panelPending?await f.panelPending:[{result:f.panel}]},i18n:{detectLanguage:async()=>f.languagePending?await f.languagePending:{isReliable:true,languages:[{language:'en',percentage:100}]}},runtime:{id:'extension',getURL:path=>'chrome-extension://extension/'+path,getContexts:async()=>f.contexts,
         onInstalled:event('installed'),onMessage:event('message'),sendMessage:async message=>{f.messages.push(message);if(message.type==='RUN_DETECTION')return {segments:[{start:1,end:4,category:'sponsor'}]};return {};},},
         storage:{sync:f.sync,local:f.local,onChanged:event('changed')},offscreen:{createDocument:async()=>{f.created++;if(f.create)await f.create();f.contexts=[{}];}},
-        tabs:{onRemoved:event('removed'),onUpdated:event('updated'),sendMessage:async(id,message)=>{f.messages.push({...message,tabId:id});},get:async()=>({id:1,url:f.url||'https://www.youtube.com/watch?v=first'}),query:async()=>[{id:1,url:'https://www.youtube.com/watch?v=first'}]}};
+        tabs:{onRemoved:event('removed'),onUpdated:event('updated'),sendMessage:async(id,message)=>{f.messages.push({...message,tabId:id});if(message.type==='GET_PLAYER_SESSION')return f.playerSession;},get:async()=>({id:1,url:f.url||'https://www.youtube.com/watch?v=first'}),query:async()=>[{id:1,url:'https://www.youtube.com/watch?v=first'}]}};
     const context=vm.createContext({chrome,initializeSettings,SessionCoordinator,ResultCache,MODEL_SPEC,TRANSCRIPT_VERSION,captureOpenTranscript,panelToTranscript,URL});vm.runInContext(source,context);
     f.coordinator=vm.runInContext('coordinator',context);
     f.sender={id:'extension',tab:{id:1,url:'https://www.youtube.com/watch?v=first'},url:'https://www.youtube.com/watch?v=first'};
@@ -77,4 +77,27 @@ test('subframes and insecure senders cannot open viewer sessions',async()=>{
     for(const sender of [{...f.sender,frameId:1},{...f.sender,url:'http://www.youtube.com/watch?v=first'}])
         assert.equal(await f.call({type:'START_SESSION',videoId:'first',token:'wrong'},sender),undefined);
     assert.equal(f.coordinator.sessions.size,0);
+});
+
+test('popup restores current content session and completed cache after service-worker restart',async()=>{
+    const f=fixture();await tick();
+    await f.call({type:'START_SESSION',videoId:'first',token:'visit'});
+    await f.call({type:'SUBMIT_TRANSCRIPT',token:'visit',transcript});
+    f.coordinator.sessions.clear();
+    f.playerSession={videoId:'first',token:'visit'};
+    const result=await f.call({type:'GET_VIDEO_STATUS'},{id:'extension',url:'chrome-extension://extension/popup.html'});
+    assert.equal(result.state?.status,'ready');assert.equal(result.state.token,'visit');
+    assert.deepEqual(result.state.segments,[{start:1,end:4,category:'sponsor'}]);
+});
+
+test('worker recovery restarts uncached analysis and preserves per-video pause',async()=>{
+    const f=fixture();await tick();f.playerSession={videoId:'first',token:'visit',paused:true};
+    const result=await f.call({type:'GET_VIDEO_STATUS'},{id:'extension',url:'chrome-extension://extension/popup.html'});
+    assert.equal(result.state?.status,'loading');assert.equal(result.state.paused,true);
+    assert.ok(f.messages.some(m=>m.type==='RETRY_VIDEO'&&m.tabId===1));
+});
+test('worker recovery rejects another video identity from a stale content session',async()=>{
+    const f=fixture();await tick();f.playerSession={videoId:'second',token:'visit'};
+    const result=await f.call({type:'GET_VIDEO_STATUS'},{id:'extension',url:'chrome-extension://extension/popup.html'});
+    assert.equal(result.state,null);assert.equal(f.coordinator.sessions.size,0);
 });

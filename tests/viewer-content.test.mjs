@@ -9,7 +9,9 @@ import {PlayerUI} from '../src/viewer/ui.js';
 const source=readFileSync(new URL('../src/viewer-content.js',import.meta.url),'utf8').replace(/^import .*;\n/gm,'');
 const tick=async()=>{for(let i=0;i<8;i++)await new Promise(resolve=>setImmediate(resolve));};
 class Element {
-    constructor(tag){this.tag=tag;this.style={};this.dataset={};this.children=[];this.events=new Map();this.className='';this.textContent='';this.classList={contains:name=>this.className.split(' ').includes(name)};}
+    constructor(tag){this.tag=tag;this.style={};this.dataset={};this.children=[];this.events=new Map();this.className='';this.textUpdates=0;this.textContent='';this.classList={contains:name=>this.className.split(' ').includes(name)};}
+    get textContent(){return this.text||'';}
+    set textContent(value){this.text=value;this.textUpdates++;}
     get isConnected(){return this.tag==='html'||!!this.parent?.isConnected;}
     appendChild(child){child.parent=this;this.children.push(child);return child;}
     remove(){if(this.parent)this.parent.children=this.parent.children.filter(child=>child!==this);this.parent=null;}
@@ -44,7 +46,7 @@ function fixture(settings={viewerSchema:1,isEnabled:true,autoSkip:true,selfPromo
             return {};
         },onMessage:{addListener:fn=>{message=fn;}}},storage:{sync:{get:async()=>settings},onChanged:{addListener:fn=>{changed=fn;}}}},
     });
-    vm.runInContext(source,context);f.context=context;f.state=state=>message({type:'VIEWER_STATE',state},{id:'extension'});
+    vm.runInContext(source,context);f.context=context;f.sessionRequest=sender=>{let result;message({type:'GET_PLAYER_SESSION'},sender,reply=>{result=reply;});return result;};f.state=state=>message({type:'VIEWER_STATE',state},{id:'extension'});
     f.change=values=>changed(Object.fromEntries(Object.entries(values).map(([key,newValue])=>[key,{newValue}])), 'sync');
     f.refresh=()=>vm.runInContext('refresh()',context);f.close=()=>win.emit('pagehide');
     return f;
@@ -85,5 +87,33 @@ test('disabled status takes priority over per-video pause',async()=>{
     const f=fixture();try{await tick();const request=f.requests.find(r=>r.type==='START_SESSION');
         f.state({videoId:'first',token:request.token,status:'ready',paused:true,segments:[],duration:30});
         f.change({isEnabled:false});f.refresh();assert.ok(f.player.querySelector('.ss-status').children[0].textContent.includes('off'));
+    }finally{f.close();}
+});
+
+// A real MutationObserver re-enters refresh when status text changes. During a
+// YouTube ad, writing the underlying caption status before the ad status creates
+// a perpetual microtask loop and stalls the player and DevTools evaluations.
+test('ad status settles without rewriting caption and ad text on every refresh',async()=>{
+    const f=fixture();try{await tick();f.player.className='ad-showing';f.refresh();
+        const text=f.player.querySelector('.ss-status').children[0];
+        assert.equal(text.textContent,'Waiting for YouTube ad to finish');
+        const updates=text.textUpdates;f.refresh();f.refresh();
+        assert.equal(text.textUpdates,updates,'Observer refresh must not produce new status mutations');
+        f.player.className='';f.refresh();assert.equal(text.textContent,'Sponsor skipping ready');
+    }finally{f.close();}
+});
+
+test('content returns its existing visit identity for service-worker recovery',async()=>{
+    const f=fixture();try{await tick();const original=f.requests.find(r=>r.type==='START_SESSION');
+        const result=await f.sessionRequest({id:'extension'});
+        assert.equal(result.videoId,'first');assert.equal(result.token,original.token);
+        assert.equal(f.requests.filter(r=>r.type==='START_SESSION').length,1);
+    }finally{f.close();}
+});
+
+test('Undo suppression survives a same-video retry and its refreshed detector results',async()=>{
+    const f=fixture();try{await tick();f.player.querySelector('.ss-skip-notice').children.find(n=>n.tag==='button').emit('click');f.video.emit('seeked');
+        await vm.runInContext('start(true)',f.context);await tick();
+        assert.equal(f.video.currentTime,1,'A detector retry must not skip the restored sponsor again');
     }finally{f.close();}
 });
