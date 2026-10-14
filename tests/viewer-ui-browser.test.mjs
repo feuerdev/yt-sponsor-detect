@@ -13,15 +13,15 @@ test('production player supports native Skip/Undo clicks, timeline hover, keyboa
     await requireHeadroom(policy);
     const directory=await mkdtemp(path.join(os.tmpdir(),'viewer-ui-test-'));
     const html=`<!doctype html><html><head><link rel="stylesheet" href="/viewer.css"><style>
-        #movie_player{position:relative;width:min(760px,100%);height:430px;background:#162a40}.ytp-progress-bar{position:absolute;bottom:35px;left:0;width:100%;height:8px;background:#f00}.ytp-right-controls{position:absolute;bottom:0;right:0;height:30px}.ytp-button{height:30px;min-width:35px}
-        </style></head><body><div id="movie_player"><div class="ytp-progress-bar"></div><div class="ytp-right-controls"><button class="ytp-fullscreen-button">Fullscreen</button></div></div><script type="module">
+        #movie_player{position:relative;width:min(760px,100%);height:430px;background:#162a40}.ytp-progress-bar{position:absolute;bottom:35px;left:0;width:100%;height:8px;background:#f00}.ytp-right-controls{position:absolute;bottom:0;right:0;height:30px}.ytp-native-group{display:inline-flex;align-items:center;height:100%}.ytp-button{height:30px;min-width:35px;text-align:left;padding:0 8px;background:#252525;border:1px solid #666;border-radius:24px}.ytp-button svg{width:100%;height:100%;padding:8px 12px}
+        </style></head><body><div id="movie_player"><div class="ytp-progress-bar"></div><div class="ytp-right-controls"><div class="ytp-native-group"><button class="ytp-settings-button">Settings</button><button class="ytp-fullscreen-button">Fullscreen</button></div></div></div><script type="module">
         import {PlayerUI} from '/viewer/ui.js';
         window.skips=0;window.playerClicks=0;window.trustedClick=false;
         const player=document.querySelector('#movie_player');
         player.addEventListener('click',event=>{window.playerClicks++;window.trustedClick=event.isTrusted;},true);
         const ui=new PlayerUI(document);ui.bind(player);ui.state({status:'ready',segments:[{start:10,end:20,category:'sponsor'}]});
         ui.suggest({skip:()=>{window.skips++;}});window.ui=ui;ui.highlights([{start:10,end:20,category:'sponsor'}],120);
-        document.querySelector('.ytp-fullscreen-button').onclick=()=>player.requestFullscreen();window.viewerReady=true;
+        document.querySelector('.ytp-fullscreen-button').onclick=()=>{window.fullscreenTransition=player.requestFullscreen();};window.viewerReady=true;
         </script></body></html>`;
     const files=new Map(['/viewer.css','/viewer/ui.js','/viewer/settings.js'].map(name=>[name,new URL('../src'+name,import.meta.url)]));
     const server=createServer(async(req,res)=>{
@@ -35,6 +35,21 @@ test('production player supports native Skip/Undo clicks, timeline hover, keyboa
         await new Promise(resolve=>server.listen(0,'127.0.0.1',resolve));
         browser=await launchChrome({executable:process.env.BENCH_CHROME,profileParent:directory,
             url:`http://127.0.0.1:${server.address().port}`,readyExpression:'window.viewerReady===true',onSample:()=>requireHeadroom(policy)});
+        assert.equal(await browser.eval("document.querySelector('.ss-control').previousElementSibling.classList.contains('ytp-settings-button')"),true,'Extension entry sits beside Settings, away from autoplay');
+        const lateAnchor=await browser.eval(`(()=>{
+            const button=document.querySelector('.ss-control'),controls=button.parentNode;
+            controls.querySelector('.ytp-settings-button').remove();const settings=document.createElement('button');settings.className='ytp-settings-button';settings.textContent='Settings';controls.appendChild(settings);
+            ui.bind(document.querySelector('#movie_player'));return {same:document.querySelector('.ss-control')===button,anchored:settings.nextElementSibling===button};
+        })()`);
+        assert.deepEqual(lateAnchor,{same:true,anchored:true},'Late native controls must place the existing extension entry beside Settings');
+        const alignment=await browser.eval(`(()=>{
+            const button=document.querySelector('.ss-control'),icon=button.querySelector('svg'),range=document.createRange();range.selectNodeContents(button);
+            const outer=button.getBoundingClientRect(),inner=icon?.getBoundingClientRect()||range.getBoundingClientRect();
+            return {x:Math.abs(inner.x+inner.width/2-outer.x-outer.width/2),y:Math.abs(inner.y+inner.height/2-outer.y-outer.height/2),background:getComputedStyle(button).backgroundColor,width:inner.width,height:inner.height};
+        })()`);
+        assert.ok(alignment.x<.5&&alignment.y<.5,'Control artwork must stay centered under native left-aligned/pill button styles: '+JSON.stringify(alignment));
+        assert.ok(alignment.width<=24&&alignment.height<=24,'Host SVG sizing must leave padding around the control artwork');
+        assert.equal(alignment.background,'rgba(0, 0, 0, 0)','Controls entry must have a flat transparent background');
         const point=await browser.eval(`(()=>{const r=document.querySelector('.ss-manual-offer').getBoundingClientRect();return {x:r.x+r.width/2,y:r.y+r.height/2};})()`);
         await browser.clickAt(point.x,point.y);
         assert.equal(await browser.eval('window.trustedClick'),true,'The regression requires a real mouse click');
@@ -54,6 +69,7 @@ test('production player supports native Skip/Undo clicks, timeline hover, keyboa
         await browser.command('Emulation.setDeviceMetricsOverride',{width:390,height:700,deviceScaleFactor:1,mobile:false});await click('.ss-control');
         assert.equal(await browser.eval("(()=>{const r=document.querySelector('.ss-controls-panel').getBoundingClientRect();return r.x>=0&&r.right<=390;})()"),true,'Narrow panel stays inside viewport');
         await click('.ss-control');await click('.ytp-fullscreen-button');
+        await browser.eval('window.fullscreenTransition.then(()=>true)');
         assert.equal(await browser.eval("document.fullscreenElement?.id"),'movie_player');await click('.ss-control');assert.equal(await browser.eval("document.querySelector('.ss-controls-panel').hidden"),false);
         await browser.command('Input.dispatchKeyEvent',{type:'keyDown',key:'Escape',code:'Escape',windowsVirtualKeyCode:27});
         assert.equal(await browser.eval("document.querySelector('.ss-controls-panel').hidden"),true);await browser.eval("document.exitFullscreen();true");

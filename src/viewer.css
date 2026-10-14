@@ -6,7 +6,9 @@
 .ss-viewer button:disabled{opacity:.55;cursor:default}.ss-viewer button:focus-visible,.ss-viewer select:focus-visible,.ss-control:focus-visible{outline:3px solid #a5f3fc;outline-offset:2px}
 .ss-controls-panel{position:absolute;bottom:60px;right:0;width:320px;max-width:calc(100% - 8px);max-height:calc(100% - 75px);overflow:auto;pointer-events:auto;background:#101827;border:1px solid #90a5bc;border-radius:10px;padding:12px;box-sizing:border-box}
 .ss-status{margin-bottom:10px}.ss-controls-panel p{margin:8px 0}.ss-controls-panel button,.ss-controls-panel select{margin:3px}.ss-intervals>div{border-top:1px solid #50647c;padding:6px 0}
-.ss-control{font:bold 17px system-ui!important;color:#a5f3fc!important}
+.ss-control{display:inline-flex!important;align-items:center;justify-content:center;padding:0!important;background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;color:#fff!important;line-height:normal!important;vertical-align:top}
+.ss-control::before,.ss-control::after{content:none!important}
+.ss-control svg{display:block;width:24px!important;height:24px!important;padding:0!important;box-sizing:border-box;flex:none;pointer-events:none}
 .ss-highlight{position:absolute;top:-5px;height:3px;background:#ffe066;border-top:1px solid #101827;border-bottom:1px solid #101827;box-sizing:content-box;pointer-events:none;z-index:3}
 .ss-highlight.ss-muted{background:#b3bbca;border-top-style:dashed;opacity:.7}
 .ss-marker-label{position:absolute;bottom:68px;left:0;max-width:calc(100% - 8px);padding:7px 10px;color:#fff;background:#101827;border:1px solid #ffe066;border-radius:6px;pointer-events:none;box-sizing:border-box}

@@ -50,12 +50,32 @@ export class PlayerUI {
     }
     bindControl() {
         const controls=this.player?.querySelector('.ytp-right-controls');
-        if(!controls||this.control?.isConnected)return;
-        const button=this.button('S',()=>{
+        if(!controls)return;
+        if(this.control?.isConnected){
+            const settings=controls.querySelector('.ytp-settings-button');
+            // YouTube can insert its Settings button after the extension binds.
+            // Anchor once per native button so its later updates keep ownership.
+            if(settings&&controls.contains(settings)&&this.controlAnchor!==settings){
+                const focused=this.doc.activeElement===this.control;this.controlAnchor=settings;
+                settings.parentNode.insertBefore(this.control,settings.nextSibling);if(focused)this.control.focus?.();
+            }
+            return;
+        }
+        const button=this.button('',()=>{
             this.panel.hidden=!this.panel.hidden;button.setAttribute('aria-expanded',String(!this.panel.hidden));
             if(!this.panel.hidden)this.modeSelect.focus?.();
         });button.className='ytp-button ss-control';button.title='Sponsor Skipper controls';button.setAttribute('aria-label','Sponsor Skipper controls');button.setAttribute('aria-controls','ss-controls-panel');button.setAttribute('aria-haspopup','dialog');button.setAttribute('aria-expanded','false');
-        controls.prepend?controls.prepend(button):controls.appendChild(button);this.control=button;
+        const svg=this.doc.createElementNS('http://www.w3.org/2000/svg','svg');
+        for(const [name,value] of Object.entries({viewBox:'0 0 24 24','aria-hidden':'true',focusable:'false',fill:'none',stroke:'currentColor','stroke-width':'1.8','stroke-linecap':'round','stroke-linejoin':'round'}))svg.setAttribute(name,value);
+        // A shield with a skip chevron identifies sponsor filtering without
+        // suggesting a mode switch. The button's name describes its action.
+        for(const d of ['M12 3 4.5 6v5.2c0 4.2 2.6 7.2 7.5 9.8 4.9-2.6 7.5-5.6 7.5-9.8V6L12 3Z','m10 9 3.5 3-3.5 3M15 9v6']){
+            const path=this.doc.createElementNS('http://www.w3.org/2000/svg','path');path.setAttribute('d',d);svg.appendChild(path);
+        }
+        button.appendChild(svg);
+        const settings=controls.querySelector('.ytp-settings-button');
+        if(settings&&controls.contains(settings)){settings.parentNode.insertBefore(button,settings.nextSibling);this.controlAnchor=settings;}else controls.appendChild(button);
+        this.control=button;
     }
     focusControl(){(this.control||this.player?.querySelector('.ytp-play-button'))?.focus?.();}
     state(state) {
@@ -113,5 +133,5 @@ export class PlayerUI {
     }
     unbindBar(){if(this.bar){this.bar.removeEventListener('pointermove',this.hoverHandler);this.bar.removeEventListener('pointerleave',this.leaveHandler);}
         this.doc.querySelectorAll('.ss-highlight').forEach(element=>element.remove());this.bar=null;if(this.label)this.label.hidden=true;}
-    destroy(){this.clearNotice();this.unbindBar();this.player?.removeEventListener('keydown',this.keyHandler);this.control?.remove();this.control=null;this.root?.remove();this.root=null;this.player=null;this.intervalSignature=null;this.markerSignature=null;}
+    destroy(){this.clearNotice();this.unbindBar();this.player?.removeEventListener('keydown',this.keyHandler);this.control?.remove();this.control=null;this.controlAnchor=null;this.root?.remove();this.root=null;this.player=null;this.intervalSignature=null;this.markerSignature=null;}
 }

@@ -31,7 +31,7 @@ function fixture(settings={viewerSchema:1,isEnabled:true,autoSkip:true,selfPromo
     const location={pathname:'/watch',search:'?v=first',origin:'https://www.youtube.com'};
     const win=new Element('window');win.location=location;
     const f={root,player,bar,video,location,requests:[],settings,win};
-    const doc={documentElement:root,createElement:tag=>new Element(tag),querySelector:selector=>selector==='video'||selector==='#movie_player video'?f.video:selector==='#movie_player'?f.player:selector==='.ytp-progress-bar'?f.bar:null,
+    const doc={documentElement:root,createElement:tag=>new Element(tag),createElementNS:(_,tag)=>new Element(tag),querySelector:selector=>selector==='video'||selector==='#movie_player video'?f.video:selector==='#movie_player'?f.player:selector==='.ytp-progress-bar'?f.bar:null,
         querySelectorAll:selector=>descendants(root).filter(node=>node.className.split(' ').includes(selector.slice(1)))};
     win.postMessage=value=>{if(value.type===REQUEST)queueMicrotask(()=>{
         const payload={videoId:new URLSearchParams(location.search).get('v'),duration:30,track:'automatic',language:'en',timing:'word',words:[{text:'sponsor',start:1,end:2}]};
