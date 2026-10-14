@@ -14,7 +14,7 @@ async function engine(){
 }
 self.onmessage=({data:job})=>{
     queue=queue.then(async()=>{
-        try{const model=await engine();const result=await model.classify(job.captions,job.threshold,p=>self.postMessage({id:job.id,progress:p}));self.postMessage({id:job.id,ok:true,...result});}
+        try{const model=await engine();self.postMessage({id:job.id,progress:{stage:'analyzing'}});const result=await model.classify(job.captions,job.threshold,p=>self.postMessage({id:job.id,progress:p}));self.postMessage({id:job.id,ok:true,...result});}
         catch(error){self.postMessage({id:job.id,ok:false,code:error.code==='model_unavailable'?'model_unavailable':'inference_failed'});}
     });
 };

@@ -3,7 +3,7 @@ import {spawn} from 'node:child_process';
 import {mkdtemp,rm} from 'node:fs/promises';
 import path from 'node:path';
 export function chromeFlags({profile,cpuOnly=false,singleProcess=false,platform=process.platform}) {
- const flags=['--headless=new','--no-first-run','--no-default-browser-check','--disable-background-networking','--disable-extensions','--disable-sync','--disable-default-apps','--remote-debugging-address=127.0.0.1','--remote-debugging-port=0','--no-startup-window',`--user-data-dir=${profile}`];
+ const flags=['--headless=new','--mute-audio','--no-first-run','--no-default-browser-check','--disable-background-networking','--disable-extensions','--disable-sync','--disable-default-apps','--remote-debugging-address=127.0.0.1','--remote-debugging-port=0','--no-startup-window',`--user-data-dir=${profile}`];
  if(platform==='linux')flags.push('--no-sandbox');
  if(singleProcess)flags.push('--single-process','--no-zygote');
  if(cpuOnly)flags.push('--disable-gpu','--disable-software-rasterizer');

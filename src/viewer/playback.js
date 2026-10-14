@@ -1,18 +1,19 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
 // Event-based scheduling inspired by SponsorSkip; no polling/busy loop.
 import {validSegments} from './cache.js';
+import {matchesCorrection} from './corrections.js';
 const EVENTS=['play','playing','pause','seeking','seeked','ratechange','waiting','durationchange','timeupdate'];
 export class PlaybackController {
-    constructor({videoId,onSkip=()=>{},onOffer=()=>{},isAd=()=>false,timers=globalThis}={}) {
-        this.getVideoId=videoId;this.onSkip=onSkip;this.onOffer=onOffer;this.isAd=isAd;this.timers=timers;
-        this.video=null;this.token=null;this.segments=[];this.suppressed=[];this.acted=[];this.enabled=false;this.autoSkip=true;
-        this.handler=event=>this.event(event.type);this.timer=null;this.ownSeek=false;
+    constructor({videoId,onSkip=()=>{},onOffer=()=>{},onChange=()=>{},isAd=()=>false,timers=globalThis}={}) {
+        this.getVideoId=videoId;this.onSkip=onSkip;this.onOffer=onOffer;this.onChange=onChange;this.isAd=isAd;this.timers=timers;
+        this.video=null;this.token=null;this.segments=[];this.suppressed=[];this.acted=[];this.enabled=false;this.autoSkip=true;this.rejected=[];this.lastSkip=null;
+        this.handler=event=>{this.event(event.type);this.onChange();};this.timer=null;this.ownSeek=false;
     }
     attach(video,id,token) {
         if(this.video===video&&this.id===id&&this.token===token&&this.source===(video.currentSrc||video.src||''))return;
         const same=this.id===id&&this.token===token;
         this.detach();this.video=video;this.source=video.currentSrc||video.src||'';this.id=id;this.token=token;this.segments=[];
-        if(!same){this.suppressed=[];this.acted=[];this.pausedForVideo=false;}
+        if(!same){this.suppressed=[];this.acted=[];this.pausedForVideo=false;this.rejected=[];this.lastSkip=null;}
         for(const name of EVENTS)video.addEventListener(name,this.handler);
         this.schedule();
     }
@@ -21,15 +22,40 @@ export class PlaybackController {
         this.video=null;this.ownSeek=false;this.buffering=false;
     }
     cancel() {if(this.timer!==null)this.timers.clearTimeout(this.timer);this.timer=null;}
-    configure(settings) {this.enabled=settings.isEnabled===true;this.autoSkip=settings.autoSkip!==false;this.selfPromotion=settings.selfPromotion===true;this.schedule();}
+    configure(settings) {this.enabled=settings.mode?settings.mode!=='off':settings.isEnabled===true;this.autoSkip=settings.mode?settings.mode==='automatic':settings.autoSkip!==false;this.selfPromotion=settings.selfPromotion===true;this.schedule();}
     pause(value) {this.pausedForVideo=value===true;this.schedule();}
     setSegments(segments,id,token) {
         if(id!==this.id||token!==this.token||!validSegments(segments))return;
         this.segments=segments.slice().sort((a,b)=>a.start-b.start);this.schedule();
     }
+    update(state,id,token) {
+        if(id!==this.id||token!==this.token||!validSegments(state.segments||[]))return;
+        this.pausedForVideo=state.paused===true;this.rejected=validSegments(state.rejected||[])?state.rejected||[]:[];
+        this.segments=(state.segments||[]).slice().sort((a,b)=>a.start-b.start);this.schedule();
+    }
+    setRejections(segments) {this.rejected=validSegments(segments)?segments:[];this.schedule();}
+    behavior(segment) {
+        if(this.rejected.some(s=>matchesCorrection(s,segment)))return 'rejected';
+        if(this.suppressed.some(s=>this.matches(s,segment))||this.acted.some(s=>s.start<=segment.start+.05&&s.end>=segment.end-.05))return 'replay';
+        return this.enabled&&this.autoSkip&&!this.pausedForVideo?'automatic':'manual';
+    }
+    available() {const v=this.video;return !!(this.current()&&this.enabled&&!this.isAd()&&v.readyState>=2&&!v.seeking
+        &&Number.isFinite(v.duration)&&v.duration>0&&Number.isFinite(v.currentTime));}
+    watch(segment) {
+        if(!this.available()||!validSegments([segment])||segment.start>=this.video.duration)return false;
+        this.suppressed.push({...segment});this.cancel();this.ownSeek=true;this.video.currentTime=segment.start;this.onOffer(null);return true;
+    }
+    undo() {
+        const last=this.lastSkip;
+        if(!last||last.undone||last.token!==this.token||last.id!==this.id||!this.available())return false;
+        this.suppressed.push({...last.segment});this.cancel();this.ownSeek=true;
+        this.video.currentTime=Math.min(last.previousTime,this.video.duration);last.undone=true;this.onOffer(null);return true;
+    }
+    skipSnapshot() {return this.lastSkip?{segment:this.lastSkip.segment,previousTime:this.lastSkip.previousTime,seconds:this.lastSkip.seconds,
+        undone:!!this.lastSkip.undone,available:this.available()}:null;}
     matches(interval,segment) {return interval.start<segment.end&&segment.start<interval.end;}
     allowed(segment) {
-        return (segment.category==='sponsor'||this.selfPromotion)&&!this.suppressed.some(s=>this.matches(s,segment))
+        return (segment.category==='sponsor'||this.selfPromotion)&&!this.rejected.some(s=>matchesCorrection(s,segment))&&!this.suppressed.some(s=>this.matches(s,segment))
             &&!this.acted.some(s=>s.start<=segment.start+0.05&&s.end>=segment.end-0.05);
     }
     current() {return this.video&&this.getVideoId()===this.id&&this.source===(this.video.currentSrc||this.video.src||'');}
@@ -46,13 +72,13 @@ export class PlaybackController {
     }
     schedule() {
         this.cancel();const video=this.video;
-        if(!this.current()||!this.enabled||this.pausedForVideo||this.isAd()||this.buffering||video.seeking
+        if(!this.current()||!this.enabled||this.isAd()||this.buffering||video.seeking
             ||video.readyState<2||!Number.isFinite(video.duration)||video.duration<=0||!Number.isFinite(video.currentTime)
             ||!Number.isFinite(video.playbackRate)||video.playbackRate<=0){this.onOffer(null);return;}
         const now=video.currentTime;
         const segment=this.segments.find(s=>this.allowed(s)&&s.end>now+0.2&&s.start<video.duration&&s.end<=video.duration+1);
         if(!segment){this.onOffer(null);return;}
-        if(!this.autoSkip){this.onOffer(now>=segment.start?{segment,skip:()=>this.skip(segment)}:null);return;}
+        if(!this.autoSkip||this.pausedForVideo){this.onOffer(now>=segment.start?{segment,skip:()=>this.skip(segment)}:null);return;}
         this.onOffer(null);if(video.paused)return;
         if(now>=segment.start){this.skip(segment);return;}
         const delay=Math.min(60000,Math.max(25,(segment.start-now)/video.playbackRate*1000));
@@ -61,18 +87,16 @@ export class PlaybackController {
     }
     skip(segment) {
         const video=this.video;
-        if(!this.current()||!this.enabled||this.pausedForVideo||this.isAd()||!this.segments.includes(segment)
+        if(!this.available()||this.buffering||!this.allowed(segment)||!this.segments.includes(segment)
             ||!Number.isFinite(video.duration)||!Number.isFinite(video.currentTime)||video.currentTime<segment.start
             ||video.currentTime>=segment.end-0.2)return false;
         const end=Math.min(segment.end,video.duration);
         if(end<=video.currentTime)return false;
-        const token=this.token,id=this.id,identity=video,previousTime=video.currentTime;
+        const previousTime=video.currentTime;
         this.cancel();this.acted.push({...segment});this.ownSeek=true;video.currentTime=end;
-        this.onSkip({segment,seconds:end-previousTime,undo:()=>{
-            if(!this.enabled||this.token!==token||this.video!==identity||this.id!==id||!this.current()||this.isAd())return false;
-            this.suppressed.push({...segment});this.cancel();this.ownSeek=true;
-            video.currentTime=Math.max(0,segment.start);return true;
-        }});
+        this.lastSkip={segment:{...segment},previousTime,seconds:end-previousTime,token:this.token,id:this.id};
+        const skip=this.lastSkip;this.onSkip({...this.skipSnapshot(),undo:()=>this.lastSkip===skip&&skip.token===this.token&&skip.id===this.id?this.undo():false});
+        this.onOffer(null);
         // Seeked will re-arm; tests and paused/manual seeks need no extra polling.
         return true;
     }

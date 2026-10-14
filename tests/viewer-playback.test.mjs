@@ -23,8 +23,8 @@ test('late result skips remaining sponsor and never rewinds an already passed on
     const f=fixture();f.enable();f.video.currentTime=15;f.result();assert.equal(f.video.currentTime,20);assert.equal(f.skips[0].seconds,5);
     const passed=fixture();passed.enable();passed.video.currentTime=30;passed.result();assert.equal(passed.video.currentTime,30);assert.equal(passed.skips.length,0);
 });
-test('Undo restores segment start and suppresses overlapping refreshed results for the session',()=>{
-    const f=fixture();f.enable();f.video.currentTime=15;f.result();assert.equal(f.skips[0].undo(),true);assert.equal(f.video.currentTime,10);
+test('Undo restores exact position and suppresses overlapping refreshed results for the session',()=>{
+    const f=fixture();f.enable();f.video.currentTime=15;f.result();assert.equal(f.skips[0].undo(),true);assert.equal(f.video.currentTime,15);
     f.video.emit('seeked');f.result([{start:9,end:21,category:'sponsor'}]);f.video.currentTime=15;f.video.emit('timeupdate');assert.equal(f.video.currentTime,15);
 });
 test('intentional seeking into a sponsor is respected',()=>{
@@ -37,7 +37,7 @@ test('manual seeking into a sponsor keeps Skip available until explicit Undo',()
     f.video.seeking=false;f.video.emit('seeked');
     assert.equal(f.video.currentTime,12);assert.ok(f.offer,'Timeline seeking must preserve the manual Skip offer');
     assert.equal(f.offer.skip(),true);assert.equal(f.video.currentTime,20);
-    f.video.emit('seeked');assert.equal(f.skips[0].undo(),true);assert.equal(f.video.currentTime,10);
+    f.video.emit('seeked');assert.equal(f.skips[0].undo(),true);assert.equal(f.video.currentTime,12);
     f.video.emit('seeked');f.video.currentTime=12;f.video.emit('timeupdate');
     assert.equal(f.offer,null,'Explicit Undo must still suppress the manual offer for this visit');
     assert.equal(f.video.currentTime,12);

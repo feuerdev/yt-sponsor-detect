@@ -44,9 +44,9 @@ test('missing speech duration can use next speech boundary; blank separators nee
     const parsed=parseJson3([{tStartMs:1000,segs:[{utf8:'one'}]},{tStartMs:1500,segs:[{utf8:'\n'}]},{tStartMs:2000,dDurationMs:1000,segs:[{utf8:'two'}]}],20);
     assert.equal(parsed.words[0].end,2);assert.equal(parsed.words.length,2);
 });
-test('installation defaults work without opening popup and migrate forced legacy manual mode',async()=>{
+test('installation defaults work without opening popup and preserve legacy manual mode',async()=>{
     let saved;const storage={get:async()=>({autoSkip:false,labels:[]}),set:async value=>{saved=value;}};
-    await initializeSettings(storage);assert.equal(saved.autoSkip,true);assert.equal(saved.selfPromotion,false);
+    await initializeSettings(storage);assert.equal(saved.autoSkip,false);assert.equal(saved.selfPromotion,false);
     assert.equal(normalizeSettings({isEnabled:false}).isEnabled,false);
     assert.equal(normalizeSettings({viewerSchema:1,autoSkip:false}).autoSkip,false);
 });

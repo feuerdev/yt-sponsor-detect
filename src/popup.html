@@ -1,15 +1,18 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Sponsor Skipper</title>
 <style>
-:root{color-scheme:light dark;font:14px/1.5 system-ui,sans-serif}body{margin:0;padding:18px;width:340px;box-sizing:border-box;background:#101827;color:#e5edf8}h1{font-size:20px;margin:0}p{margin:8px 0;color:#b8c6d9}.status{padding:12px;margin:16px 0;background:#1c2a3e;border-radius:9px}label{display:flex;gap:10px;align-items:center;padding:8px 0}input{accent-color:#38bdf8}button{font:inherit;background:#253b55;color:inherit;border:1px solid #55728f;border-radius:6px;padding:7px 10px;cursor:pointer}button:focus-visible,input:focus-visible,summary:focus-visible{outline:3px solid #7dd3fc;outline-offset:2px}button[hidden]{display:none}button:disabled{opacity:.5;cursor:default}ol{padding-left:22px}li{margin:8px 0}small{color:#b8c6d9}details{margin-top:16px}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:11px/1.4 monospace}.actions{display:flex;gap:8px;margin:12px 0}#error{color:#fecaca}
+:root{color-scheme:dark;font:14px/1.5 system-ui,sans-serif}body{margin:0;padding:18px;width:360px;box-sizing:border-box;background:#101827;color:#e5edf8}h1{font-size:20px;margin:0}h2{font-size:15px;margin:16px 0 4px}p{margin:8px 0;color:#c5d0df}.status{padding:12px;margin:12px 0;background:#1c2a3e;border-radius:9px}label{display:flex;gap:10px;align-items:center;padding:8px 0}button,select{font:inherit;background:#253b55;color:inherit;border:1px solid #90a5bc;border-radius:6px;padding:7px 10px;cursor:pointer}button:focus-visible,select:focus-visible,summary:focus-visible{outline:3px solid #7dd3fc;outline-offset:2px}[hidden]{display:none!important}button:disabled{opacity:.5;cursor:default}ol{padding-left:22px}li{margin:10px 0}li button{margin:3px}small{color:#c5d0df}details{margin-top:16px}pre{white-space:pre-wrap;overflow-wrap:anywhere;font:11px/1.4 monospace}.actions{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0}#error,#recovery{color:#fecaca}
 </style></head><body>
-<h1>Sponsor Skipper</h1><p>English sponsors. Analyzed on your device.</p>
+<h1>Sponsor Skipper</h1><p id="video">Current video</p><p id="mode-summary"></p>
 <div class="status" role="status" aria-live="polite" id="status">Reading this video…</div>
-<label><input id="enabled" type="checkbox" disabled> Enable sponsor detection</label>
-<label><input id="automatic" type="checkbox" disabled> Skip sponsors automatically</label>
-
-<div class="actions"><button id="pause" disabled>Pause skipping for this video</button><button id="retry" hidden>Retry analysis</button></div>
-<p id="error" role="alert"></p><ol id="segments" aria-label="Detected intervals"></ol>
-<small>Undo on the player replays the skipped interval. Estimates can include regular content.</small>
-<details><summary>Analysis details</summary><pre id="diagnostics">No analysis yet.</pre></details>
+<p id="progress"></p><p id="coverage"></p><p id="recovery"></p>
+<div class="actions"><button id="pause" disabled>Pause automatic skips for this visit</button></div>
+<p id="last-skip"></p><button id="undo" hidden>Undo last skip</button>
+<h2>Possible sponsor intervals</h2><ol id="segments" aria-label="Estimated sponsor intervals"></ol>
+<button id="reset" hidden>Reset saved corrections for this video</button>
+<div class="actions"><button id="retry" hidden>Recheck captions</button><button id="fresh" hidden>Retrieve fresh captions</button></div>
+<small>Recheck analyzes captions already retrieved this visit. Fresh retrieval can open YouTube’s transcript. Undo returns to the position before the jump; Watch segment starts at the estimated beginning.</small>
+<p id="error" role="alert"></p>
+<details open><summary>Global mode</summary><label for="mode">Sponsor detection <select id="mode" disabled><option value="off">Off</option><option value="manual">Manual</option><option value="automatic">Automatic</option></select></label><small>English captions analyzed locally. Estimates can include regular content.</small></details>
+<details><summary>Technical diagnostics</summary><pre id="diagnostics">No analysis yet.</pre></details>
 <script src="viewer-popup.js"></script></body></html>

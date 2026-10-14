@@ -1,10 +1,10 @@
 # Local YouTube sponsor viewer
 
-An experimental desktop Chrome extension for English paid sponsors, using the pinned Ettin INT8 detector locally with WebGPU and CPU/WASM fallback. This viewer redesign enables automatic skipping by default, keeps playback running during analysis, and provides a compact Undo control. Undo returns to the estimated interval start and prevents repeated skipping for the visit. Estimates can include ordinary content.
+An experimental desktop Chrome extension for English paid sponsors, using the pinned Ettin INT8 detector locally with WebGPU and CPU/WASM fallback. This viewer redesign enables automatic skipping by default, keeps playback running during analysis, and provides a compact Undo control. Undo returns to the exact position before the jump and prevents repeated skipping for the visit. Watch segment replays the full estimate. Not a sponsor saves a local correction for that video until reset. Estimates can include ordinary content.
 
 Captions are acquired proactively with English-track fallback. If internal YouTube requests fail, the existing public transcript-panel recovery is retained; its panel may briefly open and is restored when safe. Partial panel transcripts show limited coverage and are not cached as complete results. Videos without usable English speech captions remain playable. Self-promotion is not currently supported by the retained model.
 
-The popup focuses on the current video: enable, automatic skipping, pause, retry, estimated intervals and optional diagnostics. Viewing preferences apply without reloading. Classification phrases and numeric thresholds are hidden from normal settings.
+The popup focuses on the current video: Off / Manual / Automatic mode, visit-only automatic-skip pause, caption coverage, recheck/fresh retrieval, estimated intervals, Undo and saved corrections. The player stays quiet except for Skip and an eight-second Undo notice. Sponsor Skipper controls are also available in YouTube’s controls bar and fullscreen. Viewing preferences apply without reloading. Classification phrases and numeric thresholds are hidden from normal settings.
 
 ## Build and install
 
