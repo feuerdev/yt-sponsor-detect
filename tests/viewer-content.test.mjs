@@ -14,6 +14,9 @@ class Element {
     set textContent(value){this.text=value;this.textUpdates++;}
     get isConnected(){return this.tag==='html'||!!this.parent?.isConnected;}
     appendChild(child){child.parent=this;this.children.push(child);return child;}
+    contains(node){return node===this||descendants(this).includes(node);}
+    replaceChildren(){for(const child of this.children)child.parent=null;this.children=[];}
+    focus(){}
     remove(){if(this.parent)this.parent.children=this.parent.children.filter(child=>child!==this);this.parent=null;}
     setAttribute(name,value){this[name]=value;}
     addEventListener(name,fn){if(!this.events.has(name))this.events.set(name,new Set());this.events.get(name).add(fn);}
@@ -53,8 +56,8 @@ function fixture(settings={viewerSchema:1,isEnabled:true,autoSkip:true,selfPromo
 }
 test('actual content entry starts without popup, automatically skips and provides functioning Undo',async()=>{
     const f=fixture();try{await tick();assert.ok(f.requests.some(r=>r.type==='SUBMIT_TRANSCRIPT'));assert.equal(f.video.currentTime,4);
-        const notice=f.player.querySelector('.ss-skip-notice');assert.ok(notice);notice.children.find(n=>n.tag==='button').emit('click');assert.equal(f.video.currentTime,1);
-        f.video.emit('seeked');f.refresh();assert.equal(f.video.currentTime,1);
+        const notice=f.player.querySelector('.ss-skip-notice');assert.ok(notice);notice.children.find(n=>n.tag==='button').emit('click');assert.equal(f.video.currentTime,1.5);
+        f.video.emit('seeked');f.refresh();assert.equal(f.video.currentTime,1.5);
     }finally{f.close();}
 });
 test('actual content rejects late old-video state on same-player navigation',async()=>{
@@ -62,11 +65,11 @@ test('actual content rejects late old-video state on same-player navigation',asy
         f.state({videoId:'first',token:old.token,status:'ready',segments:[{start:10,end:20,category:'sponsor'}],duration:30});assert.equal(f.video.currentTime,10);
     }finally{f.close();}
 });
-test('disable invalidates controls and late state; re-enable reuses captions without reload',async()=>{
+test('disable invalidates controls and late state; re-enable preserves visit skip history',async()=>{
     const f=fixture();try{await tick();const old=f.requests.find(r=>r.type==='START_SESSION');f.change({isEnabled:false});f.video.currentTime=1.5;
         f.state({videoId:'first',token:old.token,status:'ready',segments:[{start:1,end:20,category:'sponsor'}],duration:30});f.refresh();assert.equal(f.video.currentTime,1.5);
         assert.ok(f.player.querySelector('.ss-status').children[0].textContent.includes('off'));
-        f.change({isEnabled:true});await tick();assert.equal(f.video.currentTime,4);
+        f.change({mode:'automatic',isEnabled:true,autoSkip:true});await tick();assert.equal(f.video.currentTime,1.5);assert.ok(f.requests.filter(r=>r.type==='START_SESSION').length>1);
     }finally{f.close();}
 });
 test('manual mode renders one stable Skip control and still supplies Undo',async()=>{
@@ -99,7 +102,7 @@ test('ad status settles without rewriting caption and ad text on every refresh',
         assert.equal(text.textContent,'Waiting for YouTube ad to finish');
         const updates=text.textUpdates;f.refresh();f.refresh();
         assert.equal(text.textUpdates,updates,'Observer refresh must not produce new status mutations');
-        f.player.className='';f.refresh();assert.equal(text.textContent,'Sponsor skipping ready');
+        f.player.className='';f.refresh();assert.equal(text.textContent,'Caption check complete · Automatic skipping');
     }finally{f.close();}
 });
 
@@ -114,6 +117,6 @@ test('content returns its existing visit identity for service-worker recovery',a
 test('Undo suppression survives a same-video retry and its refreshed detector results',async()=>{
     const f=fixture();try{await tick();f.player.querySelector('.ss-skip-notice').children.find(n=>n.tag==='button').emit('click');f.video.emit('seeked');
         await vm.runInContext('start(true)',f.context);await tick();
-        assert.equal(f.video.currentTime,1,'A detector retry must not skip the restored sponsor again');
+        assert.equal(f.video.currentTime,1.5,'A detector retry must not skip the restored sponsor again');
     }finally{f.close();}
 });

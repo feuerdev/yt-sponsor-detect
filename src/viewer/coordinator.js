@@ -4,14 +4,14 @@ import {validVideoId,validateTranscript} from './transcript.js';
 import {validSegments} from './cache.js';
 const MODEL_ERRORS=new Set(['model_unavailable','inference_failed','invalid_output']);
 export class SessionCoordinator {
-    constructor({settings,cache,detect,cancel=()=>{},notify=()=>{},modelKey}) {
-        Object.assign(this,{settings,cache,detect,cancel,notify,modelKey}); this.sessions=new Map();
+    constructor({settings,cache,corrections,detect,cancel=()=>{},notify=()=>{},modelKey}) {
+        Object.assign(this,{settings,cache,corrections,detect,cancel,notify,modelKey}); this.sessions=new Map();
     }
     current(tabId,session) { return this.sessions.get(tabId)===session; }
     snapshot(session) {
         if (!session) return null;
-        const {videoId,token,status,segments,duration,progress,diagnostics,paused}=session;
-        return {videoId,token,status,segments,duration,progress,diagnostics,paused:!!paused};
+        const {videoId,token,status,segments,duration,progress,diagnostics,paused,rejected,recovery,stage}=session;
+        return {videoId,token,status,segments,duration,progress,diagnostics,rejected:rejected||[],recovery,stage,paused:!!paused};
     }
     publish(tabId,session) {
         if (this.current(tabId,session)) Promise.resolve(this.notify(tabId,this.snapshot(session))).catch(()=>{});
@@ -25,10 +25,12 @@ export class SessionCoordinator {
         const existing=this.sessions.get(tabId);
         if (!retry && existing?.videoId===videoId && existing.token===token) return this.snapshot(existing);
         this.clear(tabId);
-        const session={videoId,token,status:'loading',segments:[],jobId:tabId+':'+token,paused:paused===true||(existing?.videoId===videoId&&existing.paused===true)};
+        const session={videoId,token,status:'loading',segments:[],jobId:tabId+':'+token,paused:paused===true||(existing?.videoId===videoId&&(retry||existing.token===token)&&existing.paused===true)};
         this.sessions.set(tabId,session);
         const settings=await loadSettings(this.settings); if (!this.current(tabId,session)) return null;
         if (!settings.isEnabled) { session.status='disabled'; return this.snapshot(session); }
+        session.rejected=this.corrections?await this.corrections.get(videoId):[];
+        if(!this.current(tabId,session))return null;
         if (retry) await this.cache.remove(videoId);
         let cached;
         try { cached=retry?null:await this.cache.get(videoId,this.modelKey); } catch { cached=null; }
@@ -37,11 +39,23 @@ export class SessionCoordinator {
         this.publish(tabId,session); return this.snapshot(session);
     }
     progress(jobId,progress) {
+        if(progress?.stage==='analyzing'){for(const [tabId,session] of this.sessions)if(session.jobId===jobId&&session.status==='analyzing'){session.stage='analyzing';this.publish(tabId,session);}return;}
         for(const [tabId,session] of this.sessions)if(session.jobId===jobId&&session.status==='analyzing'
             &&Number.isFinite(progress?.processed)&&Number.isFinite(progress?.total)&&progress.processed>=0
             &&progress.total>0&&progress.processed<=progress.total&&validSegments(progress.segments,session.coverageEnd||session.duration)&&progress.segments.every(s=>s.start>=(session.coverageStart||0))) {
-            session.progress={processed:progress.processed,total:progress.total};session.segments=progress.segments;this.publish(tabId,session);
+            session.stage='analyzing';session.progress={processed:progress.processed,total:progress.total};session.segments=progress.segments;this.publish(tabId,session);
         }
+    }
+    recovering(tabId,token) {
+        const session=this.sessions.get(tabId);if(!session||session.token!==token||session.status!=='loading')return;
+        session.stage='recovering';this.publish(tabId,session);
+    }
+    async correct(tabId,token,index,reset=false) {
+        const session=this.sessions.get(tabId);if(!session||session.token!==token||!this.corrections)throw Error('stale_session');
+        const segment=session.segments[index];if(!reset&&!segment)throw Error('invalid_segment');
+        const rejected=reset?await this.corrections.reset(session.videoId):await this.corrections.reject(session.videoId,segment);
+        if(!this.current(tabId,session))return null;
+        session.rejected=rejected;this.publish(tabId,session);return this.snapshot(session);
     }
     unavailable(tabId,token,reason) {
         const session=this.sessions.get(tabId);
@@ -57,11 +71,11 @@ export class SessionCoordinator {
         if (!this.current(tabId,session)) return null;
         if (!settings.isEnabled) { session.status='disabled'; this.publish(tabId,session); return this.snapshot(session); }
         if (session.work) return session.work;
-        session.status='analyzing'; session.duration=transcript.duration;session.coverageEnd=transcript.coverage==='partial'?transcript.coverageEnd:transcript.duration;session.coverageStart=transcript.coverage==='partial'?transcript.coverageStart:0; this.publish(tabId,session);
+        session.status='analyzing';session.stage='initializing'; session.duration=transcript.duration;session.coverageEnd=transcript.coverage==='partial'?transcript.coverageEnd:transcript.duration;session.coverageStart=transcript.coverage==='partial'?transcript.coverageStart:0; this.publish(tabId,session);
         session.work=(async()=>{
             try {
                 const result=await this.detect(transcript,{jobId:session.jobId,onProgress:progress=>{
-                    if (this.current(tabId,session)) { session.progress=progress; this.publish(tabId,session); }
+                    if (this.current(tabId,session)) {session.stage='analyzing'; session.progress=progress; this.publish(tabId,session); }
                 }});
                 if (!this.current(tabId,session)) return null;
                 if (!result || !validSegments(result.segments,session.coverageEnd)||!result.segments.every(s=>s.start>=session.coverageStart)) throw Object.assign(new Error('invalid_output'),{code:'invalid_output'});

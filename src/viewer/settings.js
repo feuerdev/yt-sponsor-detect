@@ -1,33 +1,29 @@
 // SPDX-License-Identifier: GPL-3.0-or-later
-// Viewer preferences are deliberately independent of detection/cache policy.
-export const DEFAULT_SETTINGS = Object.freeze({viewerSchema: 1, isEnabled: true, autoSkip: true, selfPromotion: false});
-export function normalizeSettings(value = {}) {
-    return {viewerSchema: 1, isEnabled: value.isEnabled !== false,
-        autoSkip: value.viewerSchema === 1 ? value.autoSkip !== false : true,
-        selfPromotion: value.viewerSchema === 1 && value.selfPromotion === true};
+export const MODES=Object.freeze(['off','manual','automatic']);
+export const DEFAULT_SETTINGS=Object.freeze({viewerSchema:2,mode:'automatic',isEnabled:true,autoSkip:true,selfPromotion:false});
+export function normalizeSettings(value={}) {
+    const mode=value.viewerSchema===2&&MODES.includes(value.mode)?value.mode:
+        value.isEnabled===false?'off':value.autoSkip===false?'manual':'automatic';
+    return {viewerSchema:2,mode,isEnabled:mode!=='off',autoSkip:mode==='automatic',selfPromotion:value.selfPromotion===true};
 }
-export async function loadSettings(storage) {
-    return normalizeSettings(await storage.get(null));
-}
+export async function loadSettings(storage){return normalizeSettings(await storage.get(null));}
 export async function initializeSettings(storage) {
-    const existing = await storage.get(null);
-    if (existing.viewerSchema === 1) return normalizeSettings(existing);
-    const latest = await storage.get(null);
-    if (latest.viewerSchema === 1) return normalizeSettings(latest);
-    // Never rewrite an existing enable choice during worker startup.
-    await storage.set({viewerSchema: 1, autoSkip: true, selfPromotion: false});
-    return normalizeSettings({...latest, viewerSchema: 1, autoSkip: true, selfPromotion: false});
+    let existing=await storage.get(null);
+    if(existing.viewerSchema===2&&MODES.includes(existing.mode))return normalizeSettings(existing);
+    existing=await storage.get(null);
+    const settings=normalizeSettings(existing);
+    if(existing.viewerSchema!==2||!MODES.includes(existing.mode))await storage.set(settings);
+    return settings;
 }
-export const STATUS_TEXT = Object.freeze({
-    loading: 'Getting captions…', analyzing: 'Checking for sponsors…', ready: 'Sponsor skipping ready',
-    no_captions: 'No captions available for this video', unsupported_language: 'English captions required',
-    fetch_failed: 'Could not retrieve captions', invalid_captions: 'Caption timing could not be read',
-    insufficient_text: 'No usable speech captions', model_unavailable: 'Local model unavailable',
-    inference_failed: 'Local analysis could not finish', invalid_output: 'Local analysis returned invalid results',
-    disabled: 'Sponsor skipping is off', paused: 'Paused for this video', ad: 'Waiting for YouTube ad to finish',
+export const STATUS_TEXT=Object.freeze({
+    loading:'Getting captions…',recovering:'Recovering captions from the transcript…',initializing:'Preparing the local model…',analyzing:'Checking captions for possible sponsors…',
+    no_captions:'No captions available for this video',unsupported_language:'English captions are required for local analysis',
+    fetch_failed:'Could not retrieve captions',invalid_captions:'Caption timing could not be read',insufficient_text:'No usable speech captions',
+    model_unavailable:'Local model unavailable',inference_failed:'Local analysis could not finish',invalid_output:'Local analysis returned invalid results',
+    disabled:'Sponsor detection is off',ad:'Waiting for YouTube ad to finish',
 });
 export function statusText(state) {
-    if(state?.status==='ready'&&state.diagnostics?.coverage==='partial')return 'Checked available captions · Partial video coverage';
-    if (state?.status === 'ready' && !state.segments?.length) return 'Checked captions: no sponsors detected';
-    return STATUS_TEXT[state?.status] || 'Open a YouTube video';
+    if(!state)return 'Open a YouTube video';
+    if(state.status==='ready')return state.segments?.length?'Caption check complete · '+(state.mode==='manual'?'Manual skipping':state.paused?'Automatic skips paused':'Automatic skipping'):'Checked available captions: no possible sponsors found';
+    return STATUS_TEXT[state.status]||'Could not read this video’s status';
 }

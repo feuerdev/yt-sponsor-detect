@@ -74,10 +74,10 @@ test('automatic capture leaves an already-open user transcript panel open',async
  const f=automaticCapture({alreadyOpen:true});assert.equal((await f.result)?.rows.length,2);assert.equal(f.state.opens,0);assert.equal(f.state.closes,0);assert.equal(f.state.open,true);
 });
 test('automatic recovery preserves the user transcript search rather than changing it',async()=>{
- const f=automaticCapture({alreadyOpen:true,search:'sponsor'});assert.equal(await f.result,null);assert.equal(f.state.closes,0);assert.equal(f.state.opens,0);
+ const f=automaticCapture({alreadyOpen:true,search:'sponsor'});assert.equal((await f.result).recovery.reason,'searched_transcript');assert.equal(f.state.closes,0);assert.equal(f.state.opens,0);
 });
 test('navigation while opening a transcript prevents old-video extraction and restoration',async()=>{
- const f=automaticCapture({navigate:true});assert.equal(await f.result,null);assert.equal(f.state.closes,0);
+ const f=automaticCapture({navigate:true});assert.equal((await f.result).recovery.reason,'navigated');assert.equal(f.state.closes,0);
 });
 
 test('recovery never closes an unrelated visible engagement panel',async()=>{

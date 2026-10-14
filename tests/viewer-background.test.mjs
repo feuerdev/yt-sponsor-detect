@@ -6,8 +6,9 @@ import {initializeSettings} from '../src/viewer/settings.js';
 import {SessionCoordinator} from '../src/viewer/coordinator.js';
 import {ResultCache} from '../src/viewer/cache.js';
 import {MODEL_SPEC} from '../src/model-spec.js';
-import {TRANSCRIPT_VERSION} from '../src/viewer/transcript.js';
-import {captureOpenTranscript} from '../src/transcript-panel.js';
+import {TRANSCRIPT_VERSION,validVideoId} from '../src/viewer/transcript.js';
+import {captureOpenTranscript,cancelTranscriptRecovery} from '../src/transcript-panel.js';
+import {CorrectionStore} from '../src/viewer/corrections.js';
 import {panelToTranscript} from '../src/viewer/panel.js';
 const source=readFileSync(new URL('../src/viewer-background.js',import.meta.url),'utf8').replace(/^import .*;\n/gm,'').replace('export const coordinator','const coordinator');
 const tick=async()=>{for(let i=0;i<4;i++)await new Promise(resolve=>setImmediate(resolve));};
@@ -16,11 +17,11 @@ function storage(initial={}){const values={...initial};return {values,get:async 
 function fixture(){
     const f={sync:storage(),local:storage(),messages:[],contexts:[],created:0};
     const event=name=>({addListener:fn=>{f[name]=fn;}});
-    const chrome={scripting:{executeScript:async()=>f.panelPending?await f.panelPending:[{result:f.panel}]},i18n:{detectLanguage:async()=>f.languagePending?await f.languagePending:{isReliable:true,languages:[{language:'en',percentage:100}]}},runtime:{id:'extension',getURL:path=>'chrome-extension://extension/'+path,getContexts:async()=>f.contexts,
+    const chrome={scripting:{executeScript:async request=>{f.scripts??=[];f.scripts.push(request);if(request.func===cancelTranscriptRecovery)return [{}];return f.panelPending?await f.panelPending:[{result:f.panel}];}},i18n:{detectLanguage:async()=>f.languagePending?await f.languagePending:{isReliable:true,languages:[{language:'en',percentage:100}]}},runtime:{id:'extension',getURL:path=>'chrome-extension://extension/'+path,getContexts:async()=>f.contexts,
         onInstalled:event('installed'),onMessage:event('message'),sendMessage:async message=>{f.messages.push(message);if(message.type==='RUN_DETECTION')return {segments:[{start:1,end:4,category:'sponsor'}]};return {};},},
         storage:{sync:f.sync,local:f.local,onChanged:event('changed')},offscreen:{createDocument:async()=>{f.created++;if(f.create)await f.create();f.contexts=[{}];}},
         tabs:{onRemoved:event('removed'),onUpdated:event('updated'),sendMessage:async(id,message)=>{f.messages.push({...message,tabId:id});if(message.type==='GET_PLAYER_SESSION')return f.playerSession;},get:async()=>({id:1,url:f.url||'https://www.youtube.com/watch?v=first'}),query:async()=>[{id:1,url:'https://www.youtube.com/watch?v=first'}]}};
-    const context=vm.createContext({chrome,initializeSettings,SessionCoordinator,ResultCache,MODEL_SPEC,TRANSCRIPT_VERSION,captureOpenTranscript,panelToTranscript,URL});vm.runInContext(source,context);
+    const context=vm.createContext({chrome,initializeSettings,SessionCoordinator,ResultCache,MODEL_SPEC,TRANSCRIPT_VERSION,validVideoId,captureOpenTranscript,cancelTranscriptRecovery,CorrectionStore,panelToTranscript,URL});vm.runInContext(source,context);
     f.coordinator=vm.runInContext('coordinator',context);
     f.sender={id:'extension',tab:{id:1,url:'https://www.youtube.com/watch?v=first'},url:'https://www.youtube.com/watch?v=first'};
     f.call=(message,sender=f.sender)=>new Promise(resolve=>{if(f.message(message,sender,resolve)!==true)resolve(undefined);});
@@ -54,7 +55,7 @@ test('popup pause and status route through active tab, disable prevents cached r
     const popup={id:'extension',url:'chrome-extension://extension/popup.html'};
     assert.equal((await f.call({type:'GET_VIDEO_STATUS'},popup)).state.status,'ready');
     assert.equal((await f.call({type:'PAUSE_VIDEO',paused:true},popup)).state.paused,true);
-    await f.sync.set({isEnabled:false});f.changed({isEnabled:{newValue:false}},'sync');
+    await f.sync.set({mode:'off',isEnabled:false});f.changed({mode:{newValue:'off'},isEnabled:{newValue:false}},'sync');
     assert.equal((await f.call({type:'START_SESSION',videoId:'first',token:'b'})).state.status,'disabled');
 });
 
@@ -100,4 +101,16 @@ test('worker recovery rejects another video identity from a stale content sessio
     const f=fixture();await tick();f.playerSession={videoId:'second',token:'visit'};
     const result=await f.call({type:'GET_VIDEO_STATUS'},{id:'extension',url:'chrome-extension://extension/popup.html'});
     assert.equal(result.state,null);assert.equal(f.coordinator.sessions.size,0);
+});
+test('fullscreen player pause and correction restore the current completed session after worker restart',async()=>{
+ const f=fixture();await tick();await f.call({type:'START_SESSION',videoId:'first',token:'visit'});await f.call({type:'SUBMIT_TRANSCRIPT',token:'visit',transcript});
+ f.coordinator.sessions.clear();f.playerSession={videoId:'first',token:'visit'};
+ assert.equal((await f.call({type:'PAUSE_VIDEO',token:'visit',paused:true})).state.paused,true);
+ f.coordinator.sessions.clear();f.playerSession.paused=true;
+ const correction=await f.call({type:'REJECT_SEGMENT',token:'visit',index:0});assert.equal(correction.state.rejected.length,1);assert.equal(correction.state.paused,true);
+ assert.equal(f.local.values['viewer-corrections:v1:first'].rejected.length,1);
+});
+test('content cancellation reaches MAIN after worker restart even without its recovery map',async()=>{
+ const f=fixture();await tick();assert.equal((await f.call({type:'CANCEL_PANEL',videoId:'first',token:'old'})).cancelled,true);
+ assert.ok(f.scripts.some(s=>s.func===cancelTranscriptRecovery&&s.args[0]==='first'&&s.args[1]==='old'));
 });

@@ -2,7 +2,7 @@ import {validateCaptions} from './caption-contract.js';
 
 // Serialized by chrome.scripting into MAIN. Keep this function self-contained.
 // Automatic acquisition uses YouTube's own transcript control without changing CC or playback.
-export function captureOpenTranscript(videoId, automatic=false) {
+export function captureOpenTranscript(videoId, automatic=false, requestId=videoId) {
     let capturedPanel=null;
     function read() {
     try {
@@ -46,42 +46,99 @@ export function captureOpenTranscript(videoId, automatic=false) {
     }
     if(!automatic)return read();
     return (async()=>{
-        const sameVideo=()=>new URL(location.href).searchParams.get('v')===videoId;
+        // MAIN-world ownership is shared by capture and the cancellation helper.
+        if(window.__ssTranscriptCancelled?.has(requestId))return {error:'fetch_failed',recovery:{restored:true,reason:'cancelled'}};
+        const previous=window.__ssTranscriptRecovery;
+        if(previous){previous.abort();await previous.done;}
+        let finish,cancelled=window.__ssTranscriptCancelled?.has(requestId)===true,navigated=false,wake;
+        const operation={videoId,requestId,abort(){cancelled=true;wake?.();},done:new Promise(resolve=>{finish=resolve;})};
+        window.__ssTranscriptRecovery=operation;
+        const sameVideo=()=>{try{const url=new URL(location.href);return url.origin==='https://www.youtube.com'&&url.pathname==='/watch'&&url.searchParams.get('v')===videoId;}catch{return false;}};
+        const current=()=>!cancelled&&!navigated&&window.__ssTranscriptRecovery===operation&&sameVideo();
         const panels=()=>Array.from(document.querySelectorAll('ytd-engagement-panel-section-list-renderer'));
-        const visible=panel=>{const r=panel.getBoundingClientRect();return r.width>0&&r.height>0
-            && panel.getAttribute?.('visibility')!=='ENGAGEMENT_PANEL_VISIBILITY_HIDDEN';};
+        const visible=panel=>{const r=panel.getBoundingClientRect();return r.width>0&&r.height>0&&panel.getAttribute?.('visibility')!=='ENGAGEMENT_PANEL_VISIBILITY_HIDDEN';};
         const transcriptPanel=panel=>!!panel.querySelector('ytd-transcript-renderer, transcript-view-model, transcript-segment-view-model, ytd-transcript-segment-renderer');
-        const alreadyOpen=panels().some(p=>visible(p)&&transcriptPanel(p));
-        let opened=false,interacted=false;
-        const interrupted=event=>{if(event.isTrusted)interacted=true;};
-        document.addEventListener('pointerdown',interrupted,true);
-        document.addEventListener('keydown',interrupted,true);
+        const navigation=()=>{navigated=true;operation.abort();};
+        window.addEventListener?.('yt-navigate-start',navigation);window.addEventListener?.('popstate',navigation);
+        const initialPanels=panels().filter(visible),alreadyOpen=initialPanels.some(transcriptPanel);
+        const initialFocus=document.activeElement,initialScroll={x:window.scrollX||0,y:window.scrollY||0};
+        let opened=false,taken=false,layoutTaken=false,scrollTaken=false,focusTaken=false,result=null,restoreIssue=null;
+        const belongsToTranscript=target=>panels().some(p=>transcriptPanel(p)&&p.contains?.(target));
+        const interaction=event=>{
+            if(!event.isTrusted)return;
+            if(belongsToTranscript(event.target))taken=true;
+            const panel=event.target?.closest?.('ytd-engagement-panel-section-list-renderer');
+            if(panel&&!transcriptPanel(panel))layoutTaken=true;
+            if(event.target?.closest?.('ytd-video-description-transcript-section-renderer'))taken=true;
+            if(event.type==='pointerdown'||event.type==='keydown')focusTaken=true;
+            if(event.type==='pointerdown'&&Number.isFinite(window.innerWidth)&&event.clientX>=window.innerWidth-20)scrollTaken=true;
+            // Player keyboard shortcuts are unrelated to transcript ownership.
+            if(event.type==='keydown'&&!event.target?.closest?.('#movie_player')&&['PageDown','PageUp','Home','End','ArrowDown','ArrowUp',' '].includes(event.key))scrollTaken=true;
+        };
+        const scrolling=event=>{if(event.isTrusted)scrollTaken=true;};
+        const types=['pointerdown','keydown','input'];
+        for(const type of types)document.addEventListener(type,interaction,true);
+        document.addEventListener('wheel',scrolling,true);document.addEventListener('touchmove',scrolling,true);
+        // Keep native opening commands for any panel displaced by recovery.
+        const openerFor=panel=>{
+            const identifier=panel.getAttribute?.('target-id')||panel.id;if(!identifier)return null;
+            return Array.from(document.querySelectorAll('button, ytd-button-renderer, ytd-menu-service-item-renderer')).find(element=>{
+                if(panel.contains?.(element))return false;
+                const data=element.data;
+                return element.getAttribute?.('aria-controls')===identifier||data?.serviceEndpoint?.showEngagementPanelEndpoint?.panelIdentifier===identifier
+                    ||data?.command?.showEngagementPanelEndpoint?.panelIdentifier===identifier||data?.buttonRenderer?.command?.showEngagementPanelEndpoint?.panelIdentifier===identifier;
+            });
+        };
+        const displaced=initialPanels.filter(p=>!transcriptPanel(p)).map(panel=>({panel,opener:openerFor(panel)}));
         try {
             const deadline=Date.now()+15000;
-            while(sameVideo() && Date.now()<deadline) {
-                const result=read();if(result)return result;
-                // An existing searched transcript belongs to the user. Never clear its search.
-                if(panels().some(p=>visible(p)&&p.querySelector('input[type="search"], input#search')?.value?.trim()))return null;
-                if(interacted&&!opened&&!alreadyOpen)return null;
+            while(current()&&Date.now()<deadline) {
+                result=read();if(result)break;
+                if(panels().some(p=>visible(p)&&transcriptPanel(p)&&p.querySelector('input[type="search"], input#search')?.value?.trim())){restoreIssue='searched_transcript';break;}
                 if(!opened&&!alreadyOpen) {
                     const button=document.querySelector('ytd-video-description-transcript-section-renderer button');
-                    if(button) {opened=true;button.click();continue;}
+                    if(button&&current()){opened=true;button.click();continue;}
                 }
-                await new Promise(resolve=>setTimeout(resolve,200));
+                await new Promise(resolve=>{wake=resolve;setTimeout(resolve,200);});wake=null;
             }
-            return null;
-        }finally {
-            document.removeEventListener('pointerdown',interrupted,true);
-            document.removeEventListener('keydown',interrupted,true);
-            if(opened && !interacted && sameVideo()) {
-                for(const panel of panels())if(visible(panel)) {
-                    // Scope restoration to a panel containing transcript rows, never another panel.
-                    if(panel===capturedPanel || transcriptPanel(panel))
-                        panel.querySelector('#visibility-button button')?.click();
+            if(!result&&!restoreIssue)restoreIssue=cancelled?'cancelled':sameVideo()?'transcript_unavailable':'navigated';
+        } catch {restoreIssue='transcript_unavailable';}
+        finally {
+            for(const type of types)document.removeEventListener(type,interaction,true);
+            window.removeEventListener?.('yt-navigate-start',navigation);window.removeEventListener?.('popstate',navigation);
+            document.removeEventListener('wheel',scrolling,true);document.removeEventListener('touchmove',scrolling,true);
+            // Cancellation still owns cleanup. Navigation never does.
+            try {
+            if(window.__ssTranscriptRecovery===operation&&!navigated&&sameVideo()&&opened&&!taken&&!layoutTaken) {
+                for(const panel of panels())if(sameVideo()&&visible(panel)&&(panel===capturedPanel||transcriptPanel(panel))) {
+                    const close=panel.querySelector('#visibility-button button');
+                    if(close)close.click();else restoreIssue='close_control_unavailable';
                 }
+                for(const {panel,opener} of displaced)if(sameVideo()&&!visible(panel)) {
+                    const newerPanel=panels().some(p=>visible(p)&&!initialPanels.includes(p)&&!transcriptPanel(p));
+                    if(newerPanel)continue;
+                    if(opener?.isConnected&&sameVideo())opener.click();else restoreIssue='panel_restore_unavailable';
+                }
+                if(!focusTaken&&sameVideo()&&initialFocus?.isConnected){
+                    const focused=document.activeElement;
+                    if(!focused||focused===document.body||belongsToTranscript(focused))initialFocus.focus?.({preventScroll:true});
+                }
+                if(!scrollTaken&&sameVideo())window.scrollTo?.(initialScroll.x,initialScroll.y);
             }
+            } catch {restoreIssue='cleanup_failed';}
+            finally {if(window.__ssTranscriptRecovery===operation)delete window.__ssTranscriptRecovery;finish();}
         }
+        const recovery={restored:!['close_control_unavailable','panel_restore_unavailable','cleanup_failed'].includes(restoreIssue),userOwned:taken||layoutTaken,reason:restoreIssue};
+        return result?{...result,recovery}:{error:'fetch_failed',recovery};
     })();
+}
+
+export async function cancelTranscriptRecovery(videoId,requestId) {
+    window.__ssTranscriptCancelled ||= new Set();window.__ssTranscriptCancelled.add(requestId);
+    if(window.__ssTranscriptCancelled.size>100)window.__ssTranscriptCancelled.delete(window.__ssTranscriptCancelled.values().next().value);
+    const operation=window.__ssTranscriptRecovery;
+    if(operation?.videoId!==videoId||operation.requestId!==requestId)return;
+    operation.abort();await operation.done;
 }
 
 export function panelCaptions(snapshot,videoId,language,{allowPartial=false}={}) {
