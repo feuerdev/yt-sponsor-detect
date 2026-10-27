@@ -1,6 +1,0 @@
----
-description: 
-globs: 
-alwaysApply: true
----
-Run 'npm run build' after an implementation.
